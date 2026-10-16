@@ -1,0 +1,122 @@
+{
+  "title": "AI Agent Engineering Guide",
+  "hours_per_week": "10–12",
+  "levels": [
+    {
+      "id": "L0", "num": 0, "title": "Foundations", "tier": "Basics",
+      "summary": "The Python, API and tooling skills every later level assumes.",
+      "modules": [
+        {"id": "l0-python-for-ai", "title": "Python for AI engineering", "kind": "core", "hours": "12–15",
+         "scope": "Modern Python setup (uv or venv + pip), type hints, dataclasses and Pydantic v2 models, f-strings, list/dict comprehensions, exceptions, context managers, reading/writing JSON and files, async/await basics with asyncio and httpx, pytest basics. Aimed at someone who has written a little code (any language)."},
+        {"id": "l0-apis-and-http", "title": "Web APIs, HTTP and JSON", "kind": "core", "hours": "8–10",
+         "scope": "HTTP methods, status codes, headers, JSON, REST conventions, API keys and auth headers, environment variables for secrets, rate limits and retries with backoff, pagination; calling APIs with httpx/requests; building a small API with FastAPI (routes, Pydantic request/response models, automatic docs)."},
+        {"id": "l0-dev-tooling", "title": "Git, the command line and Docker", "kind": "core", "hours": "6–8",
+         "scope": "Shell basics, git (commit, branch, merge, pull requests), GitHub, .gitignore and never committing secrets, Docker images/containers/Dockerfile/compose basics, GitHub Actions for running tests on push, writing a good README."},
+        {"id": "l0-ml-concepts", "title": "Just enough machine learning", "kind": "core", "hours": "6–8",
+         "scope": "What a model is, training vs inference, neural networks and gradient descent at an intuitive level, supervised vs self-supervised learning, overfitting, embeddings as vectors of meaning, what a transformer is at a very high level. Visual/intuitive resources (3Blue1Brown, fast.ai, Google ML crash course). No heavy math required."}
+      ],
+      "project": {"id": "p0-api-service", "title": "A tested API service", "weeks": "1"}
+    },
+    {
+      "id": "L1", "num": 1, "title": "LLM fundamentals", "tier": "Beginner",
+      "summary": "How large language models work and how to use them reliably from code.",
+      "modules": [
+        {"id": "l1-how-llms-work", "title": "How LLMs work", "kind": "core", "hours": "8–10",
+         "scope": "Tokens and tokenization, next-token prediction, transformers and attention (intuition), pretraining vs instruction tuning vs RLHF, context windows, sampling (temperature, top-p), why models hallucinate, reasoning/thinking models at a high level, knowledge cutoffs."},
+        {"id": "l1-llm-apis", "title": "Calling LLM APIs", "kind": "core", "hours": "8–10",
+         "scope": "Using provider SDKs (OpenAI, Anthropic, Google Gemini) and local open models (Ollama), the messages format (system/user/assistant), streaming responses, token counting and cost, rate limits and retries, choosing a model (capability vs cost vs latency), multimodal input basics, keeping API keys safe."},
+        {"id": "l1-prompt-engineering", "title": "Prompt engineering", "kind": "core", "hours": "8–10",
+         "scope": "Clear instructions, roles/system prompts, few-shot examples, delimiters/XML tags, chain-of-thought and letting the model think, prompt templates and versioning, prompt chaining, common mistakes; official guides from Anthropic, OpenAI and Google; treating prompts as code that you test."},
+        {"id": "l1-structured-outputs", "title": "Structured outputs and function calling basics", "kind": "core", "hours": "6–8",
+         "scope": "Getting reliable JSON: JSON Schema, provider structured-output modes, Pydantic validation, the Instructor library, retry-on-validation-error, function/tool calling as structured output, extraction and classification tasks."},
+        {"id": "l1-first-evals", "title": "Your first evals", "kind": "core", "hours": "5–6",
+         "scope": "Why you must measure LLM output, building a small golden dataset, assertion-based checks, exact-match vs fuzzy vs LLM-graded checks (intro), tracking results across prompt versions, tools like promptfoo or a pytest-based harness. Keep it introductory; Level 5 goes deep."}
+      ],
+      "project": {"id": "p1-extraction-service", "title": "Structured extraction service", "weeks": "1–1.5"}
+    },
+    {
+      "id": "L2", "num": 2, "title": "Retrieval and RAG", "tier": "Intermediate",
+      "summary": "Grounding model answers in your own data with search, retrieval and citations.",
+      "modules": [
+        {"id": "l2-embeddings-vector-search", "title": "Embeddings and vector search", "kind": "core", "hours": "8–10",
+         "scope": "What embeddings are, embedding models and the MTEB leaderboard, cosine similarity, vector databases and indexes (HNSW, IVF) at a conceptual level, pgvector, Chroma, Qdrant, FAISS; choosing one; metadata filtering."},
+        {"id": "l2-rag-pipeline", "title": "Building a RAG pipeline", "kind": "core", "hours": "10–12",
+         "scope": "The RAG architecture end to end: loading and parsing documents (PDF, HTML), chunking strategies, indexing, retrieval, prompt assembly, citations and refusing when the answer isn't in the context; frameworks (LlamaIndex, LangChain) vs plain code; RAG vs long context vs fine-tuning."},
+        {"id": "l2-advanced-retrieval", "title": "Better retrieval: hybrid search and reranking", "kind": "core", "hours": "8–10",
+         "scope": "Keyword search and BM25, hybrid search with reciprocal rank fusion, rerankers (cross-encoders, Cohere Rerank, open rerankers), query rewriting and HyDE, contextual retrieval (Anthropic), parent/child chunks, multi-hop questions."},
+        {"id": "l2-rag-evaluation", "title": "Evaluating RAG", "kind": "core", "hours": "6–8",
+         "scope": "Separating retrieval quality from generation quality, recall@k, MRR, nDCG, faithfulness/groundedness and answer relevance, building a question set from your corpus, Ragas and similar tools, error analysis on failures."},
+        {"id": "l2-graphrag", "title": "Knowledge graphs and GraphRAG", "kind": "optional", "hours": "5–6",
+         "scope": "When graph-structured retrieval helps (global questions, entity relationships), Microsoft GraphRAG, LightRAG-style approaches, Neo4j basics, cost trade-offs. Optional specialisation."}
+      ],
+      "project": {"id": "p2-docs-qa", "title": "Docs Q&A with citations", "weeks": "1.5–2"}
+    },
+    {
+      "id": "L3", "num": 3, "title": "Tools and agents", "tier": "Intermediate",
+      "summary": "Letting models take actions: tool calling, the agent loop, workflow patterns, MCP and memory.",
+      "modules": [
+        {"id": "l3-tool-calling", "title": "Tool calling in depth", "kind": "core", "hours": "8",
+         "scope": "How tool/function calling works across providers, designing tool names/descriptions/schemas the model uses well, parallel tool calls, returning errors to the model, tool results size, idempotency for tools with side effects, security of tool inputs."},
+        {"id": "l3-agent-loop", "title": "The agent loop", "kind": "core", "hours": "10",
+         "scope": "What an agent is (model + tools + loop), ReAct, building an agent from scratch without a framework, stop conditions, max steps and token/cost budgets, error recovery, planning vs reacting, reflection, when an agent is the wrong choice."},
+        {"id": "l3-workflow-patterns", "title": "Workflows and agent design patterns", "kind": "core", "hours": "8",
+         "scope": "Workflows vs agents; prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer (Anthropic's Building effective agents); plan-and-execute; choosing the simplest pattern that works; agent design guides from OpenAI and Google."},
+        {"id": "l3-mcp", "title": "Model Context Protocol (MCP)", "kind": "core", "hours": "8–10",
+         "scope": "What MCP is and why it exists, hosts/clients/servers, tools/resources/prompts, transports (stdio, Streamable HTTP), building a server with the official Python SDK or FastMCP, connecting it to a client (Claude Desktop, an IDE, your own agent), authorization for remote servers, security risks of third-party servers."},
+        {"id": "l3-memory-context", "title": "Memory and context engineering", "kind": "core", "hours": "8",
+         "scope": "Short-term vs long-term memory, conversation history management and summarisation, semantic/episodic/procedural memory, memory stores (Mem0, LangGraph store, Letta/MemGPT ideas), context engineering: what goes into the window and why, context rot and compaction."}
+      ],
+      "project": {"id": "p3-research-agent", "title": "Personal research agent", "weeks": "2"}
+    },
+    {
+      "id": "L4", "num": 4, "title": "Frameworks and multi-agent systems", "tier": "Advanced",
+      "summary": "Stateful agent frameworks, multi-agent designs, human approval and specialised agents.",
+      "modules": [
+        {"id": "l4-langgraph", "title": "Stateful agents with LangGraph", "kind": "core", "hours": "10–12",
+         "scope": "Graphs, state, nodes and edges, conditional routing, checkpointers and persistence, interrupts and resuming, streaming, the LangChain Academy course; when a graph framework helps and when it's overhead."},
+        {"id": "l4-agent-sdks", "title": "Agent SDKs compared", "kind": "core", "hours": "8",
+         "scope": "OpenAI Agents SDK, Claude Agent SDK, Google Agent Development Kit (ADK), Pydantic AI, CrewAI, Microsoft Agent Framework (AutoGen is in maintenance mode); what each abstracts, how to compare them, and building the same small agent in two of them."},
+        {"id": "l4-multi-agent", "title": "Multi-agent systems", "kind": "core", "hours": "8",
+         "scope": "Supervisor/orchestrator-worker, handoffs, swarms, debate; shared state vs message passing; Anthropic's multi-agent research system lessons (token cost); when not to go multi-agent (Cognition's 'Don't build multi-agents'); A2A protocol for agents from different vendors."},
+        {"id": "l4-human-in-the-loop", "title": "Human in the loop", "kind": "core", "hours": "6–8",
+         "scope": "Deciding which actions need approval, pausing and resuming durable runs, approval UIs, editing proposed actions, audit trails, undo/rollback, confidence-based escalation."},
+        {"id": "l4-coding-agents", "title": "Coding agents", "kind": "optional", "hours": "8–10",
+         "scope": "How coding agents work (tools: read/search/edit/run tests), sandboxing code execution, repository instructions (AGENTS.md), harnesses for long-running work, SWE-bench; using and building one. Optional specialisation."},
+        {"id": "l4-computer-use", "title": "Browser and computer-use agents", "kind": "optional", "hours": "8–10",
+         "scope": "Observing pages via DOM/accessibility tree vs screenshots, Playwright, browser-use library, Playwright MCP, computer-use tools from providers, reliability and safety (credentials, prompt injection from web pages), evaluation (WebArena, OSWorld). Optional specialisation."}
+      ],
+      "project": {"id": "p4-triage-team", "title": "Support triage with human approval", "weeks": "2"}
+    },
+    {
+      "id": "L5", "num": 5, "title": "Evaluation, observability and safety", "tier": "Advanced",
+      "summary": "Measuring agent quality, seeing what agents do in production and defending them against attack.",
+      "modules": [
+        {"id": "l5-evals-in-depth", "title": "Evals in depth", "kind": "core", "hours": "10–12",
+         "scope": "Error analysis first (look at your data), eval-driven development, LLM-as-a-judge done right (calibrating against human labels), trajectory and tool-use evals for agents, regression evals in CI, eval tools (Inspect AI, promptfoo, DeepEval, OpenAI Evals, Braintrust/LangSmith datasets). Hamel Husain, Eugene Yan, Shreya Shankar writing."},
+        {"id": "l5-observability", "title": "Observability and tracing", "kind": "core", "hours": "8",
+         "scope": "Tracing LLM and agent runs, spans for model calls and tools, OpenTelemetry GenAI semantic conventions, open-source and hosted tools (Langfuse, Arize Phoenix, LangSmith, OpenLLMetry), token/cost/latency dashboards, online quality signals and user feedback."},
+        {"id": "l5-security", "title": "Security and guardrails", "kind": "core", "hours": "10",
+         "scope": "Prompt injection (direct and indirect), the lethal trifecta, OWASP Top 10 for LLM applications and for agentic applications, least-privilege tools, sandboxing, PII handling, jailbreaks, guardrail tools (e.g. Guardrails AI, NeMo Guardrails, Llama Guard), red-teaming (garak, PyRIT), design patterns for securing agents."},
+        {"id": "l5-benchmarks", "title": "Reading agent benchmarks", "kind": "optional", "hours": "4–6",
+         "scope": "What SWE-bench (Verified), tau-bench, GAIA, WebArena, OSWorld, Terminal-Bench measure; pass@k vs pass^k; contamination and leaderboard pitfalls; reading a model launch claim critically. Optional."}
+      ],
+      "project": {"id": "p5-harden-agent", "title": "Harden an agent: evals, tracing and red-teaming", "weeks": "1.5–2"}
+    },
+    {
+      "id": "L6", "num": 6, "title": "Production and scale", "tier": "Expert",
+      "summary": "Deploying, scaling and operating agents reliably and affordably.",
+      "modules": [
+        {"id": "l6-deployment", "title": "Deploying agent applications", "kind": "core", "hours": "10–12",
+         "scope": "Serving with FastAPI and streaming (SSE), background jobs and queues, durable execution for long-running agents (Temporal, LangGraph persistence, Inngest/Restate-style), containers, serverless vs Kubernetes, configuration and secrets, CI/CD with an eval gate, canary releases for prompt/model changes."},
+        {"id": "l6-reliability-cost", "title": "Reliability, latency and cost", "kind": "core", "hours": "8–10",
+         "scope": "LLM gateways (LiteLLM, cloud gateways), fallbacks across providers, timeouts and retries, rate limits and per-user budgets, prompt caching, semantic caching, batching, model routing and smaller models, measuring cost per task."},
+        {"id": "l6-open-models", "title": "Open models, fine-tuning and serving", "kind": "optional", "hours": "10",
+         "scope": "When to fine-tune vs prompt vs RAG, LoRA/QLoRA, the Hugging Face ecosystem (Transformers, PEFT, TRL), distillation for agents, serving open models with vLLM or Ollama, quantization. Optional specialisation."},
+        {"id": "l6-staying-current", "title": "Staying current and building a portfolio", "kind": "core", "hours": "4–6",
+         "scope": "How to read papers (arXiv, Papers with Code alternatives), newsletters and blogs worth following, writing technical posts, demo videos, contributing to open-source agent projects, preparing for AI engineering interviews (system design for LLM apps)."}
+      ],
+      "project": {"id": "p6-production-deploy", "title": "Take an agent to production", "weeks": "1.5–2"}
+    }
+  ],
+  "capstone": {"id": "capstone", "title": "Capstone: ship a production agent", "weeks": "3–4"}
+}

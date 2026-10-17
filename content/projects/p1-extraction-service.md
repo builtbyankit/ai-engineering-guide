@@ -3,6 +3,7 @@ title: Structured extraction service
 level: L1
 weeks: 1–1.5
 summary: Build a service that turns messy text into validated JSON with an LLM, backed by a golden set, an accuracy report and a measured cost per document.
+review-by: 2027-01-31 | Free tiers, including Gemini's, may use your inputs
 ---
 
 ## The brief

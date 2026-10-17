@@ -19,11 +19,11 @@ A RAG system is a pipeline, and each stage can quietly spoil the answer. Bad PDF
 - **Loading and parsing**: HTML, Markdown and plain text are easy. PDFs are hard because columns, headers, footers and tables get scrambled. Tools such as Docling or PyMuPDF4LLM convert PDFs to Markdown that keeps headings and tables.
 - **Chunking**: Split documents into passages small enough to match precisely but large enough to make sense alone. Start with structure-aware splitting (by heading, then paragraph) at a few hundred tokens with a small overlap, and tune from there with measurements.
 - **Chunk metadata**: Keep the source file, title, heading path, page number and URL with every chunk. You need them for citations, filters and debugging.
-- **Prompt assembly**: Wrap each retrieved chunk in clear delimiters with an id, then add the question and instructions. Models use the start and end of a long context better than the middle, so send a few well-ranked chunks instead of dozens.
+- **Prompt assembly**: Wrap each retrieved chunk in clear delimiters with an id, then add the question and instructions. Models still use long inputs less reliably than short ones (see context rot in [Memory and context engineering](#l3-memory-context)), so send a few well-ranked chunks instead of dozens.
 - **Citations**: Ask the model to cite chunk ids for each claim and return structured output you can validate (see [Structured outputs](#l1-structured-outputs)). Some APIs, such as Anthropic's Citations feature, return the cited passages for you.
 - **Refusing**: Instruct the model to say it cannot find the answer when the context does not support one, and test that it does. A wrong answer with a confident citation does more harm than "I don't know".
 - **Frameworks versus plain code**: LlamaIndex and LangChain supply loaders, splitters, retrievers and integrations. Build your first pipeline as a short plain Python script so you understand each step, then adopt a framework where it saves real work.
-- **RAG, long context or fine-tuning**: If the whole corpus fits comfortably in the context window (Anthropic suggests under about 200,000 tokens), try sending all of it with prompt caching, where the provider reuses an unchanged prompt prefix at a discount (see [Reliability, latency and cost](#l6-reliability-cost)). Use RAG for larger or frequently changing data. Fine-tuning shapes behaviour and format and is a poor way to add facts.
+- **RAG, long context or fine-tuning**: If the whole corpus fits comfortably in your model's context window and the cost per call is acceptable, try sending all of it with prompt caching, where the provider reuses an unchanged prompt prefix at a discount (see [Reliability, latency and cost](#l6-reliability-cost)). Use RAG for larger or frequently changing data. Fine-tuning shapes behaviour and format and is a poor way to add facts.
 
 ## Resources
 
@@ -39,7 +39,7 @@ A RAG system is a pipeline, and each stage can quietly spoil the answer. Bad PDF
 - [Introduction to RAG](https://developers.llamaindex.ai/python/framework/understanding/rag/) · LlamaIndex · Docs · Free · 15 min — Defines the five stages of a RAG app and the vocabulary (nodes, retrievers, response synthesizers) used across LlamaIndex.
 - [Citations](https://platform.claude.com/docs/en/build-with-claude/citations) · Anthropic · Docs · Free · 20 min — API-level citations over plain text, PDFs and your own chunks, with a response format you can render as footnotes.
 - [Optimizing LLM Accuracy](https://developers.openai.com/api/docs/guides/optimizing-llm-accuracy) · OpenAI · Docs · Free · 30 min — A clear mental model for when to reach for prompting, RAG or fine-tuning, and why they fix different problems.
-- [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) · Liu et al. · Paper · Free · 1 h — Evidence that models miss facts placed mid-context, which shapes how many chunks you send and in what order.
+- [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) · Liu et al. · Paper · Free · 1 h — The 2023 evidence that models miss facts placed mid-context; newer models do better, so measure your own model before you tune chunk count and order around it.
 - [Build a custom RAG agent with LangGraph](https://docs.langchain.com/oss/python/langgraph/agentic-rag) · LangChain · Tutorial · Free · 1.5 h — Turns retrieval into a tool an agent chooses to call, with document grading and question rewriting; a preview of Level 3.
 
 ### Reference

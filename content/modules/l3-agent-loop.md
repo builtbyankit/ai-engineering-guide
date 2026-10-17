@@ -21,9 +21,10 @@ The loop is also where cost and reliability are decided. Without a step limit, a
 - **Error recovery**: Retry transient failures such as timeouts and rate limits in code, with backoff. Return other failures to the model as tool errors. Stop after a few consecutive failures instead of looping forever.
 - **Planning vs reacting**: A reactive agent decides one step at a time. A planning agent writes a plan first, executes it and re-plans when results surprise it. Plans help on long tasks and make runs easier to inspect.
 - **Reflection**: Asking the model to critique its draft or a failed attempt, then try again, often improves results. Reflexion keeps these lessons as text for the next attempt. Reflection costs extra calls, so measure the gain.
+- **Reasoning models in the loop**: Reasoning models can think between tool calls, which helps on multi-step tool use. Send their reasoning blocks or items back with each tool result, exactly as received. Depending on the provider, dropping them either gets the request rejected or throws away the reasoning the model built up. Effort settings change cost and latency, so measure a lower setting before paying for a higher one.
 - **When an agent is the wrong choice**: If the steps are known in advance, mistakes are expensive or you cannot check the result, use a fixed workflow or a single call. [Workflows and agent design patterns](#l3-workflow-patterns) covers those options.
 
-Here is the whole loop. `call_model` and `run_tools` are thin wrappers you write around one provider SDK.
+Here is the whole loop. `call_model`, `run_tools` and `wrap_up` are thin wrappers you write around one provider SDK. `run_tools` returns a list of result messages in your provider's format. Anthropic expects one user message holding every result, and OpenAI-style APIs expect one tool message per call. `wrap_up` makes one last call without tools that asks for the best partial answer, so a stopped run still returns something useful.
 
 ```python
 def run_agent(task, tools, max_steps=10, max_cost=0.50):
@@ -31,14 +32,14 @@ def run_agent(task, tools, max_steps=10, max_cost=0.50):
     spent = 0.0
     for step in range(max_steps):
         if spent >= max_cost:
-            return None, "stopped: budget"
+            return wrap_up(messages), "stopped: budget"
         reply = call_model(messages, tools)
         spent += reply.cost
-        messages.append(reply.message)
+        messages.append(reply.message)  # keep reasoning blocks as received
         if not reply.tool_calls:
             return reply.text, "done"
-        messages.append(run_tools(reply.tool_calls))  # all results, errors included
-    return None, "stopped: max steps"
+        messages.extend(run_tools(reply.tool_calls))  # errors included
+    return wrap_up(messages), "stopped: max steps"
 ```
 
 ## Resources
@@ -55,6 +56,8 @@ def run_agent(task, tools, max_steps=10, max_cost=0.50):
 - [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) · Yao et al. · Paper · Free · 1 h — The paper that introduced interleaving reasoning with actions, and the source of the thought-action-observation vocabulary.
 - [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366) · Shinn et al. · Paper · Free · 1 h — Shows agents improving across attempts by writing lessons from their failures into memory as text.
 - [Running agents](https://openai.github.io/openai-agents-python/running_agents/) · OpenAI · Docs · Free · reference — How a production SDK structures the same loop, including a max_turns limit that raises an error when exceeded.
+- [Thinking in tool and multi-turn workflows](https://platform.claude.com/docs/en/build-with-claude/thinking-tool-workflows) · Anthropic · Docs · Free · reference — The rules for returning thinking blocks unchanged with tool results, and how interleaved thinking lets the model reason about each result before its next call.
+- [Reasoning models](https://developers.openai.com/api/docs/guides/reasoning) · OpenAI · Docs · Free · reference — How to set reasoning effort, budget for reasoning tokens that are billed as output, and pass reasoning items back alongside function call outputs.
 
 ## Practice
 1. **Bare loop.** Write `run_agent()` with one provider SDK and two tools over public APIs, for example a dictionary API and a calculator. Done when it answers a question that needs both tools and prints every step.
@@ -70,6 +73,7 @@ def run_agent(task, tools, max_steps=10, max_cost=0.50):
 - [ ] [Recommended] Log every step (tool, arguments, tokens, latency) to a JSONL file.
 - [ ] [Recommended] Add a planning step and compare it with the reactive version on a few tasks.
 - [ ] [Stretch] Add a reflection pass that critiques the final answer, and measure whether it helps.
+- [ ] [Stretch] Run five tasks with a reasoning model at two effort settings and compare success, steps and cost.
 
 ## You're ready when
 - You can write the agent loop from memory and explain each line.

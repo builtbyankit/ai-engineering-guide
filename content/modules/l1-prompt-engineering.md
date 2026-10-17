@@ -26,15 +26,15 @@ Prompt engineering also has an engineering half. Prompts change as you learn, mo
 ## Resources
 ### Start here
 - [Prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices) · Anthropic · Docs · Free · 1 h — Anthropic's living reference on clarity, context, examples, XML structure, roles, thinking and chaining; most of it transfers to other models.
-- [ChatGPT Prompt Engineering for Developers](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/) · DeepLearning.AI · Course · Free tier · 1.5–2 h — Isa Fulford and Andrew Ng teach two core prompting principles through summarising, inferring, transforming and chatbot examples in code.
-- [Prompt engineering interactive tutorial](https://github.com/anthropics/prompt-eng-interactive-tutorial) · Anthropic · Course · Free · self-paced — Nine chapters of notebook exercises, from basic structure to avoiding hallucinations; written for older models, so pair it with the best-practices page.
-### Go deeper
 - [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering) · OpenAI · Docs · Free · 45 min — OpenAI's guide to message roles, Markdown and XML formatting, few-shot examples, keeping prompts in code and prompting reasoning models.
 - [Prompt design strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies) · Google · Docs · Free · 45 min — Gemini's guide to instructions, few-shot examples, breaking prompts into chains and tuning sampling parameters.
+### Go deeper
 - [Prompting Fundamentals and How to Apply them Effectively](https://eugeneyan.com/writing/prompting/) · Eugene Yan · Article · Free · 40 min — A practitioner's tour of roles, XML structure, n-shot examples, chain of thought and prompt splitting, plus popular tricks that barely help.
 - [Best practices for prompt engineering for 2026](https://www.claude.com/blog/best-practices-for-prompt-engineering) · Anthropic · Article · Free · 20 min — A late-2025 overview of core and advanced techniques, common mistakes and how to choose which technique to reach for.
 - [Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/) · Lilian Weng · Article · Free · 1 h — A research survey of zero-shot, few-shot, chain-of-thought and self-consistency prompting, with links to the original papers.
 - [Classification with Claude](https://platform.claude.com/cookbook/capabilities-classification-guide) · Anthropic · Tutorial · Free · 1 h — Improves a support-ticket classifier step by step and measures accuracy after each prompt change, which is prompts-as-code in practice.
+- [ChatGPT Prompt Engineering for Developers](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/) · DeepLearning.AI · Course · Free tier · 1.5–2 h — Isa Fulford and Andrew Ng teach two core prompting principles through summarising, inferring, transforming and chatbot examples in code; recorded in 2023, so swap in a current model name when you run it.
+- [Prompt engineering interactive tutorial](https://github.com/anthropics/prompt-eng-interactive-tutorial) · Anthropic · Course · Free · self-paced — Nine chapters of notebook exercises, from basic structure to avoiding hallucinations; written for older models, so pair it with the best-practices page.
 ### Reference
 - [Prompt engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview) · Anthropic · Docs · Free · reference — Lists what to have before you start (success criteria, tests, a first draft) and links a prompt generator for first drafts.
 - [Prompt Engineering Guide](https://www.promptingguide.ai/) · DAIR.AI · Docs · Free · reference — A broad catalogue of prompting techniques with short examples and links to the papers behind them.
@@ -48,7 +48,7 @@ Prompt engineering also has an engineering half. Prompts change as you learn, mo
 5. **Cross-model check.** Run your best classifier prompt on two providers. Done when you have noted at least one place where the same prompt behaves differently and what you changed to fix it.
 
 ## Checklist
-- [ ] [Must ship] Complete chapters 1 to 7 of the interactive tutorial or the whole DeepLearning.AI course.
+- [ ] [Must ship] Read the three Start here guides and list five techniques they agree on and one place where they differ.
 - [ ] [Must ship] Rewrite one vague prompt with role, context, format and examples, and compare outputs.
 - [ ] [Must ship] Store prompts as versioned template files that your code loads.
 - [ ] [Recommended] Measure the accuracy of a few-shot classifier on at least 30 labelled examples.

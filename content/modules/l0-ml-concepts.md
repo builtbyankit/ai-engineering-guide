@@ -29,7 +29,7 @@ This module gives you that picture through visual, intuitive material with almos
 
 ### Start here
 
-- [Neural networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) · 3Blue1Brown · Video · Free · 1.5 h — Animated explanations of neurons, gradient descent and backpropagation; watch chapters 1 to 3, then chapter 5 on transformers.
+- [Neural networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) · 3Blue1Brown · Video · Free · 1 h — Animated explanations of neurons, gradient descent and backpropagation; watch chapters 1 to 3 now, and save the transformer chapters for How LLMs work in Level 1.
 - [Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course) · Google · Course · Free · 2–3 h — Take the neural networks and embeddings modules and the overfitting pages of the datasets module, each with interactive exercises.
 - [Embeddings: What they are and why they matter](https://simonwillison.net/2023/Oct/23/embeddings/) · Simon Willison · Article · Free · 30–45 min — A practical explanation of embeddings and cosine similarity with real uses such as related content and semantic search.
 

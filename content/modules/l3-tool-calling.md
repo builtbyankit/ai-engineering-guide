@@ -26,7 +26,7 @@ Most agent failures trace back to tools. A vague description makes the model pic
 ## Resources
 ### Start here
 - [Tool use with Claude](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview) · Anthropic · Docs · Free · 30 min — A clear walkthrough of the tool_use and tool_result round trip, plus the split between client tools you run and server tools Anthropic runs.
-- [Function calling](https://developers.openai.com/docs/guides/function-calling) · OpenAI · Docs · Free · 45 min — The same loop in OpenAI's API, with strict schemas, several calls per response and practical advice on keeping tool sets small.
+- [Function calling](https://developers.openai.com/api/docs/guides/function-calling) · OpenAI · Docs · Free · 45 min — The same loop in OpenAI's API, with strict schemas, several calls per response and practical advice on keeping tool sets small.
 - [Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) · Anthropic · Article · Free · 30 min — The best single guide to tool naming, namespacing, response size and evaluating tools with realistic multi-step tasks.
 ### Go deeper
 - [Function calling with the Gemini API](https://ai.google.dev/gemini-api/docs/function-calling) · Google · Docs · Free · 45 min — Covers parallel and compositional (chained) calls and the calling modes, so you can see which ideas are universal and which are provider-specific.

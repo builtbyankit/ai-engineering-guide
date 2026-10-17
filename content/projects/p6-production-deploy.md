@@ -3,6 +3,10 @@ title: Take an agent to production
 level: L6
 weeks: 1.5–2
 summary: Deploy your hardened agent as a streaming, durable, budget-aware service with a gateway, prompt caching, an eval-gated CI/CD pipeline and canary releases for prompt changes.
+review-by: 2027-01-31 | Cloud Run (monthly free tier)
+review-by: 2027-01-31 | free web service that sleeps after 15 idle minutes
+review-by: 2027-01-31 | Fly.io (pay as you go after a short trial), Railway (small monthly credit)
+review-by: 2027-01-31 | limits such as spin-down after 15 idle minutes
 ---
 
 ## The brief

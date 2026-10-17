@@ -5,6 +5,7 @@ kind: optional
 hours: 8–10
 summary: Explain how coding agents search, edit and test code, run one safely in a sandbox, and build a small agent that fixes a failing test by itself.
 checked: 2026-10-16
+review-by: 2027-01-31 | the free tier includes one-time credits
 ---
 
 ## Why it matters
@@ -20,7 +21,7 @@ Coding agents are also the clearest case study in agent design. They need well-s
 - **Edit formats**: How the model writes changes matters. Common options are whole-file rewrites, search-and-replace blocks, unified diffs, and an exact string replacement that only applies when the old text matches once. A failed match gives the model a clear error to fix, which beats a silent bad edit.
 - **Agent-computer interface (ACI)**: The SWE-agent paper showed that the design of an agent's tools strongly affects how many issues it solves. Good tools return short output, show line numbers and give error messages the model can act on.
 - **Tests as the feedback signal**: An agent stops when the work looks done. A test suite, type checker or linter turns "looks done" into a pass or fail that the agent can read and iterate on.
-- **Repository context**: No agent can hold a large codebase in its context window. Agents search on demand and may read a compact repo map of key symbols. They also load instruction files such as AGENTS.md or CLAUDE.md with build commands and conventions.
+- **Repository context**: No agent can hold a large codebase in its context window. Agents search on demand and may read a compact repo map of key symbols. They also load instruction files such as AGENTS.md or CLAUDE.md with build commands and conventions, plus skills they open only when a task needs them ([Memory and context engineering](#l3-memory-context)).
 - **Sandboxing**: A coding agent runs commands written by a model that may have read hostile text. Run them in a container, VM or OS-level sandbox that limits which files it can touch and which hosts it can reach. Keep real credentials outside the sandbox.
 - **Permission modes**: Coding tools range from approving every command to running unattended inside a sandbox. Match the mode to the damage a mistake could do ([Human in the loop](#l4-human-in-the-loop)).
 - **Harnesses for long-running work**: For multi-session tasks, keep state outside the model in a feature list, progress file, git history and startup script. Each fresh session reads them, finishes one feature and leaves the code in a clean state.

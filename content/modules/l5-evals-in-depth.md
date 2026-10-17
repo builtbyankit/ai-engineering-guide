@@ -5,6 +5,7 @@ kind: core
 hours: 10–12
 summary: Run error analysis on agent traces, build an LLM judge calibrated against human labels, evaluate trajectories and block regressions with evals in CI.
 checked: 2026-10-16
+review-by: 2026-12-01 | OpenAI is retiring its hosted Evals platform (read-only from 31 October 2026 and shut down on 30 November 2026)
 ---
 
 ## Why it matters

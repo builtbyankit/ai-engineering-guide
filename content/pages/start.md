@@ -4,9 +4,11 @@ summary: What the guide covers, how levels, modules, milestones and projects fit
 ---
 
 ## Who this guide is for
-This guide is for anyone who has written a little code and wants to build AI agents professionally. You might be a student, a developer from another field or a career switcher. You need to know what a variable, a loop and a function are. You do not need machine learning experience or advanced maths.
+This guide is for anyone who can write small programs and wants to build AI agents professionally. You might be a student, a developer from another field or a career switcher. You should be able to write a short program on your own in any language, using variables, loops, functions and files, and fix it by reading the error message. You do not need machine learning experience or advanced maths. If you are newer to programming than that, take a beginner course such as Harvard's free CS50P first, then come back.
 
 By the end you will be able to design, build, evaluate, secure and deploy agents that use tools, retrieve knowledge and ask a person before risky actions. You will also have eight projects on GitHub to show for it.
+
+The guide uses Python throughout. It does not cover TypeScript agent stacks or voice and realtime agents. The ideas carry over, but for those you will need each platform's own documentation.
 
 ## How the guide is organised
 The guide has seven levels and a capstone. Each level has a few modules, one project and a milestone. Work through them in order, because each level builds on the one before.
@@ -33,9 +35,16 @@ The milestone is a short list of checks at the bottom of each level page. Tick t
 The [capstone](#capstone) comes last. You build a new agent from scratch that uses every core skill in the guide, then deploy it and write it up.
 
 ## Core path and optional modules
-Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents or fine-tuning open models. Choose the **Core path** or **Everything** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
+Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents or fine-tuning open models. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
 
-At 10 to 12 hours a week, the core path takes about %%CORE_WEEKS%% and everything takes about %%FULL_WEEKS%%. Time estimates cover the Start here resources, the practice, the must-ship tasks and the projects. Treat them as time boxes. If a module runs long, finish its must-ship tasks and move on; you can come back for the rest.
+At 10 to 12 hours a week, the core path takes about %%CORE_WEEKS%%, everything takes about %%FULL_WEEKS%% and the fast track takes about %%FAST_WEEKS%%. Time estimates cover the Start here resources, the practice, the must-ship tasks and the projects. Treat them as time boxes. If a module runs long, finish its must-ship tasks and move on; you can come back for the rest.
+
+## Fast track for experienced developers
+If you already write Python and use web APIs, SQL, git and Docker at work, choose the **Fast track**. It skips four Level 0 modules: Python, web APIs, SQL and tooling. It keeps [Just enough machine learning](#l0-ml-concepts), because most developers have not met those ideas at work.
+
+Build the [Level 0 project](#p0-api-service) anyway. It doubles as a placement check. If it takes you a few evenings, the skipped modules would have been review. If it takes much longer, go back to the module where you got stuck.
+
+In every other module, read **You're ready when** first. If you can already do everything it lists, do the must-ship tasks and move on. Expect most of the new material in Levels 1 to 5. Level 6 deployment will feel familiar, so spend that time on the parts specific to agents, such as durable runs, gateways and eval gates.
 
 ## How your progress is saved
 Your ticks are saved in your browser's local storage on this device. Nothing is sent to a server and you do not need an account. This also means a different browser, a different device or clearing your site data starts you from zero.

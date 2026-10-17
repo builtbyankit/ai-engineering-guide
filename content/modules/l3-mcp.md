@@ -5,6 +5,10 @@ kind: core
 hours: 8–10
 summary: Explain how MCP connects AI apps to tools and data, build and test an MCP server in Python, connect it to clients, and judge its security risks.
 checked: 2026-10-16
+review-by: 2027-01-31 | version 2 at the time of writing
+review-by: 2027-01-31 | install `mcp>=1.28,<2`
+review-by: 2027-04-30 | is deprecated in the 2026-07-28 protocol version
+review-by: 2027-04-30 | the 2026-07-28 version made each request self-contained
 ---
 
 ## Why it matters

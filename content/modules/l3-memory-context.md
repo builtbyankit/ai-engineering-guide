@@ -17,8 +17,8 @@ Context engineering is choosing the smallest set of useful tokens for each step,
 - **Managing history**: Trim old turns to a token budget, fold earlier turns into a running summary, and clear bulky old tool results the agent no longer needs. Keep the system prompt and the latest turns intact.
 - **Kinds of long-term memory**: Semantic memory holds facts, such as "the user prefers metric units". Episodic memory holds past experiences, such as how a similar task went. Procedural memory holds rules and instructions, often kept as an editable part of the system prompt.
 - **Writing and reading memories**: Write in the hot path, with the agent calling a `save_memory` tool, or in the background after a run. Read with keyword or embedding search, filtered by user and ranked by relevance and recency, as in [Embeddings and vector search](#l2-embeddings-vector-search).
-- **Memory stores**: Mem0 extracts and retrieves memories for you. LangGraph has a namespaced store with semantic search. Letta, from the MemGPT authors, gives the agent tools to edit its own memory. A SQLite table or a folder of files is often enough to start.
-- **The MemGPT idea**: Treat the context window like RAM and external storage like disk. The agent moves information in and out with tools, so it can work on more than fits in one window.
+- **Memory stores**: Mem0 extracts and retrieves memories for you. LangGraph has a namespaced store with semantic search. Letta, from the MemGPT authors, treats the context window like RAM and external storage like disk, and gives the agent tools to move information between them. A SQLite table or a folder of files is often enough to start.
+- **Skills and progressive disclosure**: A skill is a folder with a `SKILL.md` file (a name, a description and instructions) plus optional scripts and reference files. The agent sees only each skill's name and description until a task needs it, then loads the instructions and opens extra files on demand. Agent Skills began at Anthropic and is now an open format read by many agents, so it is a cheap way to give an agent procedures without bloating every prompt.
 - **Context engineering moves**: Write notes outside the window, select only the relevant tools and memories, compress history, and isolate subtasks in sub-agents with their own clean context. Decide deliberately what enters each call.
 - **Context rot and failure modes**: Long contexts weaken recall and reasoning. Common failures are poisoning (an early error keeps being reused), distraction by a long history, confusion from irrelevant tools, and clashes between conflicting facts.
 - **Compaction**: When a run nears its limit, summarise the important state (decisions, open questions, file paths, URLs) and continue in a fresh window. Keep references so dropped details can be fetched again.
@@ -34,6 +34,7 @@ Context engineering is choosing the smallest set of useful tokens for each step,
 - [How Long Contexts Fail](https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html) · Drew Breunig · Article · Free · 15 min — Names four failure modes (poisoning, distraction, confusion, clash) that you will recognise in your own agent logs.
 - [How to Fix Your Context](https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html) · Drew Breunig · Article · Free · 20 min — The follow-up, with six practical tactics from tool loadouts to pruning, summarisation and offloading.
 - [Context Engineering for AI Agents: Lessons from Building Manus](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) · Manus · Article · Free · 20 min — Production lessons such as keeping the prompt prefix stable for caching, using files as memory and leaving errors in context.
+- [Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) · Anthropic · Article · Free · 20 min — How a skill packages instructions, scripts and files that an agent loads in three stages, so it can carry many skills at a small context cost.
 - [LLMs as Operating Systems: Agent Memory](https://www.deeplearning.ai/short-courses/llms-as-operating-systems-agent-memory/) · DeepLearning.AI · Course · Free tier · 1.5 h — The MemGPT authors teach core and archival memory and build an agent that edits its own memory with Letta.
 ### Reference
 - [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) · Packer et al. · Paper · Free · 1 h — The paper behind virtual context management, which moves information between in-context and external memory tiers.
@@ -56,6 +57,7 @@ Context engineering is choosing the smallest set of useful tokens for each step,
 - [ ] [Recommended] Implement compaction for long runs that keeps references to dropped details.
 - [ ] [Recommended] Run a small context-length experiment on one model.
 - [ ] [Stretch] Compare your memory store with Mem0, Letta or the LangGraph store.
+- [ ] [Stretch] Package one repeated procedure as a skill with a `SKILL.md` and a script, and check that your agent loads it only when a task needs it.
 
 ## You're ready when
 - You can explain short-term, long-term, semantic, episodic and procedural memory with an example of each.

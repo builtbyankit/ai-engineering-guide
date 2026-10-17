@@ -5,6 +5,7 @@ kind: core
 hours: 8
 summary: Instrument an agent with OpenTelemetry-style traces, inspect every model and tool call, and track tokens, cost, latency and user feedback on a dashboard.
 checked: 2026-10-16
+review-by: 2027-01-31 | They are still evolving and now live in their own repository
 ---
 
 ## Why it matters

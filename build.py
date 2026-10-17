@@ -3,6 +3,7 @@
 Usage: python3 build.py
 Needs: markdown, beautifulsoup4, pygments (pip install -r requirements.txt)
 """
+import datetime
 import hashlib
 import html
 import json
@@ -66,6 +67,15 @@ def front_matter(text):
             k, v = line.split(":", 1)
             fm[k.strip()] = v.strip().strip('"')
     return fm, text[m.end():]
+
+
+def page_checked(fm):
+    """The page's own links-checked date ("2026-10-17" -> "17 Oct 2026"), falling back to the site-wide date."""
+    try:
+        d = datetime.date.fromisoformat(fm.get("checked", ""))
+    except ValueError:
+        return CHECKED
+    return f"{d.day} {d.strftime('%b %Y')}"
 
 
 def res_id(url):
@@ -245,6 +255,8 @@ library = {}  # url -> resource dict with uses
 fragments = {}
 level_weeks = {}
 optional_ids = set()
+fast_skip_ids = set()  # modules the fast track skips (curriculum.json "fast_skip")
+TRACKS = ("core", "full", "fast")
 
 
 def add_resources(page_id, resources):
@@ -277,17 +289,25 @@ for lv in levels:
         mods.append((m, fm, body))
         if m["kind"] == "optional":
             optional_ids.add(m["id"])
+        if m.get("fast_skip"):
+            assert m["kind"] == "core", f"{m['id']}: only core modules can be skipped by the fast track"
+            fast_skip_ids.add(m["id"])
     pid = lv["project"]["id"]
     pfm, pbody = front_matter((CONTENT / "projects" / f"{pid}.md").read_text(encoding="utf-8"))
     core_lo = sum(rng(m["hours"])[0] for m, _, _ in mods if m["kind"] == "core")
     core_hi = sum(rng(m["hours"])[1] for m, _, _ in mods if m["kind"] == "core")
     opt_lo = sum(rng(m["hours"])[0] for m, _, _ in mods if m["kind"] == "optional")
     opt_hi = sum(rng(m["hours"])[1] for m, _, _ in mods if m["kind"] == "optional")
+    fast_lo = sum(rng(m["hours"])[0] for m, _, _ in mods if m["kind"] == "core" and not m.get("fast_skip"))
+    fast_hi = sum(rng(m["hours"])[1] for m, _, _ in mods if m["kind"] == "core" and not m.get("fast_skip"))
     p_lo, p_hi = rng(pfm["weeks"])
     weeks = {
         "core": (half(core_lo / HOURS[1] + p_lo), half(core_hi / HOURS[0] + p_hi)),
         "full": (half((core_lo + opt_lo) / HOURS[1] + p_lo), half((core_hi + opt_hi) / HOURS[0] + p_hi)),
-        "mods": ((core_lo / HOURS[1] + core_hi / HOURS[0]) / 2, ((core_lo + opt_lo) / HOURS[1] + (core_hi + opt_hi) / HOURS[0]) / 2),
+        "fast": (half(fast_lo / HOURS[1] + p_lo), half(fast_hi / HOURS[0] + p_hi)),
+        "mods": {"core": (core_lo / HOURS[1] + core_hi / HOURS[0]) / 2,
+                 "full": ((core_lo + opt_lo) / HOURS[1] + (core_hi + opt_hi) / HOURS[0]) / 2,
+                 "fast": (fast_lo / HOURS[1] + fast_hi / HOURS[0]) / 2},
         "proj": (p_lo + p_hi) / 2,
     }
     assert lfm["weeks"] == fmt_range(*weeks["core"], "").strip(), f"{lid}: page weeks {lfm['weeks']} vs computed {weeks['core']}"
@@ -298,7 +318,7 @@ cap_fm, cap_body = front_matter((CONTENT / "projects" / "capstone.md").read_text
 cap_weeks = rng(cap_fm["weeks"])
 
 total = {}
-for tr in ("core", "full"):
+for tr in TRACKS:
     lo = sum(level_weeks[l][tr][0] for l in LEVEL_IDS) + cap_weeks[0]
     hi = sum(level_weeks[l][tr][1] for l in LEVEL_IDS) + cap_weeks[1]
     total[tr] = (lo, hi)
@@ -328,6 +348,7 @@ def level_table():
 start_md = (start_body.replace("%%LEVEL_TABLE%%", level_table())
             .replace("%%CORE_WEEKS%%", DURATION["core"]["weeks"])
             .replace("%%FULL_WEEKS%%", DURATION["full"]["weeks"])
+            .replace("%%FAST_WEEKS%%", DURATION["fast"]["weeks"])
             .replace("%%REPO_URL%%", REPO_URL))
 soup, _ = md_to_soup(start_md)
 finish(soup, "start")
@@ -347,7 +368,7 @@ def module_page(lv, idx, n_mods, m, fm, body):
     chip = ' <span class="chip chip-opt">Optional</span>' if m["kind"] == "optional" else ""
     meta = meta_line([f'Must ship <span data-must-for="{mid}">0/0</span>',
                       f'Resources done <span data-res-for="{mid}">0/{len(resources)}</span>',
-                      f"Links checked {CHECKED}"])
+                      f"Links checked {page_checked(fm)}"])
     eyebrow = f'<a href="#{lv["id"]}">Level {lv["num"]}</a> · Module {idx} of {n_mods}'
     fragments[mid] = page_head(eyebrow, f'{m["hours"]} h', fm["title"], fm["summary"], meta, chip) + f'<div class="prose">{soup}</div>'
     learn = [b.get_text().split(":")[0] for b in soup.find_all("strong")][:12]
@@ -459,7 +480,7 @@ def route_figure(tr):
     rows, t = [], 0.0
     for lv, *_ in level_info:
         w = level_weeks[lv["id"]]
-        mods_w = w["mods"][0 if tr == "core" else 1]
+        mods_w = w["mods"][tr]
         rows.append((lv["id"], f"L{lv['num']} {lv['title']}", fmt_range(*w[tr], "wk"), t, mods_w, w["proj"]))
         t += mods_w + w["proj"]
     cap_mid = sum(cap_weeks) / 2
@@ -480,10 +501,11 @@ def route_figure(tr):
     html_rows.append(f'<li class="route-row"><div class="route-static">{buf}</div></li>')
     step = 5 if axis <= 50 else 10
     ticks = "".join(f'<span class="tick" style="left:{wk / axis * 100:.3f}%">{wk}</span>' for wk in range(0, axis + 1, step))
-    name = "Core path" if tr == "core" else "Everything, including optional modules"
+    name = {"core": "Core path", "full": "Everything, including optional modules",
+            "fast": "Fast track, skipping the Level 0 modules experienced developers already know"}[tr]
     cap = (f"{name}: {DURATION[tr]['weeks']} at 10–12 hours a week. Each bar starts where the previous level ends and uses the "
            "midpoint of its estimate. Modules are blue, projects amber. The buffer runs to the top of the range.")
-    return (f'<figure class="route" data-track-view="{tr}" style="--axis:{axis}"{" hidden" if tr == "full" else ""} '
+    return (f'<figure class="route" data-track-view="{tr}" style="--axis:{axis}"{" hidden" if tr != "core" else ""} '
             f'aria-labelledby="route-title-{tr}"><div class="route-top"><p class="route-title" id="route-title-{tr}">The path, to scale</p>'
             '<ul class="legend"><li><span class="sw sw-stage"></span>Modules</li><li><span class="sw sw-proj"></span>Project</li>'
             '<li><span class="sw sw-buffer"></span>Buffer</li><li><span class="sw sw-done"></span>Milestone complete</li></ul></div>'
@@ -510,7 +532,7 @@ def home_cards():
 lib = sorted(library.values(), key=lambda r: order.index(r["uses"][0][0]))
 data = {
     "routes": routes, "order": order, "gates": gate_totals, "tasks": task_totals, "tiers": task_tiers,
-    "pageRes": page_res, "optional": sorted(optional_ids), "resources": lib, "duration": DURATION, "checked": CHECKED,
+    "pageRes": page_res, "optional": sorted(optional_ids), "fastSkip": sorted(fast_skip_ids), "resources": lib, "duration": DURATION, "checked": CHECKED,
     "levels": [{"id": lv["id"], "num": lv["num"], "t": lv["title"], "modules": [m["id"] for m, _, _ in mods], "project": pid}
                for lv, lfm, lbody, mods, pid, pfm, pbody in level_info],
 }
@@ -528,16 +550,18 @@ n_mod_core = sum(1 for lv in levels for m in lv["modules"] if m["kind"] == "core
 n_mod_opt = len(optional_ids)
 tpl = (ROOT / "template.html").read_text(encoding="utf-8")
 page = (tpl.replace("%%NAV%%", nav_html())
-        .replace("%%ROUTE%%", route_figure("core") + route_figure("full"))
+        .replace("%%ROUTE%%", "".join(route_figure(tr) for tr in TRACKS))
         .replace("%%CARDS%%", home_cards())
         .replace("%%DATA%%", json.dumps(data, ensure_ascii=True).replace("</", "<\\/"))
         .replace("%%CORE_WEEKS%%", DURATION["core"]["weeks"])
         .replace("%%FULL_WEEKS%%", DURATION["full"]["weeks"])
+        .replace("%%FAST_WEEKS%%", DURATION["fast"]["weeks"])
         .replace("%%CORE_HOURS%%", DURATION["core"]["hours"])
         .replace("%%N_RES%%", str(n_res))
         .replace("%%N_FREE%%", str(n_free))
         .replace("%%N_CORE_MODULES%%", str(n_mod_core))
         .replace("%%N_OPT_MODULES%%", str(n_mod_opt))
+        .replace("%%N_FAST_SKIP%%", str(len(fast_skip_ids)))
         .replace("%%N_PROJECTS%%", str(len(levels) + 1))
         .replace("%%REPO_URL%%", REPO_URL)
         .replace("%%CHECKED%%", CHECKED))
@@ -553,4 +577,4 @@ shutil.copy(ROOT / "favicon.svg", OUT / "favicon.svg")
 size = sum(f.stat().st_size for f in OUT.rglob("*") if f.is_file())
 print(f"pages {len(fragments)} | gates {sum(gate_totals.values())} | tasks {sum(task_totals.values())} | "
       f"must {sum(v.count('M') for v in task_tiers.values())} | resources {n_res} ({n_free} free) | "
-      f"core {DURATION['core']['weeks']} | full {DURATION['full']['weeks']} | {size / 1e6:.2f} MB")
+      f"core {DURATION['core']['weeks']} | full {DURATION['full']['weeks']} | fast {DURATION['fast']['weeks']} | {size / 1e6:.2f} MB")

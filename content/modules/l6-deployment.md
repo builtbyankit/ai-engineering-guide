@@ -5,6 +5,7 @@ kind: core
 hours: 10–12
 summary: Serve an agent behind a streaming API, run long jobs durably in the background, and ship changes safely with containers, CI eval gates and canary releases.
 checked: 2026-10-16
+review-by: 2027-04-30 | version 0.135.0 and later
 ---
 
 ## Why it matters

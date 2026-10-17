@@ -5,6 +5,7 @@ kind: core
 hours: 10
 summary: Explain and test prompt injection and other LLM risks, design agents that limit damage by construction, and add guardrails and red-team scans to your workflow.
 checked: 2026-10-16
+review-by: 2027-01-31 | The 2026 list for agentic applications
 ---
 
 ## Why it matters

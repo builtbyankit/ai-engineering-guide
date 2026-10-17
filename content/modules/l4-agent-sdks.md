@@ -5,6 +5,9 @@ kind: core
 hours: 8
 summary: Compare the main agent SDKs by what they abstract, build the same small agent in two of them, and choose one for a project with evidence.
 checked: 2026-10-16
+review-by: 2027-01-31 | for .NET, Python and Go
+review-by: 2027-01-31 | including graph workflows and multi-agent orchestration in ADK 2.0
+review-by: 2027-04-30 | AutoGen is in maintenance mode, so do not start new projects on it
 ---
 
 ## Why it matters

@@ -3,6 +3,7 @@ title: Personal research agent
 level: L3
 weeks: 2
 summary: Build a framework-free agent that researches questions with web search, page fetching and your own MCP notes server, stays within budgets, and writes short cited reports.
+review-by: 2027-01-31 | free plan with 1,000 credits a month at the time of writing
 ---
 
 ## The brief

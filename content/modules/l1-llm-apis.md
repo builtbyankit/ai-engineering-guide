@@ -5,6 +5,7 @@ kind: core
 hours: 8–10
 summary: Call cloud and local LLMs from Python, stream replies, count tokens and cost, handle rate limits, and pick a model on capability, cost and latency.
 checked: 2026-10-16
+review-by: 2027-01-31 | the Gemini API also has a free tier that suits learning
 ---
 
 ## Why it matters
@@ -15,9 +16,9 @@ This module makes you comfortable with the three big cloud providers and one loc
 ## What to learn
 - **Provider SDKs**: OpenAI, Anthropic and Google each publish official Python and TypeScript SDKs that handle authentication, retries and typed responses. Use them instead of raw HTTP unless you have a specific reason.
 - **The messages format**: A request carries a list of messages with roles, usually user and assistant, plus a system prompt with standing instructions. Most chat APIs are stateless, so you resend the whole conversation on every call. OpenAI's Responses API can also keep history for you on the server, but earlier turns are still billed as input tokens. Where the system prompt goes differs slightly by provider.
-- **Key parameters**: Model name, maximum output tokens and temperature are the settings you change most. The response also tells you why generation stopped, for example a natural end or hitting the token limit.
+- **Key parameters**: Model name, maximum output tokens and temperature are the settings you change most. Reasoning models add an effort or thinking-budget setting that trades answer quality against tokens and latency. The response also tells you why generation stopped, for example a natural end or hitting the token limit.
 - **Streaming**: With streaming on, the server sends the reply in small pieces as server-sent events (SSE). Users see text sooner, and long generations avoid HTTP timeouts.
-- **Tokens and cost**: Every response reports input and output tokens. Cost is tokens multiplied by the per-million-token price, and output tokens usually cost several times more than input. Log both for every call.
+- **Tokens and cost**: Every response reports input and output tokens. Cost is tokens multiplied by the per-million-token price, and output tokens usually cost several times more than input. Log both for every call, and remember that reasoning tokens are billed as output even when the API hides them.
 - **Rate limits and retries**: Providers cap requests and tokens per minute and return HTTP 429 when you exceed them. Retry with exponential backoff and jitter, respect the Retry-After header, and check what your SDK already retries by default.
 - **Choosing a model**: Larger models are more capable but slower and pricier. Prove the task works on a strong model first, then test whether a smaller, cheaper one still passes your checks.
 - **Local models**: Ollama runs open-weight models on your own machine, with no per-token bill and no data leaving it. It also offers an OpenAI-compatible endpoint, so the same client code can talk to it.

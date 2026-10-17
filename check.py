@@ -2,7 +2,9 @@
 
 Usage: python3 check.py content/modules/l1-how-llms-work.md [more files...]
        python3 check.py --all
+       python3 check.py --due    # list time-sensitive claims whose review-by date has passed
 """
+import datetime
 import json
 import re
 import sys
@@ -43,6 +45,44 @@ def front_matter(text):
             k, v = line.split(":", 1)
             fm[k.strip()] = v.strip()
     return fm, text[m.end():]
+
+
+REVIEW_RE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2}) \| (?P<phrase>.+)$")
+
+
+def review_items(text):
+    """Return (date, phrase, raw) for every 'review-by: YYYY-MM-DD | exact phrase' line in the front matter.
+
+    A review-by line marks a time-sensitive claim (a price, a free tier, a version, a deprecation date).
+    The phrase must appear on the page, so the marker is removed when the claim is.
+    """
+    m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+    out = []
+    if not m:
+        return out
+    for line in m.group(1).splitlines():
+        if line.startswith("review-by:"):
+            raw = line.split(":", 1)[1].strip()
+            r = REVIEW_RE.match(raw)
+            out.append((r.group("date") if r else None, r.group("phrase").strip() if r else None, raw))
+    return out
+
+
+def check_reviews(text, body, errors, warns, today):
+    flat = " ".join(body.split())
+    for date, phrase, raw in review_items(text):
+        if not date:
+            errors.append(f"review-by should be 'YYYY-MM-DD | exact phrase from the page', got: {raw[:80]}")
+            continue
+        try:
+            due = datetime.date.fromisoformat(date)
+        except ValueError:
+            errors.append(f"review-by has an invalid date: {date}")
+            continue
+        if " ".join(phrase.split()) not in flat:
+            errors.append(f"review-by phrase not found on the page: {phrase[:80]}")
+        elif due <= today:
+            warns.append(f"review-by {date} has passed; re-check against its source: {phrase[:80]}")
 
 
 def strip_code(body):
@@ -106,6 +146,7 @@ def check_file(path):
     fm, body = front_matter(text)
     if fm is None:
         return [f"{p}: missing front matter"], []
+    check_reviews(text, body, errors, warns, datetime.date.today())
     kind = p.parent.name
     pid = p.stem
     prose = strip_code(body)
@@ -237,7 +278,23 @@ def check_file(path):
     return errors, warns
 
 
+def list_due():
+    today = datetime.date.today()
+    due = []
+    for f in sorted((ROOT / "content").glob("*/*.md")):
+        text = f.read_text(encoding="utf-8")
+        for date, phrase, _raw in review_items(text):
+            if date and datetime.date.fromisoformat(date) <= today:
+                due.append((date, f.relative_to(ROOT), phrase))
+    for date, f, phrase in sorted(due):
+        print(f"{date}  {f}: {phrase}")
+    print(f"{len(due)} claim(s) due for review")
+
+
 def main(argv):
+    if argv == ["--due"]:
+        list_due()
+        return
     files = argv
     if argv == ["--all"]:
         files = sorted(str(p) for p in (ROOT / "content").glob("*/*.md") if p.parent.name != "pages")

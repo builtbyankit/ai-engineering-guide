@@ -21,6 +21,7 @@ This module shows when that trade is worth it and how to make it. You fine-tune 
 - **LoRA and QLoRA**: LoRA freezes the base model and trains small low-rank adapter matrices, so only a tiny fraction of weights change. QLoRA does the same on a 4-bit quantized base, which lets a 7B or 8B model train on a single modest GPU.
 - **Chat templates and tool-call formats**: Each model family expects its own special tokens for roles and tool calls. Train and serve with the same template, or the tuned model will emit malformed tool calls.
 - **Distillation for agents**: A strong model generates successful agent trajectories (reasoning, tool calls, observations), your evals filter them, and a small model is fine-tuned on the survivors. This can make a narrow agent far cheaper to run, but the student also inherits the teacher's habits and mistakes.
+- **Reinforcement fine-tuning**: When code can score an output, such as a passing test, a correct answer or a valid tool call, you can train on rewards instead of examples. GRPO samples several answers per prompt and shifts the model toward the higher-scoring ones. It needs a reliable grader and more compute than SFT, and a loose reward teaches the model to game it.
 - **Quantization**: Storing weights in 8, 4 or fewer bits instead of 16 cuts memory and often speeds up inference, at some cost in quality. GGUF files suit llama.cpp and Ollama, while GPTQ, AWQ and FP8 formats suit GPU servers such as vLLM.
 - **Serving**: Ollama is the easy path for local and single-user serving. vLLM is built for GPU throughput and batches many concurrent requests. Both expose OpenAI-compatible endpoints, so your gateway and agent code barely change.
 - **Total cost of ownership**: A rented GPU bills by the hour whether traffic arrives or not. Compare that with per-token API pricing at your real volume, and count the engineering time to evaluate, update and monitor your own model.
@@ -46,7 +47,7 @@ This module shows when that trade is worth it and how to make it. You fine-tune 
 
 - [PEFT](https://huggingface.co/docs/peft/index) · Hugging Face · Docs · Free · reference — The library that implements LoRA and other parameter-efficient methods on top of Transformers.
 - [SFT Trainer](https://huggingface.co/docs/trl/sft_trainer) · Hugging Face · Docs · Free · reference — TRL's supervised fine-tuning trainer, including dataset formats for tool calling, assistant-only loss and LoRA or QLoRA through PEFT.
-- [QLoRA: Efficient Finetuning of Quantized LLMs](https://arxiv.org/abs/2305.14314) · Dettmers et al. · Paper · Free · 1 h — The 4-bit data type, double quantization and paged optimizers that make fine-tuning large models possible on one GPU.
+- [GRPO Trainer](https://huggingface.co/docs/trl/en/grpo_trainer) · Hugging Face · Docs · Free · reference — TRL's trainer for reinforcement fine-tuning with your own reward functions, with a quick start and generation through vLLM.
 - [Quickstart](https://docs.vllm.ai/en/latest/getting_started/quickstart.html) · vLLM · Docs · Free · 30 min — Install vLLM, run offline batched inference and start an OpenAI-compatible server with `vllm serve`.
 - [Importing a Model](https://docs.ollama.com/import) · Ollama · Docs · Free · reference — Load your own Safetensors or GGUF weights into Ollama, and quantize first with llama.cpp tools when you need to.
 
@@ -66,6 +67,7 @@ This module shows when that trade is worth it and how to make it. You fine-tune 
 - [ ] [Recommended] Route one agent step to your self-served model through the gateway.
 - [ ] [Recommended] Compare a 4-bit and a 16-bit version of the same model on quality and speed.
 - [ ] [Stretch] Distil agent trajectories from a strong model into a small model and measure task success.
+- [ ] [Stretch] Train a small model with GRPO on a step your code can score, and compare it with your SFT model on the held-out set.
 
 ## You're ready when
 

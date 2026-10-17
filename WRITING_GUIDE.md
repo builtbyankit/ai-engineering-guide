@@ -1,10 +1,10 @@
 # Writing guide: AI Agent Engineering Guide (resource-first edition)
 
-This guide sets the rules for every page of a free, public study website that takes a learner from "can code a little" to "can build, evaluate and run production AI agents". The site is resource-first: every module points the learner to the best existing blogs, courses, docs, videos, papers and repos, and adds short framing, practice, a checklist and a project. Pages come from several contributors, so follow this guide exactly. Consistency matters as much as quality.
+This guide sets the rules for every page of a free, public study website that takes a learner from "can write small programs" to "can build, evaluate and run production AI agents". The site is resource-first: every module points the learner to the best existing blogs, courses, docs, videos, papers and repos, and adds short framing, practice, a checklist and a project. Pages come from several contributors, so follow this guide exactly. Consistency matters as much as quality.
 
 ## The reader
 
-Someone who has written a little code (any language) and wants to become an AI agent engineer. They may be a student, a career switcher or a developer from another field. Assume nothing about their employer, stack or project. Explain jargon the first time it appears. Do not assume the reader is building any particular product.
+Someone who can write small programs on their own in any language and wants to become an AI agent engineer. Experienced developers may take the Fast track, which skips the Level 0 modules flagged `fast_skip` in `curriculum.json`. They may be a student, a career switcher or a developer from another field. Assume nothing about their employer, stack or project. Explain jargon the first time it appears. Do not assume the reader is building any particular product.
 
 ## Source of truth for scope
 
@@ -38,7 +38,7 @@ Each resource is one bullet on one line:
 
 ## File formats
 
-All files are Markdown with YAML front matter. Set `checked` to the date you last opened the page's links (YYYY-MM-DD).
+All files are Markdown with YAML front matter. Set `checked` to the date you last opened the page's links (YYYY-MM-DD). Pages may also carry `review-by` lines for time-sensitive claims (see "Time-sensitive claims" under Accuracy).
 
 ### Module page: `content/modules/<module-id>.md`
 
@@ -164,6 +164,16 @@ A table: `| Criterion | Good enough | Excellent |` with 4–6 rows, measurable w
 - Do not invent facts, URLs, course lengths, prices, version numbers or API names. If a fact about a tool's current state matters, check it against official documentation or phrase it generically.
 - Course lengths and costs come from the course page you fetched.
 - Never reproduce copyrighted text. Paraphrase. Quotes under 15 words, at most one per source.
+
+### Time-sensitive claims
+
+Some sentences are true today and will expire on a schedule: a free tier's limits, a price, an SDK or protocol version, a deprecation date. Tag each one in the page's front matter with a date by which someone must check it again and an exact phrase from the page:
+
+```text
+review-by: 2027-01-31 | free plan with 1,000 credits a month at the time of writing
+```
+
+Use one line per claim. Pick a date close to any announced change (for example the day after a shutdown) and otherwise three to six months out. `check.py` reports an ERROR if the phrase is no longer on the page, so remove the line when you remove the claim, and a warning once the date has passed. `python check.py --due` lists every overdue claim. When you re-check a claim, update the sentence if needed and move its date forward.
 
 ## Before you finish
 

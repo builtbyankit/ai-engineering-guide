@@ -1,18 +1,18 @@
 # AI Agent Engineering Guide
 
-A free, resource-first study guide that takes you from writing a little code to building, evaluating and running production AI agents.
+A free, resource-first study guide that takes you from writing small programs to building, evaluating and running production AI agents.
 
 **Read it here: https://builtbyankit.github.io/ai-engineering-guide/**
 
 ## What's inside
 
 - **Seven levels and a capstone**, from Python and APIs to production deployment: Foundations, LLM fundamentals, Retrieval and RAG, Tools and agents, Frameworks and multi-agent systems, Evaluation, observability and safety, and Production and scale.
-- **33 modules** (28 core, 5 optional). Each has a plain-language overview, hand-picked resources in three tiers (Start here, Go deeper, Reference), practice exercises, a checklist and a "you're ready when" self-test.
-- **About 430 resources**: official docs, blogs, free courses, videos, papers and repos. Every link was opened and checked on 16 October 2026. A searchable resource library lets you filter by type, level and cost.
+- **34 modules** (29 core, 5 optional). Each has a plain-language overview, hand-picked resources in three tiers (Start here, Go deeper, Reference), practice exercises, a checklist and a "you're ready when" self-test.
+- **About 440 resources**: official docs, blogs, free courses, videos, papers and repos. Every link was opened and checked on 16 October 2026, and links added later on the date shown in each page's `checked` field. A searchable resource library lets you filter by type, level and cost.
 - **A milestone and a portfolio project per level**, each with requirements, stretch goals, a suggested stack, step-by-step guidance and a rubric, plus a capstone.
 - **Progress saved in your browser.** Tick resources, tasks and milestone checks; they are stored in `localStorage` and never leave your device. Back up and restore from the "Your progress" page.
 
-At 10 to 12 hours a week, the core path takes about 32 to 43 weeks.
+At 10 to 12 hours a week, the core path takes about 32.5 to 43.5 weeks. Experienced developers can pick the fast track (about 30 to 40 weeks), which skips most of Level 0.
 
 ## Repository layout
 
@@ -45,6 +45,6 @@ Every push to `main` runs `.github/workflows/deploy.yml`. It checks the content,
 
 ## Contributing
 
-Broken link, outdated resource or a better pick? Open an issue or a pull request. Edit the Markdown in `content/`, follow `WRITING_GUIDE.md`, and run `python check.py --all` before you push.
+Broken link, outdated resource or a better pick? Open an issue or a pull request. Edit the Markdown in `content/`, follow `WRITING_GUIDE.md`, and run `python check.py --all` before you push. Run `python check.py --due` to list time-sensitive claims that are due for a re-check.
 
 Progress ids are tied to the order of checklist items and to resource URLs, so reordering checklist items shifts learners' saved ticks. Add new items at the end of a list where you can.

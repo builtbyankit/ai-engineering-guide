@@ -10,7 +10,7 @@ checked: 2026-10-16
 ## Why it matters
 You will spend the rest of this guide sending text to a model and building on what comes back. Most odd behaviour you meet later has its cause here. Bills are counted in tokens. Answers change between runs because of sampling. A model states false facts with confidence because of how it was trained, and it knows nothing after its training date unless you tell it.
 
-You do not need the maths to build agents. You need a working mental model that lets you predict failures and choose fixes. This module gives you that model through about five hours of videos and reading, plus small experiments you can run in a browser.
+You do not need the maths to build agents. You need a working mental model that lets you predict failures and choose fixes. This module gives you that model through about four hours of videos and reading, plus small experiments you can run in a browser.
 
 ## What to learn
 - **Tokens**: Models read and write tokens, which are chunks of text such as whole words, word pieces or punctuation. As a rough rule, one English token is about four characters, and other languages and code often use more tokens per word. Prices, limits and context sizes are all counted in tokens.
@@ -25,9 +25,8 @@ You do not need the maths to build agents. You need a working mental model that 
 
 ## Resources
 ### Start here
-- [Intro to Large Language Models](https://www.youtube.com/watch?v=zjkBMFhNj_g) · Andrej Karpathy · Video · Free · 1 h — A one-hour talk that builds the big picture: what a model file is, how pretraining and fine-tuning differ, and where the risks lie.
 - [Transformers, the tech behind LLMs](https://www.youtube.com/watch?v=wjZofJX0v4M) · 3Blue1Brown · Video · Free · 27 min — The clearest animated explanation of how text flows through a transformer to become next-token probabilities.
-- [Deep Dive: LLMs like ChatGPT](https://www.youtube.com/watch?v=7xTGNNLPyMI) · Andrej Karpathy · Video · Free · 3.5 h — The full pipeline from internet text and tokenization to fine-tuning, RLHF, reasoning models and hallucinations; watch it in chapters over several sittings.
+- [Deep Dive: LLMs like ChatGPT](https://www.youtube.com/watch?v=7xTGNNLPyMI) · Andrej Karpathy · Video · Free · 3.5 h — The full pipeline from internet text and tokenization to fine-tuning, RLHF, reasoning models and hallucinations; watch it in chapters over several sittings, since it covers everything in his shorter 2023 talk and more.
 ### Go deeper
 - [Attention in transformers, step-by-step](https://www.youtube.com/watch?v=eMlx5fFNoYc) · 3Blue1Brown · Video · Free · 26 min — Shows what queries, keys and values actually compute, so attention stops being a buzzword.
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) · Jay Alammar · Article · Free · 30 min — The classic diagram-led tour of self-attention, multi-head attention and positional encoding.
@@ -50,7 +49,7 @@ You do not need the maths to build agents. You need a working mental model that 
 5. **Explain it back.** Write a one-page explainer, in your own words, of what happens between pressing Enter and seeing a reply. Cover tokens, the forward pass, sampling and when generation stops. Done when a friend without a technical background can follow it.
 
 ## Checklist
-- [ ] [Must ship] Watch the three Start here videos and write a ten-line summary of each.
+- [ ] [Must ship] Watch the two Start here videos and write a ten-line summary of each.
 - [ ] [Must ship] Complete the token counting exercise and keep the table in your notes repo.
 - [ ] [Must ship] Write the one-page explainer from Practice 5.
 - [ ] [Recommended] Read The Illustrated Transformer after the 3Blue1Brown videos.

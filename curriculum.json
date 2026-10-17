@@ -4,13 +4,15 @@
   "levels": [
     {
       "id": "L0", "num": 0, "title": "Foundations", "tier": "Basics",
-      "summary": "The Python, API and tooling skills every later level assumes.",
+      "summary": "The Python, API, SQL and tooling skills every later level assumes.",
       "modules": [
-        {"id": "l0-python-for-ai", "title": "Python for AI engineering", "kind": "core", "hours": "12–15",
+        {"id": "l0-python-for-ai", "fast_skip": true, "title": "Python for AI engineering", "kind": "core", "hours": "12–15",
          "scope": "Modern Python setup (uv or venv + pip), type hints, dataclasses and Pydantic v2 models, f-strings, list/dict comprehensions, exceptions, context managers, reading/writing JSON and files, async/await basics with asyncio and httpx, pytest basics. Aimed at someone who has written a little code (any language)."},
-        {"id": "l0-apis-and-http", "title": "Web APIs, HTTP and JSON", "kind": "core", "hours": "8–10",
+        {"id": "l0-apis-and-http", "fast_skip": true, "title": "Web APIs, HTTP and JSON", "kind": "core", "hours": "8–10",
          "scope": "HTTP methods, status codes, headers, JSON, REST conventions, API keys and auth headers, environment variables for secrets, rate limits and retries with backoff, pagination; calling APIs with httpx/requests; building a small API with FastAPI (routes, Pydantic request/response models, automatic docs)."},
-        {"id": "l0-dev-tooling", "title": "Git, the command line and Docker", "kind": "core", "hours": "6–8",
+        {"id": "l0-sql-basics", "fast_skip": true, "title": "Just enough SQL", "kind": "core", "hours": "5–6",
+         "scope": "Tables and types, SELECT/WHERE/ORDER BY/LIMIT, INSERT/UPDATE/DELETE, joins, GROUP BY and aggregates, UNIQUE constraints and upserts (ON CONFLICT) for idempotent writes, transactions, placeholders and SQL injection, indexes and EXPLAIN QUERY PLAN, full-text search (SQLite FTS5, Postgres) at a basic level; using SQLite from Python with sqlite3. Prepares for pgvector, memory stores, checkpointers and audit logs later."},
+        {"id": "l0-dev-tooling", "fast_skip": true, "title": "Git, the command line and Docker", "kind": "core", "hours": "6–8",
          "scope": "Shell basics, git (commit, branch, merge, pull requests), GitHub, .gitignore and never committing secrets, Docker images/containers/Dockerfile/compose basics, GitHub Actions for running tests on push, writing a good README."},
         {"id": "l0-ml-concepts", "title": "Just enough machine learning", "kind": "core", "hours": "6–8",
          "scope": "What a model is, training vs inference, neural networks and gradient descent at an intuitive level, supervised vs self-supervised learning, overfitting, embeddings as vectors of meaning, what a transformer is at a very high level. Visual/intuitive resources (3Blue1Brown, fast.ai, Google ML crash course). No heavy math required."}
@@ -24,7 +26,7 @@
         {"id": "l1-how-llms-work", "title": "How LLMs work", "kind": "core", "hours": "8–10",
          "scope": "Tokens and tokenization, next-token prediction, transformers and attention (intuition), pretraining vs instruction tuning vs RLHF, context windows, sampling (temperature, top-p), why models hallucinate, reasoning/thinking models at a high level, knowledge cutoffs."},
         {"id": "l1-llm-apis", "title": "Calling LLM APIs", "kind": "core", "hours": "8–10",
-         "scope": "Using provider SDKs (OpenAI, Anthropic, Google Gemini) and local open models (Ollama), the messages format (system/user/assistant), streaming responses, token counting and cost, rate limits and retries, choosing a model (capability vs cost vs latency), multimodal input basics, keeping API keys safe."},
+         "scope": "Using provider SDKs (OpenAI, Anthropic, Google Gemini) and local open models (Ollama), the messages format (system/user/assistant), streaming responses, token counting and cost, rate limits and retries, choosing a model (capability vs cost vs latency), reasoning effort or thinking-budget settings and reasoning-token cost, multimodal input basics, keeping API keys safe."},
         {"id": "l1-prompt-engineering", "title": "Prompt engineering", "kind": "core", "hours": "8–10",
          "scope": "Clear instructions, roles/system prompts, few-shot examples, delimiters/XML tags, chain-of-thought and letting the model think, prompt templates and versioning, prompt chaining, common mistakes; official guides from Anthropic, OpenAI and Google; treating prompts as code that you test."},
         {"id": "l1-structured-outputs", "title": "Structured outputs and function calling basics", "kind": "core", "hours": "6–8",
@@ -58,13 +60,13 @@
         {"id": "l3-tool-calling", "title": "Tool calling in depth", "kind": "core", "hours": "8",
          "scope": "How tool/function calling works across providers, designing tool names/descriptions/schemas the model uses well, parallel tool calls, returning errors to the model, tool results size, idempotency for tools with side effects, security of tool inputs."},
         {"id": "l3-agent-loop", "title": "The agent loop", "kind": "core", "hours": "10",
-         "scope": "What an agent is (model + tools + loop), ReAct, building an agent from scratch without a framework, stop conditions, max steps and token/cost budgets, error recovery, planning vs reacting, reflection, when an agent is the wrong choice."},
+         "scope": "What an agent is (model + tools + loop), ReAct, building an agent from scratch without a framework, stop conditions, max steps and token/cost budgets, error recovery, planning vs reacting, reflection, reasoning models in the loop (returning reasoning blocks with tool results, effort settings), when an agent is the wrong choice."},
         {"id": "l3-workflow-patterns", "title": "Workflows and agent design patterns", "kind": "core", "hours": "8",
          "scope": "Workflows vs agents; prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer (Anthropic's Building effective agents); plan-and-execute; choosing the simplest pattern that works; agent design guides from OpenAI and Google."},
         {"id": "l3-mcp", "title": "Model Context Protocol (MCP)", "kind": "core", "hours": "8–10",
          "scope": "What MCP is and why it exists, hosts/clients/servers, tools/resources/prompts, transports (stdio, Streamable HTTP), building a server with the official Python SDK or FastMCP, connecting it to a client (Claude Desktop, an IDE, your own agent), authorization for remote servers, security risks of third-party servers."},
         {"id": "l3-memory-context", "title": "Memory and context engineering", "kind": "core", "hours": "8",
-         "scope": "Short-term vs long-term memory, conversation history management and summarisation, semantic/episodic/procedural memory, memory stores (Mem0, LangGraph store, Letta/MemGPT ideas), context engineering: what goes into the window and why, context rot and compaction."}
+         "scope": "Short-term vs long-term memory, conversation history management and summarisation, semantic/episodic/procedural memory, memory stores (Mem0, LangGraph store, Letta/MemGPT ideas), context engineering: what goes into the window and why, context rot and compaction, Agent Skills and progressive disclosure."}
       ],
       "project": {"id": "p3-research-agent", "title": "Personal research agent", "weeks": "2"}
     },
@@ -111,7 +113,7 @@
         {"id": "l6-reliability-cost", "title": "Reliability, latency and cost", "kind": "core", "hours": "8–10",
          "scope": "LLM gateways (LiteLLM, cloud gateways), fallbacks across providers, timeouts and retries, rate limits and per-user budgets, prompt caching, semantic caching, batching, model routing and smaller models, measuring cost per task."},
         {"id": "l6-open-models", "title": "Open models, fine-tuning and serving", "kind": "optional", "hours": "10",
-         "scope": "When to fine-tune vs prompt vs RAG, LoRA/QLoRA, the Hugging Face ecosystem (Transformers, PEFT, TRL), distillation for agents, serving open models with vLLM or Ollama, quantization. Optional specialisation."},
+         "scope": "When to fine-tune vs prompt vs RAG, LoRA/QLoRA, the Hugging Face ecosystem (Transformers, PEFT, TRL), distillation for agents, reinforcement fine-tuning (GRPO) at a high level, serving open models with vLLM or Ollama, quantization. Optional specialisation."},
         {"id": "l6-staying-current", "title": "Staying current and building a portfolio", "kind": "core", "hours": "4–6",
          "scope": "How to read papers (arXiv, Papers with Code alternatives), newsletters and blogs worth following, writing technical posts, demo videos, contributing to open-source agent projects, preparing for AI engineering interviews (system design for LLM apps)."}
       ],

@@ -6,7 +6,7 @@
 <title>AI Agent Engineering Guide</title>
 <meta name="description" content="A free, resource-first study guide to AI agent engineering: seven levels from Python basics to production agents, with milestones, portfolio projects and hand-picked blogs, courses, docs and papers.">
 <meta property="og:title" content="AI Agent Engineering Guide">
-<meta property="og:description" content="From writing a little code to building, evaluating and running production AI agents. Free, with milestones, projects and progress saved in your browser.">
+<meta property="og:description" content="From writing small programs to building, evaluating and running production AI agents. Free, with milestones, projects and progress saved in your browser.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#2b5c8a">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -193,18 +193,20 @@ body {
 .progress-link { font: 0.76rem/1.3 var(--font-display); color: var(--accent); }
 
 /* track selector */
-.track-select { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.track-select { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .track-opt { position: relative; display: grid; gap: 2px; padding: 10px 12px 10px 34px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; cursor: pointer; }
 .track-opt input { position: absolute; left: 12px; top: 13px; margin: 0; width: 14px; height: 14px; accent-color: var(--accent); }
 .track-opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
 .track-opt:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .track-name { font: 650 0.92rem/1.25 var(--font-display); color: var(--ink); }
 .track-sub { font: 0.72rem/1.35 var(--font-mono); color: var(--ink-3); }
-.track-select.compact .track-opt { padding: 7px 8px 7px 28px; border-radius: 8px; }
-.track-select.compact .track-opt input { left: 9px; top: 9px; width: 12px; height: 12px; }
+/* compact (sidebar): the radio dot is hidden but still focusable; the checked card's border and fill show the choice */
+.track-select.compact { gap: 6px; }
+.track-select.compact .track-opt { padding: 6px 7px; border-radius: 8px; }
+.track-select.compact .track-opt input { opacity: 0; inset: 0; width: 100%; height: 100%; cursor: pointer; }
 .track-select.compact .track-name { font-size: 0.8rem; }
 .track-select.compact .track-sub { font-size: 0.64rem; }
-@media (max-width: 420px) { .hero .track-select { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 720px) { .hero .track-select { grid-template-columns: minmax(0, 1fr); } }
 
 /* chips, labels, verification */
 .chip { display: inline-block; align-self: flex-start; margin-left: 8px; padding: 1px 8px; border-radius: 999px; font: 600 0.62rem/1.6 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 0.15em; white-space: nowrap; }
@@ -597,6 +599,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
           <legend class="sr-only">What to count</legend>
           <label class="track-opt"><input type="radio" name="track-side" value="core" checked><span class="track-name">Core path</span><span class="track-sub">%%CORE_WEEKS%%</span></label>
           <label class="track-opt"><input type="radio" name="track-side" value="full"><span class="track-name">Everything</span><span class="track-sub">%%FULL_WEEKS%%</span></label>
+          <label class="track-opt"><input type="radio" name="track-side" value="fast"><span class="track-name">Fast track</span><span class="track-sub">%%FAST_WEEKS%%</span></label>
         </fieldset>
         <p class="progress-head"><span>Your progress</span><span>this browser</span></p>
         <div class="counter">
@@ -623,11 +626,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
       <header class="hero">
         <p class="eyebrow">A free, open study guide</p>
         <h1>AI Agent Engineering Guide</h1>
-        <p class="standfirst">Go from writing a little code to building, evaluating and running production AI agents. Seven levels, %%N_CORE_MODULES%% core modules and %%N_OPT_MODULES%% optional ones, %%N_PROJECTS%% portfolio projects and %%N_RES%% hand-picked blogs, courses, docs, videos and papers.</p>
+        <p class="standfirst">Go from writing small programs to building, evaluating and running production AI agents. Seven levels, %%N_CORE_MODULES%% core modules and %%N_OPT_MODULES%% optional ones, %%N_PROJECTS%% portfolio projects and %%N_RES%% hand-picked blogs, courses, docs, videos and papers.</p>
         <fieldset class="track-select">
           <legend class="sr-only">Choose what to count</legend>
           <label class="track-opt"><input type="radio" name="track-home" value="core" checked><span class="track-name">Core path</span><span class="track-sub">%%N_CORE_MODULES%% modules · %%CORE_WEEKS%%</span></label>
           <label class="track-opt"><input type="radio" name="track-home" value="full"><span class="track-name">Everything</span><span class="track-sub">+ %%N_OPT_MODULES%% optional modules · %%FULL_WEEKS%%</span></label>
+          <label class="track-opt"><input type="radio" name="track-home" value="fast"><span class="track-name">Fast track</span><span class="track-sub">Working developers: skips %%N_FAST_SKIP%% Level 0 modules · %%FAST_WEEKS%%</span></label>
         </fieldset>
         <dl class="stats">
           <div class="stat"><dt>Time to complete</dt><dd><span class="stat-big" data-dur-weeks>%%CORE_WEEKS%%</span><span class="stat-sub" data-dur-hours>%%CORE_HOURS%%</span></dd></div>
@@ -659,8 +663,11 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   var DATA = JSON.parse(document.getElementById("site-data").textContent);
   var R = DATA.routes, ORDER = DATA.order, GATES = DATA.gates, TASKS = DATA.tasks, TIERS = DATA.tiers, PRES = DATA.pageRes;
   var LEVELS = DATA.levels, RES = DATA.resources;
-  var OPT = {}, RESBYID = {};
+  var OPT = {}, FAST = {}, RESBYID = {};
   DATA.optional.forEach(function (id) { OPT[id] = true; });
+  (DATA.fastSkip || []).forEach(function (id) { FAST[id] = true; });
+  var TRACKS = { core: "Core path", full: "Everything", fast: "Fast track" };
+  function validTrack(t) { return Object.prototype.hasOwnProperty.call(TRACKS, t) ? t : "core"; }
   RES.forEach(function (r) { RESBYID[r.id] = r; });
   var SITE = "AI Agent Engineering Guide";
   var KEY = "ai-agent-guide:progress:v1", TRACK_KEY = "ai-agent-guide:track", THEME_KEY = "ai-agent-guide:theme";
@@ -672,7 +679,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   var state = {};
   try { state = JSON.parse(read(KEY) || "{}") || {}; } catch (e) { state = {}; }
   function save() { store(KEY, JSON.stringify(state)); }
-  var track = read(TRACK_KEY) === "full" ? "full" : "core";
+  var track = validTrack(read(TRACK_KEY));
 
   var home = document.getElementById("home"), view = document.getElementById("view"), pager = document.getElementById("pager");
   var sidebar = document.getElementById("sidebar"), scrim = document.getElementById("scrim"), menuBtn = document.getElementById("menu-btn");
@@ -701,7 +708,8 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   });
 
   /* ---------- progress ---------- */
-  function inTrack(pid) { return track === "full" || !OPT[pid]; }
+  // core: everything except optional modules; full: everything; fast: core minus the fast-skip modules
+  function inTrack(pid) { return track === "full" || (!OPT[pid] && !(track === "fast" && FAST[pid])); }
   function countedPages() {
     var out = [];
     LEVELS.forEach(function (l) {
@@ -804,7 +812,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
 
   /* ---------- track ---------- */
   function applyTrack(next, persist) {
-    track = next === "full" ? "full" : "core";
+    track = validTrack(next);
     if (persist) store(TRACK_KEY, track);
     document.querySelectorAll('input[name="track-home"], input[name="track-side"]').forEach(function (r) { r.checked = r.value === track; });
     document.querySelectorAll("[data-track-view]").forEach(function (el) { el.hidden = el.getAttribute("data-track-view") !== track; });
@@ -1172,7 +1180,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   function renderProgress() {
     var t = totals();
     view.innerHTML =
-      '<header class="page-head"><p class="eyebrow">' + (track === "full" ? "Everything" : "Core path") + "</p>" +
+      '<header class="page-head"><p class="eyebrow">' + TRACKS[track] + "</p>" +
       '<h1 tabindex="-1">Your progress</h1>' +
       '<p class="standfirst">Milestone checks sit at the bottom of each level page. Must-ship tasks are the core of each module and project. Your ticks live in this browser only, so keep a backup.</p></header>' +
       '<div class="prose"><dl class="stats">' +

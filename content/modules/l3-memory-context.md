@@ -22,7 +22,7 @@ Context engineering is choosing the smallest set of useful tokens for each step,
 - **Context engineering moves**: Write notes outside the window, select only the relevant tools and memories, compress history, and isolate subtasks in sub-agents with their own clean context. Decide deliberately what enters each call.
 - **Context rot and failure modes**: Long contexts weaken recall and reasoning. Common failures are poisoning (an early error keeps being reused), distraction by a long history, confusion from irrelevant tools, and clashes between conflicting facts.
 - **Compaction**: When a run nears its limit, summarise the important state (decisions, open questions, file paths, URLs) and continue in a fresh window. Keep references so dropped details can be fetched again.
-- **Memory hygiene**: Memories can be wrong, stale or private. Store sources and dates, let users view and delete what is stored, and never store secrets. Prompt caching, which rewards a stable prompt prefix, is covered in [Reliability, latency and cost](#l6-reliability-cost).
+- **Memory hygiene**: Memories can be wrong, stale or private. Store sources and dates, let users view and delete what is stored, and never store secrets. Keep trusted state such as the user's identity, permissions and budgets outside the model's context, and recheck it before any write. Prompt caching, which rewards a stable prompt prefix, is covered in [Reliability, latency and cost](#l6-reliability-cost).
 
 ## Resources
 ### Start here

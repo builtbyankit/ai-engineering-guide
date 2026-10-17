@@ -20,7 +20,7 @@ Most agent failures trace back to tools. A vague description makes the model pic
 - **Tool choice and parallel calls**: Most APIs let you allow, force or forbid tool calls, with support varying by model. Models can also request several independent calls in one turn. Run safe ones concurrently, then return every result together, each matched to its call ID.
 - **Errors as feedback**: When a tool fails, return an error result with a message the model can act on, such as "date must be YYYY-MM-DD" or "rate limited, retry in 60 s". Models often correct themselves from a good error. A stack trace or a bare "failed" wastes a turn.
 - **Result size**: Everything a tool returns enters the context window and costs tokens. Paginate, filter, truncate with a note saying so, and return stable IDs the model can use to fetch details later.
-- **Idempotency**: A tool with side effects may run twice after a network retry or a confused model. Give writes an idempotency key, check whether the action already happened, and prefer designs where repeating a call is harmless.
+- **Idempotency**: A tool with side effects may run twice after a network retry or a confused model. Give writes an idempotency key, check whether the action already happened, and prefer designs where repeating a call is harmless. If a write times out after it was sent, its outcome is unknown, so check its status with the same key before you try again.
 - **Security of tool inputs**: Arguments come from a model that may have read malicious text. Validate them like user input, allowlist paths and domains, use parameterised queries, never build shell commands from strings, and give each tool the least privilege it needs. [Security and guardrails](#l5-security) goes further.
 
 ## Resources

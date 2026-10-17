@@ -7,8 +7,9 @@ A free, resource-first study guide that takes you from writing small programs to
 ## What's inside
 
 - **Seven levels and a capstone**, from Python and APIs to production deployment: Foundations, LLM fundamentals, Retrieval and RAG, Tools and agents, Frameworks and multi-agent systems, Evaluation, observability and safety, and Production and scale.
-- **34 modules** (29 core, 5 optional). Each has a plain-language overview, hand-picked resources in three tiers (Start here, Go deeper, Reference), practice exercises, a checklist and a "you're ready when" self-test.
-- **About 440 resources**: official docs, blogs, free courses, videos, papers and repos. Every link was opened and checked on 16 October 2026, and links added later on the date shown in each page's `checked` field. A searchable resource library lets you filter by type, level and cost.
+- **36 modules** (29 core, 7 optional). Each has a plain-language overview, hand-picked resources in three tiers (Start here, Go deeper, Reference), practice exercises, a checklist and a "you're ready when" self-test.
+- **About 460 resources**: official docs, blogs, free courses, videos, papers and repos. Every link was opened and checked on 16 October 2026, and links added later on the date shown in each page's `checked` field. A searchable resource library lets you filter by type, level and cost.
+- **Companion exercises** from the [Agentic AI Mastery guide](https://github.com/builtbyankit/agentic-ai-learning-guide): runnable labs for durable runs, approvals, threat models and RAG, plus worked capacity and cost sheets and interview practice, linked from the modules that use them.
 - **A milestone and a portfolio project per level**, each with requirements, stretch goals, a suggested stack, step-by-step guidance and a rubric, plus a capstone.
 - **Progress saved in your browser.** Tick resources, tasks and milestone checks; they are stored in `localStorage` and never leave your device. Back up and restore from the "Your progress" page.
 

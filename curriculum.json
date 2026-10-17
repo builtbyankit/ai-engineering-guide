@@ -112,10 +112,14 @@
          "scope": "Serving with FastAPI and streaming (SSE), background jobs and queues, durable execution for long-running agents (Temporal, LangGraph persistence, Inngest/Restate-style), containers, serverless vs Kubernetes, configuration and secrets, CI/CD with an eval gate, canary releases for prompt/model changes."},
         {"id": "l6-reliability-cost", "title": "Reliability, latency and cost", "kind": "core", "hours": "8–10",
          "scope": "LLM gateways (LiteLLM, cloud gateways), fallbacks across providers, timeouts and retries, rate limits and per-user budgets, prompt caching, semantic caching, batching, model routing and smaller models, measuring cost per task."},
+        {"id": "l6-system-design", "title": "Agent system design and capacity planning", "kind": "optional", "hours": "8–10",
+         "scope": "Decision briefs (baseline, autonomy boundary, systems of record, non-goals, kill criterion), SLIs and SLOs from user outcomes, system planes and state ownership, Little's law and provider quotas, latency budgets, cost per useful task and sensitivity, vector storage and rebuild time, serving memory (weights plus KV cache), human review capacity, architecture decision records. Companion worked examples from the Agentic AI Mastery guide. Optional."},
         {"id": "l6-open-models", "title": "Open models, fine-tuning and serving", "kind": "optional", "hours": "10",
          "scope": "When to fine-tune vs prompt vs RAG, LoRA/QLoRA, the Hugging Face ecosystem (Transformers, PEFT, TRL), distillation for agents, reinforcement fine-tuning (GRPO) at a high level, serving open models with vLLM or Ollama, quantization. Optional specialisation."},
         {"id": "l6-staying-current", "title": "Staying current and building a portfolio", "kind": "core", "hours": "4–6",
-         "scope": "How to read papers (arXiv, Papers with Code alternatives), newsletters and blogs worth following, writing technical posts, demo videos, contributing to open-source agent projects, preparing for AI engineering interviews (system design for LLM apps)."}
+         "scope": "How to read papers (arXiv, Papers with Code alternatives), newsletters and blogs worth following, writing technical posts, demo videos, contributing to open-source agent projects, preparing for AI engineering interviews (system design for LLM apps)."},
+        {"id": "l6-interviews", "title": "AI engineering interviews", "kind": "optional", "hours": "6–8",
+         "scope": "The shape of AI engineering interview loops, a system design answer structure, strong and weak signals, whiteboard numbers, contract-first runtime coding exercises, incident and evaluation review rounds, STAR stories backed by evidence, timed mocks with six-dimension scoring, honesty about what was built versus designed. Companion question bank, workbook and coding exercises from the Agentic AI Mastery guide. Optional."}
       ],
       "project": {"id": "p6-production-deploy", "title": "Take an agent to production", "weeks": "1.5–2"}
     }

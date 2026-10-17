@@ -22,7 +22,7 @@ The other half is being visible. Hiring managers and collaborators judge AI engi
 - **Writing technical posts**: Write about what you built and what you learned, including failures and numbers. Short "today I learned" notes count. Writing also exposes the gaps in your own understanding.
 - **Demo videos**: Keep it to two minutes, one task and real output. Show the problem, the agent working with a trace or progress view, and one failure it handles. A plain screen recording with clear narration is enough.
 - **Contributing to open source**: Start with docs fixes, bug reproductions and small "good first issue" tickets in projects you already use, such as agent frameworks, eval tools or MCP servers. Read the CONTRIBUTING file first and keep pull requests small.
-- **Interview prep**: AI engineering interviews often include LLM system design. Practise talking through requirements, architecture (retrieval, tools, gateway, caching, guardrails), evals, failure modes, latency and cost for a product such as a support agent, using numbers from your own projects.
+- **Interview prep**: AI engineering interviews often include LLM system design. Practise talking through requirements, architecture (retrieval, tools, gateway, caching, guardrails), evals, failure modes, latency and cost for a product such as a support agent, using numbers from your own projects. The optional [AI engineering interviews](#l6-interviews) module adds timed mocks, scoring and coding practice.
 - **Portfolio shape**: Two or three deep projects beat ten shallow ones. Give each a README with an architecture diagram, eval results, cost per task and a demo link.
 
 ## Resources

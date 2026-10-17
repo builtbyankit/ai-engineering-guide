@@ -24,6 +24,7 @@ Doing that well is an engineering problem. The run must stop cleanly, wait minut
 - **Undo and rollback**: Prefer reversible actions such as drafts, soft deletes or sends with a short delay. For multi-step changes, record a compensating action for each step, which is called the saga pattern.
 - **Confidence-based escalation**: Send unusual or low-confidence cases to a person and let routine ones through. Use signals you can check, such as classifier scores, rule hits or amount limits, because a model's self-reported confidence is weak on its own.
 - **Timeouts and defaults**: Decide what happens when nobody answers. Expire the request, escalate to someone else or take the safe default, and log which one happened.
+- **Exact approvals and the outbox**: Bind each approval to a digest of the exact proposal (target, amount, reason, policy version and expiry), so any change makes the approval stale. Write the decision and an outbox row in one database transaction, then let a worker send the action with a stable idempotency key, so a crash can neither lose an approved action nor send it twice.
 
 ## Resources
 
@@ -48,6 +49,7 @@ Doing that well is an engineering problem. The run must stop cleanly, wait minut
 - [Deferred tools](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/) · Pydantic · Docs · Free · reference — Tool approval and externally executed tools in Pydantic AI, with runs that resume once results arrive.
 - [Human-in-the-loop in workflows](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop) · Microsoft · Docs · Free · reference — Request and response ports in Microsoft Agent Framework, including how pending requests survive in checkpoints.
 - [langchain-ai/agent-inbox](https://github.com/langchain-ai/agent-inbox) · LangChain · Repo · Free · reference — An open-source inbox UI for LangGraph interrupts, with accept, edit, respond and ignore actions.
+- [Pattern: Transactional outbox](https://microservices.io/patterns/data/transactional-outbox) · Chris Richardson · Article · Free · reference — The standard description of saving outgoing messages in the same transaction as the business change, including why consumers must handle duplicates.
 
 ## Practice
 

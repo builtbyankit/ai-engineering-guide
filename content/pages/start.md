@@ -35,7 +35,7 @@ The milestone is a short list of checks at the bottom of each level page. Tick t
 The [capstone](#capstone) comes last. You build a new agent from scratch that uses every core skill in the guide, then deploy it and write it up.
 
 ## Core path and optional modules
-Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents or fine-tuning open models. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
+Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents, fine-tuning open models, system design or interview preparation. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
 
 At 10 to 12 hours a week, the core path takes about %%CORE_WEEKS%%, everything takes about %%FULL_WEEKS%% and the fast track takes about %%FAST_WEEKS%%. Time estimates cover the Start here resources, the practice, the must-ship tasks and the projects. Treat them as time boxes. If a module runs long, finish its must-ship tasks and move on; you can come back for the rest.
 

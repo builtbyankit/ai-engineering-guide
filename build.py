@@ -22,7 +22,7 @@ CONTENT = ROOT / "content"
 OUT = ROOT / "site"
 PAGES = OUT / "pages"
 CUR = json.loads((ROOT / "curriculum.json").read_text(encoding="utf-8"))
-REPO_URL = "https://github.com/builtbyankit/ai-agent-engineering-guide"
+REPO_URL = "https://github.com/builtbyankit/ai-engineering-guide"
 SITE_TITLE = "AI Agent Engineering Guide"
 CHECKED = "16 Oct 2026"
 HOURS = (10, 12)  # hours per week, low and high

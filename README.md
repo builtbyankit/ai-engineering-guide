@@ -2,7 +2,7 @@
 
 A free, resource-first study guide that takes you from writing a little code to building, evaluating and running production AI agents.
 
-**Read it here: https://builtbyankit.github.io/ai-agent-engineering-guide/**
+**Read it here: https://builtbyankit.github.io/ai-engineering-guide/**
 
 ## What's inside
 

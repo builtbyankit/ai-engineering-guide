@@ -24,6 +24,7 @@ Agent security is therefore mostly an architecture problem. You limit what a hij
 - **Secure design patterns**: Action-selector, plan-then-execute, map-reduce, dual LLM, code-then-execute and context minimisation all stop untrusted text from choosing the agent's next action. CaMeL goes further by tracking where each value came from and enforcing policies at every tool call.
 - **Guardrails as one layer**: Input and output filters catch known-bad content, policy violations and personal data. Llama Guard is a safety classifier model, NeMo Guardrails adds programmable rails including checks on tool execution, and Guardrails AI wraps calls with validators. Treat them as risk reducers and measure their false positives.
 - **PII handling**: Send the model only the personal data a task needs, mask it in traces and logs with a tool such as Presidio, and set retention limits.
+- **Threat register**: List the assets, the inputs an attacker controls and the capabilities the model can request. For each threat, record the control, the evidence that it works, the gap that remains and an owner, and keep a test that fails if someone removes the control.
 - **Red-teaming**: Attack your own system on purpose. Scanners such as garak, PyRIT and promptfoo's red-team mode generate many attacks, and you add hand-written injections aimed at your tools. Re-run the suite after every change, because defences regress.
 
 ## Resources

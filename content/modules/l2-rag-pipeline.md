@@ -23,6 +23,7 @@ A RAG system is a pipeline, and each stage can quietly spoil the answer. Bad PDF
 - **Citations**: Ask the model to cite chunk ids for each claim and return structured output you can validate (see [Structured outputs](#l1-structured-outputs)). Some APIs, such as Anthropic's Citations feature, return the cited passages for you.
 - **Refusing**: Instruct the model to say it cannot find the answer when the context does not support one, and test that it does. A wrong answer with a confident citation does more harm than "I don't know".
 - **Frameworks versus plain code**: LlamaIndex and LangChain supply loaders, splitters, retrievers and integrations. Build your first pipeline as a short plain Python script so you understand each step, then adopt a framework where it saves real work.
+- **Index lifecycle and permissions**: An index is derived data. Re-embed changed documents, remove deleted ones, and build a new index version beside the live one, switching only when checks pass. Check the user's current access at query time, because a stale index or a vector filter is not the authority on who may see a document.
 - **RAG, long context or fine-tuning**: If the whole corpus fits comfortably in your model's context window and the cost per call is acceptable, try sending all of it with prompt caching, where the provider reuses an unchanged prompt prefix at a discount (see [Reliability, latency and cost](#l6-reliability-cost)). Use RAG for larger or frequently changing data. Fine-tuning shapes behaviour and format and is a poor way to add facts.
 
 ## Resources
@@ -47,6 +48,7 @@ A RAG system is a pipeline, and each stage can quietly spoil the answer. Bad PDF
 - [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/abs/2005.11401) · Lewis et al. · Paper · Free · 1 h — The 2020 paper that coined the term; the introduction and method sections are enough for context.
 - [Docling](https://github.com/docling-project/docling) · Docling Project · Repo · Free · reference — An open-source parser that turns PDFs, Office files and HTML into Markdown or JSON, with LlamaIndex and LangChain integrations.
 - [PyMuPDF4LLM](https://pymupdf.readthedocs.io/en/latest/pymupdf4llm/) · PyMuPDF · Docs · Free · reference — A lightweight PDF-to-Markdown converter with layout analysis and OCR for scanned pages.
+- [Module 11: Unstructured Data, RAG, and Agent Optimization](https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-module-11-data-rag-and-optimization.md) · Agentic AI Mastery · Tutorial · Free · 1.5 h — A runnable local ingestion, chunking and vector query lab with a corpus evaluation, plus an optimisation scorecard for caching, routing and batching.
 
 ## Practice
 

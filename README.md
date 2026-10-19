@@ -12,7 +12,7 @@ A free, resource-first study guide that takes you from writing small programs to
 - **Companion exercises** from the [Agentic AI Mastery guide](https://github.com/builtbyankit/agentic-ai-learning-guide): runnable labs for durable runs, approvals, threat models and RAG, plus worked capacity and cost sheets and interview practice, linked from the modules that use them.
 - **Agentic AI interview prep**, a separate section outside the levels for the AI-specific interview rounds: system design, a question bank of about 40 questions with model answers, product and customer rounds, evaluation and debugging with worked numbers, coding, enterprise and regulated settings, behavioural stories and five timed mock rounds with scoring.
 - **A milestone and a portfolio project per level**, each with requirements, stretch goals, a suggested stack, step-by-step guidance and a rubric, plus a capstone.
-- **Progress saved in your browser.** Tick resources, tasks and milestone checks; they are stored in `localStorage` and never leave your device. Back up and restore from the "Your progress" page.
+- **Progress saved in your browser.** Mark pages complete and tick resources, tasks and milestone checks; they are stored in `localStorage` and never leave your device. Back up and restore from the "Your progress" page.
 
 At 10 to 12 hours a week, the core path takes about 32.5 to 43.5 weeks. Experienced developers can pick the fast track (about 30 to 40 weeks), which skips most of Level 0.
 

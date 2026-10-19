@@ -370,6 +370,28 @@ routes["start"] = {"t": start_fm["title"], "k": "page", "s": "start", "e": "Star
 order.append("start")
 
 
+doneable = []  # pages a learner can mark as complete: modules, projects, the capstone and interview prep pages
+
+
+def done_flag(pid):
+    """Chip beside the page title, shown by the site script once the page is marked complete."""
+    return f' <span class="chip chip-done" data-done-flag="{pid}" hidden>Completed</span>'
+
+
+def done_block(pid):
+    """Placeholder at the end of a page; the site script renders the mark-as-complete control into it."""
+    doneable.append(pid)
+    return f'<section class="page-done" data-done-for="{pid}" aria-label="Page completion"></section>'
+
+
+def fast_tag(m, cls="nav-tag"):
+    return f'<span class="{cls} fast-tag">Skipped on fast track</span>' if m.get("fast_skip") else ""
+
+
+def li_attrs(m):
+    return (" data-opt" if m["kind"] == "optional" else "") + (" data-fast" if m.get("fast_skip") else "")
+
+
 def module_page(lv, idx, n_mods, m, fm, body):
     mid = m["id"]
     soup, resources = md_to_soup(body)
@@ -382,7 +404,8 @@ def module_page(lv, idx, n_mods, m, fm, body):
                       f'Resources done <span data-res-for="{mid}">0/{len(resources)}</span>',
                       f"Links checked {page_checked(fm)}"])
     eyebrow = f'<a href="#{lv["id"]}">Level {lv["num"]}</a> · Module {idx} of {n_mods}'
-    fragments[mid] = page_head(eyebrow, f'{m["hours"]} h', fm["title"], fm["summary"], meta, chip) + f'<div class="prose">{soup}</div>'
+    fragments[mid] = (page_head(eyebrow, f'{m["hours"]} h', fm["title"], fm["summary"], meta, chip + done_flag(mid)) +
+                      f'<div class="prose">{soup}</div>' + done_block(mid))
     learn = [b.get_text().split(":")[0] for b in soup.find_all("strong")][:12]
     routes[mid] = {"t": fm["title"], "k": "module", "s": lv["id"], "e": f"Level {lv['num']}", "sum": fm["summary"],
                    "h": headings_of(soup) + learn, "opt": m["kind"] == "optional", "hrs": m["hours"]}
@@ -398,7 +421,8 @@ def project_page(lv, pid, pfm, pbody, capstone=False):
     meta = meta_line([f'Requirements <span data-must-for="{pid}">0/0</span>',
                       f'Stretch goals <span data-extra-for="{pid}">0/0</span>'])
     eyebrow = "Capstone" if capstone else f'<a href="#{lv["id"]}">Level {lv["num"]}</a> · Project'
-    fragments[pid] = page_head(eyebrow, f'{pfm["weeks"]} weeks', pfm["title"], pfm["summary"], meta) + f'<div class="prose">{soup}</div>'
+    fragments[pid] = (page_head(eyebrow, f'{pfm["weeks"]} weeks', pfm["title"], pfm["summary"], meta, done_flag(pid)) +
+                      f'<div class="prose">{soup}</div>' + done_block(pid))
     routes[pid] = {"t": pfm["title"], "k": "capstone" if capstone else "project", "s": "capstone" if capstone else lv["id"],
                    "e": "Capstone" if capstone else f"Level {lv['num']} project", "sum": pfm["summary"], "h": headings_of(soup),
                    "wk": pfm["weeks"]}
@@ -413,7 +437,8 @@ def level_page(lv, lfm, lbody, mods, pid, pfm):
     rows = []
     for i, (m, fm, _b) in enumerate(mods, 1):
         chip = '<span class="chip chip-opt">Optional</span>' if m["kind"] == "optional" else ""
-        rows.append(f'<li{" data-opt" if m["kind"] == "optional" else ""}><a class="topic" href="#{m["id"]}"><span class="t-num">{i:02d}</span>'
+        chip += fast_tag(m, "chip chip-fast")
+        rows.append(f'<li{li_attrs(m)}><a class="topic" href="#{m["id"]}"><span class="t-num">{i:02d}</span>'
                     f'<span class="t-body"><span class="t-title">{esc(fm["title"])}{chip}</span><span class="t-sum">{esc(fm["summary"])}</span></span>'
                     f'<span class="t-meta"><span>{esc(m["hours"])} h</span><span class="t-tasks"><span data-must-for="{m["id"]}">0/0</span> must ship</span></span></a></li>')
     mod_html = (f'<h2 id="{lid}--modules">Modules</h2><p class="topics-intro">{len(mods)} modules, in suggested order. '
@@ -428,7 +453,8 @@ def level_page(lv, lfm, lbody, mods, pid, pfm):
     timebox = fmt_range(*wk["core"], "weeks")
     if wk["full"] != wk["core"]:
         timebox += f" (+{fmt_num(half(wk['full'][0] - wk['core'][0]))}–{fmt_num(half(wk['full'][1] - wk['core'][1]))} optional)"
-    meta = meta_line([f'Milestone <span data-count-for="{lid}">0/{info["gates"]}</span>',
+    meta = meta_line([f'Pages done <span data-pages-for="{lid}">0/0</span>',
+                      f'Milestone <span data-count-for="{lid}">0/{info["gates"]}</span>',
                       f'Must-ship tasks <span data-level-must="{lid}">0/0</span>'])
     eyebrow = f"Level {lv['num']} · {esc(lv['tier'])}"
     fragments[lid] = page_head(eyebrow, timebox, lv["title"], lfm["summary"], meta) + f'<div class="prose">{soup}</div>'
@@ -462,7 +488,8 @@ def interview_page(idx, pg, fm, body):
     else:
         eyebrow = f'<a href="#interview">Interview prep</a> · Page {idx} of {len(iv_info) - 1}'
         timebox = f'{pg["hours"]} h'
-    fragments[pid] = page_head(eyebrow, timebox, fm["title"], fm["summary"], meta) + f'<div class="prose">{html_out}</div>'
+    fragments[pid] = (page_head(eyebrow, timebox, fm["title"], fm["summary"], meta, done_flag(pid)) +
+                      f'<div class="prose">{html_out}</div>' + done_block(pid))
     routes[pid] = {"t": fm["title"], "k": "interview", "s": "interview", "e": "Interview prep", "sum": fm["summary"],
                    "h": headings_of(soup), "hrs": pg["hours"]}
 
@@ -510,11 +537,11 @@ def nav_html():
         subs = []
         for m, fm, _b in mods:
             tag = '<span class="nav-tag">Optional</span>' if m["kind"] == "optional" else ""
-            subs.append(f'<li{" data-opt" if m["kind"] == "optional" else ""}><a href="#{m["id"]}" data-route="{m["id"]}">{esc(fm["title"])}{tag}</a></li>')
+            subs.append(f'<li{li_attrs(m)}><a href="#{m["id"]}" data-route="{m["id"]}">{esc(fm["title"])}{tag}{fast_tag(m)}</a></li>')
         subs.append(f'<li><a href="#{pid}" data-route="{pid}">Project: {esc(pfm["title"])}</a></li>')
         out.append(f'<li class="nav-sec" data-sec="{lid}"><div class="nav-row"><a href="#{lid}" data-route="{lid}">'
                    f'<span class="nav-num">L{lv["num"]}</span><span>{esc(lv["title"])}</span>'
-                   f'<span class="nav-count" data-count-for="{lid}">0/0</span></a>'
+                   f'<span class="nav-count" data-pages-for="{lid}" title="Pages completed">0/0</span></a>'
                    f'<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="sub-{lid}">'
                    f'<span class="sr-only">Show modules in {esc(lv["title"])}</span></button></div>'
                    f'<ul class="nav-sub" id="sub-{lid}" hidden>{"".join(subs)}</ul></li>')
@@ -526,7 +553,7 @@ def nav_html():
     out.append('<div class="nav-group"><p class="nav-heading">Any time</p><ul class="nav-list">'
                '<li class="nav-sec" data-sec="interview"><div class="nav-row"><a href="#interview" data-route="interview">'
                '<span class="nav-num">◎</span><span>Interview prep</span>'
-               '<span class="nav-count" data-iv-count>0/0</span></a>'
+               '<span class="nav-count" data-iv-count title="Pages completed">0/0</span></a>'
                '<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="sub-interview">'
                '<span class="sr-only">Show pages in Interview prep</span></button></div>'
                f'<ul class="nav-sub" id="sub-interview" hidden>{subs}</ul></li></ul></div>')
@@ -579,13 +606,13 @@ def home_cards():
         cards.append(f'<li><a class="card" href="#{lid}"><span class="card-eyebrow">Level {lv["num"]} · {esc(lv["tier"])}</span>'
                      f'<span class="card-title">{esc(lv["title"])}</span><span class="card-sum">{esc(lv["summary"])}</span>'
                      f'<span class="card-foot"><span>{fmt_range(*level_weeks[lid]["core"], "wk")}</span>'
-                     f'<span class="card-prog" data-count-for="{lid}">0/0</span></span></a></li>')
+                     f'<span class="card-prog"><span data-pages-for="{lid}">0/0</span> pages</span></span></a></li>')
     cards.append(f'<li><a class="card card-cap" href="#capstone"><span class="card-eyebrow">Finish</span>'
                  f'<span class="card-title">Capstone</span><span class="card-sum">{esc(cap_fm["summary"])}</span>'
                  f'<span class="card-foot"><span>{fmt_range(*cap_weeks, "wk")}</span><span class="card-prog" data-must-for="capstone">0/0</span></span></a></li>')
     cards.append(f'<li><a class="card card-iv" href="#interview"><span class="card-eyebrow">Any time</span>'
                  f'<span class="card-title">Interview prep</span><span class="card-sum">{esc(IV["summary"])}</span>'
-                 f'<span class="card-foot"><span>{len(iv_info)} pages · {IV_HOURS}</span><span class="card-prog" data-iv-count>0/0</span></span></a></li>')
+                 f'<span class="card-foot"><span>{IV_HOURS}</span><span class="card-prog"><span data-iv-count>0/0</span> pages</span></span></a></li>')
     return f'<section class="home-group"><h2>The path</h2><ul class="cards">{"".join(cards)}</ul></section>'
 
 
@@ -594,7 +621,7 @@ lib = sorted(library.values(), key=lambda r: order.index(r["uses"][0][0]))
 data = {
     "routes": routes, "order": order, "gates": gate_totals, "tasks": task_totals, "tiers": task_tiers,
     "pageRes": page_res, "optional": sorted(optional_ids), "fastSkip": sorted(fast_skip_ids), "resources": lib,
-    "interview": IV_IDS, "aliases": ALIASES, "duration": DURATION, "checked": CHECKED,
+    "interview": IV_IDS, "aliases": ALIASES, "doneable": doneable, "duration": DURATION, "checked": CHECKED,
     "levels": [{"id": lv["id"], "num": lv["num"], "t": lv["title"], "modules": [m["id"] for m, _, _ in mods], "project": pid}
                for lv, lfm, lbody, mods, pid, pfm, pbody in level_info],
 }

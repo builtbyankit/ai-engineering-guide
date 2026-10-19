@@ -27,7 +27,7 @@ Every module page has the same parts, so you always know where you are.
 - **Checklist**: tasks with a label. *Must ship* tasks are the core of the module and fit inside its time estimate. *Recommended* and *Stretch* tasks are extra.
 - **You're ready when**: statements to test yourself against before you move on.
 
-Tick a resource when you have read or watched it. Tick a task when it is done. Both count towards your progress.
+Tick a resource when you have read or watched it. Tick a task when it is done. When you finish a page, press **Mark page as complete** at its end. Completed pages get a tick in the sidebar and in the module lists, and every tick counts towards your progress.
 
 ## Milestones and projects
 Each level ends with a project and a milestone. The project is a portfolio piece you build on your own, using what the level taught. Its page gives you a brief, requirements, stretch goals, a suggested stack, step-by-step guidance and a rubric to judge your work.
@@ -37,7 +37,7 @@ The milestone is a short list of checks at the bottom of each level page. Tick t
 The [capstone](#capstone) comes last. You build a new agent from scratch that uses every core skill in the guide, then deploy it and write it up.
 
 ## Core path and optional modules
-Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents, fine-tuning open models or system design. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
+Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents, fine-tuning open models or system design. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links. Modules outside your choice stay readable, but they are dimmed in the sidebar and in the level lists and aren't counted.
 
 At 10 to 12 hours a week, the core path takes about %%CORE_WEEKS%%, everything takes about %%FULL_WEEKS%% and the fast track takes about %%FAST_WEEKS%%. Time estimates cover the Start here resources, the practice, the must-ship tasks and the projects. Treat them as time boxes. If a module runs long, finish its must-ship tasks and move on; you can come back for the rest.
 

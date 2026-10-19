@@ -7,9 +7,10 @@ A free, resource-first study guide that takes you from writing small programs to
 ## What's inside
 
 - **Seven levels and a capstone**, from Python and APIs to production deployment: Foundations, LLM fundamentals, Retrieval and RAG, Tools and agents, Frameworks and multi-agent systems, Evaluation, observability and safety, and Production and scale.
-- **36 modules** (29 core, 7 optional). Each has a plain-language overview, hand-picked resources in three tiers (Start here, Go deeper, Reference), practice exercises, a checklist and a "you're ready when" self-test.
+- **35 modules** (29 core, 6 optional). Each has a plain-language overview, hand-picked resources in three tiers (Start here, Go deeper, Reference), practice exercises, a checklist and a "you're ready when" self-test.
 - **About 460 resources**: official docs, blogs, free courses, videos, papers and repos. Every link was opened and checked on 16 October 2026, and links added later on the date shown in each page's `checked` field. A searchable resource library lets you filter by type, level and cost.
 - **Companion exercises** from the [Agentic AI Mastery guide](https://github.com/builtbyankit/agentic-ai-learning-guide): runnable labs for durable runs, approvals, threat models and RAG, plus worked capacity and cost sheets and interview practice, linked from the modules that use them.
+- **Agentic AI interview prep**, a separate section outside the levels: system design rounds, a question bank of about 35 questions with model answers, coding and debugging rounds, behavioural stories and timed mock interviews with scoring.
 - **A milestone and a portfolio project per level**, each with requirements, stretch goals, a suggested stack, step-by-step guidance and a rubric, plus a capstone.
 - **Progress saved in your browser.** Tick resources, tasks and milestone checks; they are stored in `localStorage` and never leave your device. Back up and restore from the "Your progress" page.
 
@@ -23,6 +24,7 @@ At 10 to 12 hours a week, the core path takes about 32.5 to 43.5 weeks. Experien
 | `content/levels/` | One page per level, including its milestone checks |
 | `content/modules/` | One page per module |
 | `content/projects/` | One page per level project, plus `capstone.md` |
+| `content/interview/` | The Interview prep section, one page per topic |
 | `content/pages/start.md` | The "How to use this guide" page |
 | `template.html` | The single-page app shell: styles, navigation, progress and the resource library |
 | `build.py` | Renders the content into `site/` |

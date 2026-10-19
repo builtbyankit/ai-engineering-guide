@@ -117,12 +117,28 @@
         {"id": "l6-open-models", "title": "Open models, fine-tuning and serving", "kind": "optional", "hours": "10",
          "scope": "When to fine-tune vs prompt vs RAG, LoRA/QLoRA, the Hugging Face ecosystem (Transformers, PEFT, TRL), distillation for agents, reinforcement fine-tuning (GRPO) at a high level, serving open models with vLLM or Ollama, quantization. Optional specialisation."},
         {"id": "l6-staying-current", "title": "Staying current and building a portfolio", "kind": "core", "hours": "4–6",
-         "scope": "How to read papers (arXiv, Papers with Code alternatives), newsletters and blogs worth following, writing technical posts, demo videos, contributing to open-source agent projects, preparing for AI engineering interviews (system design for LLM apps)."},
-        {"id": "l6-interviews", "title": "AI engineering interviews", "kind": "optional", "hours": "6–8",
-         "scope": "The shape of AI engineering interview loops, a system design answer structure, strong and weak signals, whiteboard numbers, contract-first runtime coding exercises, incident and evaluation review rounds, STAR stories backed by evidence, timed mocks with six-dimension scoring, honesty about what was built versus designed. Companion question bank, workbook and coding exercises from the Agentic AI Mastery guide. Optional."}
+         "scope": "How to read papers (arXiv, Papers with Code alternatives), newsletters and blogs worth following, writing technical posts, demo videos, contributing to open-source agent projects, preparing for AI engineering interviews (system design for LLM apps)."}
       ],
       "project": {"id": "p6-production-deploy", "title": "Take an agent to production", "weeks": "1.5–2"}
     }
   ],
-  "capstone": {"id": "capstone", "title": "Capstone: ship a production agent", "weeks": "3–4"}
+  "capstone": {"id": "capstone", "title": "Capstone: ship a production agent", "weeks": "3–4"},
+  "interview": {
+    "id": "interview", "title": "Agentic AI interview prep",
+    "summary": "Turn what you built into interview answers: agentic system design rounds, a question bank, coding rounds, behavioural stories and timed mocks.",
+    "pages": [
+      {"id": "interview", "title": "How to prepare", "hours": "1–2",
+       "scope": "What AI engineering interview loops look like, which guide levels each round draws on, a six-week plan and a two-week sprint, the evidence pack to bring, readiness checks."},
+      {"id": "iv-system-design", "title": "Agentic system design rounds", "hours": "6–8",
+       "scope": "What the round tests, a 45-minute timeline, a six-step answer structure, three worked prompts (support agent with refunds, permission-aware knowledge assistant, long-running research with specialists), follow-up probes, strong and weak signals."},
+      {"id": "iv-questions", "title": "Question bank", "hours": "6–8",
+       "scope": "Around 35 common questions with short model answers and a follow-up for each, grouped into LLM fundamentals, agents and tools, state and approvals, retrieval, context and security, and evaluation and operations."},
+      {"id": "iv-coding", "title": "Coding and debugging rounds", "hours": "6–8",
+       "scope": "What agent coding rounds look like, a contract-first method, warm-ups, six runtime problems with acceptance checks, a trace-debugging round with common bugs, and how attempts are scored."},
+      {"id": "iv-behavioural", "title": "Behavioural and leadership stories", "hours": "3–4",
+       "scope": "What the round tests, STAR plus reflection, a story bank mapped to common questions, making stories verifiable, using guide projects honestly, senior and leadership scenarios, questions to ask interviewers."},
+      {"id": "iv-mocks", "title": "Mock interviews and scoring", "hours": "4–6",
+       "scope": "Four timed mock rounds (system design, coding, incident, evaluation review) with prompts, a six-dimension scoring rubric, how to run mocks alone or with a peer, the retake loop and a readiness gate."}
+    ]
+  }
 }

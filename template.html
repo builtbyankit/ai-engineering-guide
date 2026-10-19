@@ -662,7 +662,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   "use strict";
   var DATA = JSON.parse(document.getElementById("site-data").textContent);
   var R = DATA.routes, ORDER = DATA.order, GATES = DATA.gates, TASKS = DATA.tasks, TIERS = DATA.tiers, PRES = DATA.pageRes;
-  var LEVELS = DATA.levels, RES = DATA.resources;
+  var LEVELS = DATA.levels, RES = DATA.resources, IV = DATA.interview || [], ALIASES = DATA.aliases || {};
   var OPT = {}, FAST = {}, RESBYID = {};
   DATA.optional.forEach(function (id) { OPT[id] = true; });
   (DATA.fastSkip || []).forEach(function (id) { FAST[id] = true; });
@@ -741,6 +741,17 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     ids.forEach(function (id) { if (state[id]) c++; });
     return { c: c, t: ids.length };
   }
+  // interview prep sits outside the path, so it never counts toward the sidebar totals
+  function ivTasks(tier) {
+    var out = { c: 0, t: 0 };
+    IV.forEach(function (p) { var r = tasksFor(p, tier); out.c += r.c; out.t += r.t; });
+    return out;
+  }
+  function ivRes() {
+    var seen = {}, out = { c: 0, t: 0 };
+    IV.forEach(function (p) { (PRES[p] || []).forEach(function (id) { if (!seen[id]) { seen[id] = 1; out.t++; if (state[id]) out.c++; } }); });
+    return out;
+  }
   function levelMust(lid) {
     var out = { c: 0, t: 0 };
     LEVELS.forEach(function (l) {
@@ -792,6 +803,13 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
       el.textContent = r.c + "/" + r.t;
       el.classList.toggle("complete", r.t > 0 && r.c === r.t);
     });
+    document.querySelectorAll("[data-all-for]").forEach(function (el) {
+      var r = tasksFor(el.getAttribute("data-all-for"));
+      el.textContent = r.c + "/" + r.t;
+      el.classList.toggle("complete", r.t > 0 && r.c === r.t);
+    });
+    var iv = ivTasks();
+    document.querySelectorAll("[data-iv-count]").forEach(function (el) { el.textContent = iv.c + "/" + iv.t; el.classList.toggle("complete", iv.t > 0 && iv.c === iv.t); });
     document.querySelectorAll("[data-extra-for]").forEach(function (el) { var r = tasksFor(el.getAttribute("data-extra-for"), "X"); el.textContent = r.c + "/" + r.t; });
     document.querySelectorAll("[data-res-for]").forEach(function (el) { var r = resFor(el.getAttribute("data-res-for")); el.textContent = r.c + "/" + r.t; });
     document.querySelectorAll("li.res").forEach(function (li) { li.classList.toggle("done", !!state[li.getAttribute("data-res")]); });
@@ -1008,6 +1026,22 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     }).then(function (txt) { cache[id] = txt; return txt; });
   }
 
+  /* ---------- stale copies ---------- */
+  // A browser can keep an older copy of this page for a few minutes after an update. If a link points to a
+  // page that copy doesn't know, check the live site once and reload from it when the page exists there.
+  var RELOAD_KEY = "ai-agent-guide:reloaded-for";
+  function newerBuildHas(id) {
+    try { if (sessionStorage.getItem(RELOAD_KEY) === id) return Promise.resolve(false); } catch (e) {}
+    return fetch("./?fresh=" + Date.now(), { cache: "no-store" }).then(function (res) {
+      return res.ok ? res.text() : "";
+    }).then(function (txt) { return txt.indexOf('"' + id + '"') !== -1; }, function () { return false; });
+  }
+  function reloadFresh(id) {
+    try { sessionStorage.setItem(RELOAD_KEY, id); } catch (e) {}
+    location.replace(location.pathname + "?v=" + Date.now() + location.hash);
+  }
+  if (/[?&]v=\d+/.test(location.search) && history.replaceState) history.replaceState(null, "", location.pathname + location.hash);
+
   /* ---------- router ---------- */
   function parseHash() {
     var h = location.hash.replace(/^#/, ""), q = "";
@@ -1048,10 +1082,16 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     if (id === "home") { showHome(); return; }
     if (id === "progress") { showView("Your progress"); renderProgress(); afterRender(id); return; }
     if (id === "resources") { showView("Resource library"); renderLibrary(parsed.params); afterRender(id); return; }
+    if (!R[id] && ALIASES[id]) { location.replace("#" + ALIASES[id]); return; }
     showView(R[id] ? R[id].t : "Not found");
     if (!R[id]) {
-      view.innerHTML = '<div class="state"><h1 tabindex="-1">Page not found</h1><p>There is no page called “' + esc(id) + '”. <a href="#home">Go to the start</a> or use search.</p></div>';
       railInner.hidden = true;
+      view.innerHTML = '<p class="state">Looking for “' + esc(id) + '”…</p>';
+      newerBuildHas(id).then(function (found) {
+        if (token !== navToken) return;
+        if (found) { reloadFresh(id); return; }
+        view.innerHTML = '<div class="state"><h1 tabindex="-1">Page not found</h1><p>There is no page called “' + esc(id) + '”. <a href="#home">Go to the start</a> or use search.</p></div>';
+      });
       return;
     }
     if (!cache[id]) view.innerHTML = '<p class="state">Loading ' + esc(R[id].t) + "…</p>";
@@ -1113,7 +1153,8 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     if (params && params.q) lib.q = params.q;
     var levelOpts = '<option value="">All levels</option>' + LEVELS.map(function (l) {
       return '<option value="' + l.id + '"' + (lib.level === l.id ? " selected" : "") + ">Level " + l.num + ": " + esc(l.t) + "</option>";
-    }).join("") + '<option value="capstone"' + (lib.level === "capstone" ? " selected" : "") + ">Capstone</option>";
+    }).join("") + '<option value="capstone"' + (lib.level === "capstone" ? " selected" : "") + ">Capstone</option>" +
+      (IV.length ? '<option value="interview"' + (lib.level === "interview" ? " selected" : "") + ">Interview prep</option>" : "");
     var chips = ['<button type="button" data-type="" aria-pressed="' + (!lib.type) + '">All</button>'].concat(TYPES.map(function (t) {
       return '<button type="button" data-type="' + t + '" aria-pressed="' + (lib.type === t) + '">' + t + "</button>";
     })).join("");
@@ -1175,6 +1216,10 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     });
     var cm = tasksFor("capstone", "M"), cr = resFor("capstone");
     rows.push("<tr" + (cm.t && cm.c === cm.t ? ' class="complete"' : "") + '><td><a href="#capstone">Capstone</a></td><td>–</td><td>' + cm.c + "/" + cm.t + "</td><td>" + cr.c + "/" + cr.t + "</td></tr>");
+    if (IV.length) {
+      var im = ivTasks("M"), ir = ivRes();
+      rows.push("<tr" + (im.t && im.c === im.t ? ' class="complete"' : "") + '><td><a href="#interview">Interview prep (not counted)</a></td><td>–</td><td>' + im.c + "/" + im.t + "</td><td>" + ir.c + "/" + ir.t + "</td></tr>");
+    }
     box.innerHTML = '<div class="table-scroll"><table class="prog-table"><thead><tr><th>Level</th><th>Milestone</th><th>Must ship</th><th>Resources</th></tr></thead><tbody>' + rows.join("") + "</tbody></table></div>";
   }
   function renderProgress() {

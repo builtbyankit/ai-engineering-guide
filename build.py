@@ -317,6 +317,17 @@ for lv in levels:
 cap_fm, cap_body = front_matter((CONTENT / "projects" / "capstone.md").read_text(encoding="utf-8"))
 cap_weeks = rng(cap_fm["weeks"])
 
+# interview prep: a standalone section, outside the level timeline and the progress totals
+IV = CUR["interview"]
+iv_info = []
+for pg in IV["pages"]:
+    ifm, ibody = front_matter((CONTENT / "interview" / f"{pg['id']}.md").read_text(encoding="utf-8"))
+    assert ifm.get("hours") == pg["hours"], f"{pg['id']}: page hours {ifm.get('hours')} vs curriculum {pg['hours']}"
+    iv_info.append((pg, ifm, ibody))
+IV_IDS = [pg["id"] for pg, _, _ in iv_info]
+iv_hours = (sum(rng(pg["hours"])[0] for pg, _, _ in iv_info), sum(rng(pg["hours"])[1] for pg, _, _ in iv_info))
+IV_HOURS = fmt_range(*iv_hours, "hours")
+
 total = {}
 for tr in TRACKS:
     lo = sum(level_weeks[l][tr][0] for l in LEVEL_IDS) + cap_weeks[0]
@@ -342,6 +353,7 @@ def level_table():
                     f"{fmt_range(*level_weeks[lv['id']]['core'], '')} |")
     rows.append(f"| [Capstone](#capstone) | Build and ship a new production agent that uses every core skill. | "
                 f"[Ship a production agent](#capstone) | {fmt_range(*cap_weeks, '')} |")
+    rows.append(f"| [Interview prep](#interview) | {IV['summary']} | Mock interviews | Not counted; any time |")
     return "\n".join(rows)
 
 
@@ -424,6 +436,37 @@ def level_page(lv, lfm, lbody, mods, pid, pfm):
                    "h": headings_of(soup), "num": lv["num"]}
 
 
+def interview_page(idx, pg, fm, body):
+    pid = pg["id"]
+    soup, resources = md_to_soup(body)
+    info = finish(soup, pid)
+    task_totals[pid] = info["todos"]
+    task_tiers[pid] = info["tiers"]
+    add_resources(pid, resources)
+    html_out = str(soup)
+    if pid == "interview":
+        rows = []
+        for i, (p2, f2, _b) in enumerate(iv_info[1:], 1):
+            rows.append(f'<li><a class="topic" href="#{p2["id"]}"><span class="t-num">{i:02d}</span>'
+                        f'<span class="t-body"><span class="t-title">{esc(f2["title"])}</span><span class="t-sum">{esc(f2["summary"])}</span></span>'
+                        f'<span class="t-meta"><span>{esc(p2["hours"])} h</span><span class="t-tasks"><span data-all-for="{p2["id"]}">0/0</span> tasks</span></span></a></li>')
+        listing = f'<ol class="topics">{"".join(rows)}</ol>'
+        assert "<p>%%PAGES%%</p>" in html_out, "interview.md needs a %%PAGES%% line"
+        html_out = html_out.replace("<p>%%PAGES%%</p>", listing)
+    meta = meta_line([f'Tasks done <span data-all-for="{pid}">0/{info["todos"]}</span>',
+                      f'Resources done <span data-res-for="{pid}">0/{len(resources)}</span>',
+                      f"Links checked {page_checked(fm)}"])
+    if pid == "interview":
+        eyebrow = "Interview prep · Not counted in the path"
+        timebox = IV_HOURS + " in all"
+    else:
+        eyebrow = f'<a href="#interview">Interview prep</a> · Page {idx} of {len(iv_info) - 1}'
+        timebox = f'{pg["hours"]} h'
+    fragments[pid] = page_head(eyebrow, timebox, fm["title"], fm["summary"], meta) + f'<div class="prose">{html_out}</div>'
+    routes[pid] = {"t": fm["title"], "k": "interview", "s": "interview", "e": "Interview prep", "sum": fm["summary"],
+                   "h": headings_of(soup), "hrs": pg["hours"]}
+
+
 for lv, lfm, lbody, mods, pid, pfm, pbody in level_info:
     lid = lv["id"]
     order.append(lid)
@@ -435,10 +478,17 @@ for lv, lfm, lbody, mods, pid, pfm, pbody in level_info:
     order.append(pid)
 project_page(None, "capstone", cap_fm, cap_body, capstone=True)
 order.append("capstone")
+for i, (pg, ifm, ibody) in enumerate(iv_info):
+    interview_page(i, pg, ifm, ibody)
+    order.append(pg["id"])
 routes["resources"] = {"t": "Resource library", "k": "page", "s": "resources", "e": "Start here",
                        "sum": "Every link in the guide in one place, searchable by type, level and cost.", "h": []}
 routes["progress"] = {"t": "Your progress", "k": "page", "s": "progress", "e": "Start here",
                       "sum": "Milestones, tasks and resources you have finished, with backup and restore.", "h": []}
+
+# old ids that moved: the router redirects these
+ALIASES = {"l6-interviews": "interview"}
+assert all(a not in routes and t in routes for a, t in ALIASES.items())
 
 # ---------------- internal link check ----------------
 broken = []
@@ -472,6 +522,14 @@ def nav_html():
                '<li class="nav-sec" data-sec="capstone"><div class="nav-row"><a href="#capstone" data-route="capstone">'
                '<span class="nav-num">★</span><span>Capstone</span>'
                '<span class="nav-count" data-must-for="capstone">0/0</span></a></div></li></ul></div>')
+    subs = "".join(f'<li><a href="#{pg["id"]}" data-route="{pg["id"]}">{esc(fm["title"])}</a></li>' for pg, fm, _b in iv_info[1:])
+    out.append('<div class="nav-group"><p class="nav-heading">Any time</p><ul class="nav-list">'
+               '<li class="nav-sec" data-sec="interview"><div class="nav-row"><a href="#interview" data-route="interview">'
+               '<span class="nav-num">◎</span><span>Interview prep</span>'
+               '<span class="nav-count" data-iv-count>0/0</span></a>'
+               '<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="sub-interview">'
+               '<span class="sr-only">Show pages in Interview prep</span></button></div>'
+               f'<ul class="nav-sub" id="sub-interview" hidden>{subs}</ul></li></ul></div>')
     return "".join(out)
 
 
@@ -525,6 +583,9 @@ def home_cards():
     cards.append(f'<li><a class="card card-cap" href="#capstone"><span class="card-eyebrow">Finish</span>'
                  f'<span class="card-title">Capstone</span><span class="card-sum">{esc(cap_fm["summary"])}</span>'
                  f'<span class="card-foot"><span>{fmt_range(*cap_weeks, "wk")}</span><span class="card-prog" data-must-for="capstone">0/0</span></span></a></li>')
+    cards.append(f'<li><a class="card card-iv" href="#interview"><span class="card-eyebrow">Any time</span>'
+                 f'<span class="card-title">Interview prep</span><span class="card-sum">{esc(IV["summary"])}</span>'
+                 f'<span class="card-foot"><span>{len(iv_info)} pages · {IV_HOURS}</span><span class="card-prog" data-iv-count>0/0</span></span></a></li>')
     return f'<section class="home-group"><h2>The path</h2><ul class="cards">{"".join(cards)}</ul></section>'
 
 
@@ -532,7 +593,8 @@ def home_cards():
 lib = sorted(library.values(), key=lambda r: order.index(r["uses"][0][0]))
 data = {
     "routes": routes, "order": order, "gates": gate_totals, "tasks": task_totals, "tiers": task_tiers,
-    "pageRes": page_res, "optional": sorted(optional_ids), "fastSkip": sorted(fast_skip_ids), "resources": lib, "duration": DURATION, "checked": CHECKED,
+    "pageRes": page_res, "optional": sorted(optional_ids), "fastSkip": sorted(fast_skip_ids), "resources": lib,
+    "interview": IV_IDS, "aliases": ALIASES, "duration": DURATION, "checked": CHECKED,
     "levels": [{"id": lv["id"], "num": lv["num"], "t": lv["title"], "modules": [m["id"] for m, _, _ in mods], "project": pid}
                for lv, lfm, lbody, mods, pid, pfm, pbody in level_info],
 }

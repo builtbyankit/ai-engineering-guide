@@ -21,6 +21,8 @@ for lv in CUR["levels"]:
         IDS.add(m["id"]); MODULES[m["id"]] = (lv["id"], m)
     IDS.add(lv["project"]["id"]); PROJECTS[lv["project"]["id"]] = lv["id"]
 PROJECTS["capstone"] = "capstone"
+INTERVIEW = {pg["id"]: pg for pg in CUR.get("interview", {}).get("pages", [])}
+IDS.update(INTERVIEW)
 
 TYPES = {"Course", "Video", "Article", "Docs", "Tutorial", "Paper", "Book", "Repo", "Tool"}
 COSTS = {"Free", "Free to audit", "Free tier", "Paid"}
@@ -268,6 +270,25 @@ def check_file(path):
         resources = check_resources(secs.get("Helpful resources", []), errors, warns, "Helpful resources")
         if not 2 <= len(resources) <= 6:
             errors.append(f"Helpful resources should have 2–6 lines, has {len(resources)}")
+    elif kind == "interview":
+        if pid not in INTERVIEW:
+            errors.append(f"unknown interview page id {pid}")
+        elif fm.get("hours") != INTERVIEW[pid]["hours"]:
+            errors.append(f"front matter hours should be '{INTERVIEW[pid]['hours']}', got '{fm.get('hours')}'")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", fm.get("checked", "")):
+            warns.append("checked should be a date like 2026-10-16")
+        heads = list(secs)
+        if len(heads) < 3 or heads[-2:] != ["Checklist", "Resources"]:
+            errors.append(f"interview pages end with '## Checklist' then '## Resources', got {heads}")
+        if pid == "interview" and "%%PAGES%%" not in body:
+            errors.append("the interview overview needs a %%PAGES%% line where the page list goes")
+        items = check_checklist(secs.get("Checklist", []), errors, "Checklist")
+        if not 3 <= len(items) <= 8:
+            errors.append(f"Checklist should have 3–8 items, has {len(items)}")
+        res_lines = [l for l in secs.get("Resources", []) if not l.startswith("### ")]
+        resources = check_resources(res_lines, errors, warns, "Resources")
+        if not 2 <= len(resources) <= 8:
+            errors.append(f"Resources should have 2–8 lines, has {len(resources)}")
     else:
         warns.append(f"unknown page kind {kind}")
 

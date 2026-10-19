@@ -143,6 +143,30 @@ A table: `| Criterion | Good enough | Excellent |` with 4–6 rows, measurable w
 2–6 resource lines in the standard format: example repos, templates, tutorials closest to this build.
 ```
 
+### Interview prep page: `content/interview/<page-id>.md`
+
+The Interview prep section sits outside the levels. Its pages are listed under `interview` in `curriculum.json` and are not counted in the time estimates or progress totals.
+
+```
+---
+title: <page title>
+hours: 6–8
+summary: One sentence, at most 30 words.
+checked: 2026-10-19
+---
+
+## <free H2 sections, with H3 where useful>
+Write for someone preparing for an interview soon. Questions on the question bank are H3 headings so search finds them.
+
+## Checklist
+3–8 items with tier tags, as on module pages.
+
+## Resources
+2–8 resource lines in the standard format. No H3 subgroups.
+```
+
+`hours` must match `curriculum.json`. The overview page (`interview.md`) must contain a line with only `%%PAGES%%`, where the build inserts the list of pages.
+
 ## Markdown conventions
 
 - Never use `#` (H1). Use exactly the H2 headings above, in order; H3 only where shown.

@@ -15,6 +15,8 @@ The guide has seven levels and a capstone. Each level has a few modules, one pro
 
 %%LEVEL_TABLE%%
 
+The **Interview prep** section sits outside the levels. It doesn't count toward the time estimates or progress totals, so open it whenever an interview is coming up. It works best after [Level 3](#L3).
+
 ## How a module works
 Every module page has the same parts, so you always know where you are.
 
@@ -35,7 +37,7 @@ The milestone is a short list of checks at the bottom of each level page. Tick t
 The [capstone](#capstone) comes last. You build a new agent from scratch that uses every core skill in the guide, then deploy it and write it up.
 
 ## Core path and optional modules
-Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents, fine-tuning open models, system design or interview preparation. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
+Most modules are core. A few are marked **Optional** because they suit particular roles, such as coding agents, browser agents, fine-tuning open models or system design. Choose the **Core path**, **Everything** or the **Fast track** in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links.
 
 At 10 to 12 hours a week, the core path takes about %%CORE_WEEKS%%, everything takes about %%FULL_WEEKS%% and the fast track takes about %%FAST_WEEKS%%. Time estimates cover the Start here resources, the practice, the must-ship tasks and the projects. Treat them as time boxes. If a module runs long, finish its must-ship tasks and move on; you can come back for the rest.
 

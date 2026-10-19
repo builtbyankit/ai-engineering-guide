@@ -1,7 +1,7 @@
 ---
 title: Question bank
 hours: 6–8
-summary: About 35 common agentic AI interview questions with short model answers and a follow-up each, from LLM fundamentals to evaluation and operations.
+summary: About 40 common agentic AI interview questions with short model answers and a follow-up each, from LLM fundamentals to evaluation and operations.
 checked: 2026-10-19
 ---
 
@@ -48,6 +48,42 @@ An embedding is a vector that represents text so that similar meanings land clos
 Prompting changes instructions, RAG supplies facts at query time and fine-tuning changes behaviour, such as format, style or a narrow skill. Try prompting and retrieval first. Fine-tune when evals show a gap they can't close, or when a small tuned model can replace an expensive one on a narrow, high-volume task. Fine-tuning is a poor way to add facts that change. See [Open models, fine-tuning and serving](#l6-open-models).
 
 **Follow-up:** What would you need in place before starting a fine-tuning project?
+
+### How does attention work, and why do long prompts cost more?
+
+Each token builds a query, a key and a value. Attention compares a token's query with the keys of the tokens before it and uses the resulting weights to mix their values. Comparing every token with every earlier one makes processing the prompt grow faster than its length. During generation, the model stores past keys and values so each new token only attends to them. Long prompts therefore cost more compute, more memory and a slower first token.
+
+**Follow-up:** Why can't you just send every document in a 1-million-token context instead of using retrieval?
+
+### What is the KV cache, and why does it matter for serving?
+
+The KV cache stores the keys and values of every token already processed, so the model doesn't recompute them for each new token. It grows with context length, the number of layers and the number of concurrent requests, and it can need more memory than the model weights. That limits how many requests a server can batch. Serving engines such as vLLM manage it in pages to waste less memory. See [Agent system design and capacity planning](#l6-system-design) for the formula.
+
+**Follow-up:** Roughly how much KV cache memory do 8 concurrent 32,000-token requests need on a model you know?
+
+### Why is time to first token different from total response time?
+
+Generation has two phases. Prefill processes the whole prompt in parallel, so time to first token grows with prompt length. Decode then produces one token at a time, so total time grows with output length. Streaming makes a long answer feel faster, prompt caching shortens prefill, and shorter outputs cut decode time.
+
+**Follow-up:** Your p95 time to first token doubled but output length didn't change. Where do you look?
+
+### What is quantization, and what does it cost?
+
+Quantization stores weights, and sometimes activations or the KV cache, in fewer bits, for example 8 or 4 instead of 16. It cuts memory and often speeds up serving, so a bigger model fits on smaller hardware. The cost is some quality loss that varies by model, method and task. Always rerun your own evals before and after quantizing.
+
+**Follow-up:** A 4-bit model is half the cost and scores 2 points lower on your evals. Do you ship it?
+
+### How do structured outputs guarantee valid JSON?
+
+Providers that support strict schemas constrain decoding. At each step they block any token that would break the schema, so the output always parses and has the required fields. This guarantees the shape, not the truth of the values. You still validate business rules, handle refusals and truncation, and keep schemas within the subset the provider supports. See [Structured outputs](#l1-structured-outputs).
+
+**Follow-up:** Why might forcing a strict schema make answers slightly worse, and how would you check?
+
+### What is the difference between full fine-tuning, LoRA and preference tuning?
+
+Full fine-tuning updates every weight, which is expensive and needs the most data and memory. LoRA freezes the model and trains small adapter matrices, which is far cheaper and easy to swap. Preference tuning, such as RLHF or DPO, trains on pairs of better and worse answers to shift style and behaviour. Reinforcement fine-tuning such as GRPO trains against a scoring function when code can check the answer.
+
+**Follow-up:** You have 500 examples of the exact output format you want. Which method do you try first?
 
 ## Agents and tools
 
@@ -242,4 +278,6 @@ Version prompts and models, and tag every trace with the version. Run the eval s
 - [Interview Workbook: Explain, Defend, Build](https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-interview-workbook.md) · Agentic AI Mastery · Tutorial · Free · 1 h — A follow-up question and an expected artifact for every core answer, so you can practise defending a reply under pressure.
 - [Numerical Workbook: LLMs, Retrieval and Serving](https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-numerical-workbook.md) · Agentic AI Mastery · Tutorial · Free · 1 h — Worked calculations for token budgets, attention, similarity, BM25 and rank fusion, ranking metrics, LoRA and KV cache memory.
 - [AI Evals: Everything You Need to Know](https://hamel.dev/blog/posts/evals-faq/) · Hamel Husain and Shreya Shankar · Article · Free · 2–3 h — A long FAQ on error analysis, judges, binary scores and agent evals, the source of many evaluation questions in interviews.
+- [A Visual Guide to Quantization](https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization) · Maarten Grootendorst · Article · Free · 45 min — Diagram-led explanations of number formats, post-training quantization, GPTQ and GGUF, enough for any quantization question.
+- [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) · Rafailov et al. · Paper · Free · 1 h — The DPO paper, which tunes a model on preference pairs without a separate reward model, a common follow-up to RLHF questions.
 - [Introduction to Machine Learning Interviews](https://huyenchip.com/ml-interviews-book/) · Chip Huyen · Book · Free · self-paced — A 2021 book with over 200 machine learning knowledge questions, useful when a loop includes a classic ML fundamentals round.

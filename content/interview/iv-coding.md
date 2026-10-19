@@ -83,7 +83,7 @@ You get a trace, logs or a failing test and must find the first failure, not the
 - The user ID came from the model's arguments instead of the session.
 - A write was retried with a new idempotency key after a timeout and ran twice.
 
-Practise on your own agent: break one thing on purpose, have a friend or a script hide which one, then find it from the trace alone.
+Practise on your own agent: break one thing on purpose, have a friend or a script hide which one, then find it from the trace alone. [Evaluation and debugging rounds](#iv-evals) works through five failures step by step.
 
 ## How attempts are scored
 

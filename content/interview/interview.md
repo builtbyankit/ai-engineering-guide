@@ -1,7 +1,7 @@
 ---
 title: Agentic AI interview prep
 hours: 1–2
-summary: Prepare for AI engineering interview loops with design rounds, a question bank, coding practice, behavioural stories and timed mocks built on the projects you shipped.
+summary: Prepare for the AI-specific rounds of AI engineering interviews with design, product, evaluation, coding and enterprise practice, stories and timed mocks built on your projects.
 checked: 2026-10-19
 ---
 
@@ -13,15 +13,17 @@ It works best once you have finished [Level 3](#L3), because most questions assu
 
 ## What the interviews look like
 
-Loops differ between companies, so ask the recruiter which rounds to expect and how long each one is. Most mix the rounds below. Senior and architect roles weight design, trade-offs and leadership more heavily.
+Loops differ between companies, so ask the recruiter which rounds to expect and how long each one is. Most mix the AI-specific rounds below, and many add a general algorithms round that this guide doesn't cover. Senior and architect roles weight design, trade-offs and leadership more heavily.
 
 | Round | Typical length | What it tests | Where in the guide |
 | --- | --- | --- | --- |
 | Agentic system design | 45–60 min | Requirements, a simple baseline, trust boundaries, failure handling, evals, cost | [Level 3](#L3) to [Level 6](#L6), [system design and capacity](#l6-system-design) |
-| Fundamentals | 30–45 min | Tokens, decoding, embeddings, retrieval metrics, fine-tuning, serving | [Level 1](#L1), [Level 2](#L2), [open models](#l6-open-models) |
+| Product or customer conversation | 30–45 min | Scoping a fuzzy request, deciding whether AI fits, success metrics, a first release | [AI product and customer rounds](#iv-product) |
+| Fundamentals | 30–45 min | Tokens, attention, decoding, embeddings, retrieval metrics, fine-tuning, serving | [Question bank](#iv-questions), [Level 1](#L1), [Level 2](#L2), [open models](#l6-open-models) |
 | Coding | 45–60 min | Runtime code such as tool loops, retries, concurrency and parsing, with tests | [Level 0](#L0), [The agent loop](#l3-agent-loop), [Tool calling](#l3-tool-calling) |
-| Debugging or incident review | 30–45 min | Reading a trace, finding the first failure, reconciling an unknown outcome | [Evals in depth](#l5-evals-in-depth), [Deploying agents](#l6-deployment) |
-| Evaluation review | 30 min | Reading eval results critically, sample sizes, holdout sets, judge calibration | [Your first evals](#l1-first-evals), [Evaluating RAG](#l2-rag-evaluation) |
+| Debugging or incident review | 30–45 min | Reading a trace, finding the first failure, reconciling an unknown outcome | [Evaluation and debugging rounds](#iv-evals), [Deploying agents](#l6-deployment) |
+| Evaluation review | 30 min | Reading eval results critically, sample sizes, holdout sets, judge calibration | [Evaluation and debugging rounds](#iv-evals), [Evals in depth](#l5-evals-in-depth) |
+| Governance (regulated companies) | Often part of design or behavioural | Approvals, personal data, audit, explainability, vendor models | [Enterprise and regulated settings](#iv-enterprise) |
 | Behavioural | 30–45 min | Ownership, judgement, disagreement and honesty about your own work | Your projects |
 
 ## The pages
@@ -37,9 +39,9 @@ Pick the plan that matches your time. Both assume 10 to 12 hours a week, like th
 | Week | Focus | Output |
 | --- | --- | --- |
 | 1 | Diagnostic design mock, fundamentals questions | Scores for six dimensions and a list of gaps |
-| 2 | Agents, tools, state and approvals questions; two warm-up coding problems | Two-minute answers you have revised after a follow-up |
+| 2 | Agents, tools, state and approvals questions; one product role-play; two warm-up coding problems | Two-minute answers you have revised after a follow-up |
 | 3 | Retrieval, context and security questions; one worked design prompt | A design sketch with failure walks and an eval plan |
-| 4 | Evals and operations questions; capacity and cost numbers | A one-page sheet with formulas you can redo from memory |
+| 4 | Evaluation and debugging rounds; capacity and cost numbers; enterprise questions if relevant | Judge and confidence-interval numbers you can redo from memory |
 | 5 | Coding and debugging rounds under time; two stories | Working code with tests, and two stories with linked evidence |
 | 6 | Three full mocks on new prompts; retake the weakest dimension | A score trend and a short list of what still needs work |
 
@@ -49,10 +51,10 @@ Pick the plan that matches your time. Both assume 10 to 12 hours a week, like th
 | --- | --- |
 | 1–2 | Diagnostic mock, then the fundamentals and agents questions |
 | 3–4 | State, approvals and unknown outcomes; one design prompt end to end |
-| 5–6 | Retrieval, evals and security questions; capacity and cost numbers |
+| 5–6 | Retrieval and security questions; evaluation numbers and two worked debugging cases |
 | 7–8 | Two coding problems and one debugging round under time |
 | 9–10 | A second design prompt; incident and evaluation review mocks |
-| 11–12 | Write and rehearse two stories; prepare questions for interviewers |
+| 11–12 | A product role-play; enterprise questions if relevant; write and rehearse two stories |
 | 13–14 | A fresh full mock, then retake your weakest dimension |
 
 ## Bring an evidence pack

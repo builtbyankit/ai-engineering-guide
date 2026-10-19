@@ -125,20 +125,26 @@
   "capstone": {"id": "capstone", "title": "Capstone: ship a production agent", "weeks": "3–4"},
   "interview": {
     "id": "interview", "title": "Agentic AI interview prep",
-    "summary": "Turn what you built into interview answers: agentic system design rounds, a question bank, coding rounds, behavioural stories and timed mocks.",
+    "summary": "Turn what you built into interview answers: agentic system design, a question bank, product, evaluation, coding and enterprise rounds, behavioural stories and timed mocks.",
     "pages": [
       {"id": "interview", "title": "How to prepare", "hours": "1–2",
        "scope": "What AI engineering interview loops look like, which guide levels each round draws on, a six-week plan and a two-week sprint, the evidence pack to bring, readiness checks."},
       {"id": "iv-system-design", "title": "Agentic system design rounds", "hours": "6–8",
        "scope": "What the round tests, a 45-minute timeline, a six-step answer structure, three worked prompts (support agent with refunds, permission-aware knowledge assistant, long-running research with specialists), follow-up probes, strong and weak signals."},
       {"id": "iv-questions", "title": "Question bank", "hours": "6–8",
-       "scope": "Around 35 common questions with short model answers and a follow-up for each, grouped into LLM fundamentals, agents and tools, state and approvals, retrieval, context and security, and evaluation and operations."},
+       "scope": "Around 40 common questions with short model answers and a follow-up for each, grouped into LLM fundamentals (including attention, KV cache, prefill and decode, quantization, constrained decoding and tuning methods), agents and tools, state and approvals, retrieval, context and security, and evaluation and operations."},
+      {"id": "iv-product", "title": "AI product and customer rounds", "hours": "4–5",
+       "scope": "The customer or product-manager simulation round: leading a scoping conversation, questions that change the design, deciding whether an LLM fits, outcome, quality, guardrail and cost metrics, a first release and pilot, a worked support-team example, common traps."},
+      {"id": "iv-evals", "title": "Evaluation and debugging rounds", "hours": "5–6",
+       "scope": "Worked judge calibration (TPR, TNR, correcting a judge-estimated rate), confidence intervals and paired comparisons on small eval sets, pass^k, designing an eval for a new tool, a six-step debugging method and five worked agent failures (tool-call loops, retrieval drift after a rebuild, model upgrade regressions, cost spikes, unfaithful answers)."},
       {"id": "iv-coding", "title": "Coding and debugging rounds", "hours": "6–8",
        "scope": "What agent coding rounds look like, a contract-first method, warm-ups, six runtime problems with acceptance checks, a trace-debugging round with common bugs, and how attempts are scored."},
+      {"id": "iv-enterprise", "title": "Enterprise and regulated settings", "hours": "3–4",
+       "scope": "Governance and model-risk questions for banks and other regulated companies: frameworks by name (NIST AI RMF and its generative AI profile, US SR 26-2, RBI FREE-AI, OWASP), launch approval, personal data with hosted models, audit trails, explainability, bias testing, vendor model changes, data residency, agent actions on accounts, monitoring and vendor due diligence."},
       {"id": "iv-behavioural", "title": "Behavioural and leadership stories", "hours": "3–4",
        "scope": "What the round tests, STAR plus reflection, a story bank mapped to common questions, making stories verifiable, using guide projects honestly, senior and leadership scenarios, questions to ask interviewers."},
       {"id": "iv-mocks", "title": "Mock interviews and scoring", "hours": "4–6",
-       "scope": "Four timed mock rounds (system design, coding, incident, evaluation review) with prompts, a six-dimension scoring rubric, how to run mocks alone or with a peer, the retake loop and a readiness gate."}
+       "scope": "Five timed mock rounds (system design, coding, incident, evaluation review, customer conversation) with prompts, a six-dimension scoring rubric, how to run mocks alone or with a peer, the retake loop and a readiness gate."}
     ]
   }
 }

@@ -1,7 +1,7 @@
 ---
 title: Mock interviews and scoring
 hours: 4–6
-summary: Run four timed mock rounds, score each one on six dimensions, retake your weakest area with new scenarios and know when you are ready.
+summary: Run five timed mock rounds, score each one on six dimensions, retake your weakest area with new scenarios and know when you are ready.
 checked: 2026-10-19
 ---
 
@@ -11,7 +11,7 @@ Knowing an answer and giving it under time pressure, while someone changes the a
 
 Treat each mock like the real thing. Set a timer, speak out loud, draw on paper or a whiteboard tool and don't look anything up. Record yourself if you are practising alone, because you will hear gaps in the recording that you missed while talking.
 
-## Four mock rounds
+## Five mock rounds
 
 ### Round A: system design (45 minutes)
 
@@ -43,7 +43,15 @@ Draw the states from approval to confirmed refund. Explain how the second worker
 
 **Prompt:** Your team compares two retrievers. Keyword search scores 95% on answerable questions but refuses only 1 of 2 unanswerable ones. Hybrid search finds more right answers but refuses less often. Which do you ship, and what experiment do you run first?
 
-Ask what the numbers are based on and how many cases each one covers. Point out that one of two is not a stable 50%. Separate retrieval metrics from answer quality, propose a larger labelled set with a fresh holdout and say which failure matters more for these users.
+Ask what the numbers are based on and how many cases each one covers. [Evaluation and debugging rounds](#iv-evals) works through the arithmetic. Point out that one of two is not a stable 50%. Separate retrieval metrics from answer quality, propose a larger labelled set with a fresh holdout and say which failure matters more for these users.
+
+### Round E: customer conversation (30 minutes)
+
+**Prompt:** Your partner plays the head of a finance team: "We process thousands of supplier invoices a month and it takes forever. Can AI help?" They answer your questions but volunteer nothing.
+
+Follow the shape on [AI product and customer rounds](#iv-product). Ask questions that change the design, say which parts should not use an LLM, define outcome, quality and guardrail metrics, and propose a pilot. Finish by summarising the plan and asking what you missed.
+
+**Probe to expect:** the customer says every invoice must be 100% correct. How do you respond?
 
 ## Score every mock
 
@@ -83,7 +91,7 @@ A reasonable target before a real loop is three mocks on different prompts, each
 - [ ] [Must ship] Complete Round A under time and score it on all six dimensions.
 - [ ] [Must ship] Complete Round C or Round D under time and score it.
 - [ ] [Must ship] Retake your weakest dimension with a new scenario and compare the scores.
-- [ ] [Recommended] Complete all four rounds at least once.
+- [ ] [Recommended] Complete all five rounds at least once.
 - [ ] [Recommended] Run at least one mock with a partner who changes an assumption halfway.
 - [ ] [Stretch] Reach 18 of 24 on three different mocks with no dimension below 2.
 

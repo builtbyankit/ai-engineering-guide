@@ -94,7 +94,7 @@ Expect the interviewer to change an assumption halfway through. Practise answeri
 - The model starts returning malformed tool calls after a version change. How do you notice and respond?
 - A customer reports that the agent revealed another customer's data. Walk through the incident.
 - The budget halves. Which quality do you give up first?
-- Legal says no data may leave the region. What changes?
+- Legal says no data may leave the region. What changes? ([Enterprise and regulated settings](#iv-enterprise) has a model answer.)
 - Why not just use a bigger context window instead of retrieval?
 
 ## Strong and weak signals

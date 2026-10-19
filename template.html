@@ -190,6 +190,7 @@ body {
 .meter { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
 .meter span { display: block; height: 100%; width: 0; background: var(--pass); transition: width 0.3s ease; }
 .meter.tasks span { background: var(--accent); }
+.meter.pages span { background: var(--ink-2); }
 .progress-link { font: 0.76rem/1.3 var(--font-display); color: var(--accent); }
 
 /* track selector */
@@ -517,6 +518,37 @@ button.btn-quiet, .file-btn { border: 1px solid var(--rule); color: var(--ink); 
 .eyebrow a { color: inherit; text-decoration: none; }
 .eyebrow a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .chip-opt { color: var(--extra); background: var(--extra-soft); }
+.chip-fast { color: var(--ink-2); background: transparent; border: 1px dashed var(--ink-3); padding: 0 7px; }
+.chip-done { color: var(--pass); background: var(--pass-soft); }
+.chip[hidden] { display: none; }
+
+/* mark a page complete */
+.page-done { max-width: 46rem; margin: 40px auto 0; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; }
+.page-done:empty { display: none; }
+.page-done.is-done { border-color: var(--pass); background: var(--pass-soft); }
+.done-text { display: grid; gap: 2px; margin: 0; }
+.done-title { font: 650 1rem/1.35 var(--font-display); color: var(--ink); }
+.page-done.is-done .done-title { color: var(--pass); }
+.done-sub { font-size: 0.88rem; line-height: 1.45; color: var(--ink-2); }
+.page-done .btn, .page-done .btn-quiet { flex: none; }
+
+/* completed pages get a tick wherever they are listed */
+.nav-sub a.is-done::before { content: "\2713"; margin-right: 6px; font-weight: 700; color: var(--pass); }
+.nav-row > a.is-done > span:nth-child(2)::after { content: " \2713"; font-weight: 700; color: var(--pass); }
+.nav-sec[data-sec="interview"] > .nav-row > a.is-done > span:nth-child(2)::after { content: none; }
+.topic.is-done .t-num, .project-card.is-done .card-eyebrow { color: var(--pass); }
+.topic.is-done .t-num::after { content: " \2713"; font-weight: 700; }
+.project-card.is-done .card-title::after { content: " \2713"; color: var(--pass); }
+[data-pages-for].complete, [data-iv-count].complete { color: var(--pass); }
+
+/* the chosen path: pages it skips are dimmed and labelled */
+.fast-tag { display: none; }
+[data-track="fast"] .fast-tag { display: inline-block; }
+[data-track="fast"] .nav-sub .fast-tag { display: block; }
+[data-track="core"] li[data-opt] > a, [data-track="fast"] li[data-opt] > a, [data-track="fast"] li[data-fast] > a { opacity: 0.5; }
+[data-track="core"] li[data-opt] > a:hover, [data-track="fast"] li[data-opt] > a:hover, [data-track="fast"] li[data-fast] > a:hover,
+[data-track] li > a[aria-current="page"] { opacity: 1; }
+.track-hint { margin: 2px 0 0; font: 0.7rem/1.4 var(--font-display); color: var(--ink-3); }
 .page-head h1 .chip { font-size: 0.6rem; vertical-align: 0.5em; }
 .t-title .chip { margin-left: 8px; vertical-align: 0.1em; }
 .card-sum { font-size: 0.86rem; line-height: 1.45; color: var(--ink-2); flex: 1; }
@@ -601,7 +633,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
           <label class="track-opt"><input type="radio" name="track-side" value="full"><span class="track-name">Everything</span><span class="track-sub">%%FULL_WEEKS%%</span></label>
           <label class="track-opt"><input type="radio" name="track-side" value="fast"><span class="track-name">Fast track</span><span class="track-sub">%%FAST_WEEKS%%</span></label>
         </fieldset>
+        <p class="track-hint" data-track-hint></p>
         <p class="progress-head"><span>Your progress</span><span>this browser</span></p>
+        <div class="counter">
+          <p><span>Pages completed</span><b><span data-pages-done>0</span>/<span data-pages-total>0</span></b></p>
+          <div class="meter pages"><span data-pages-bar></span></div>
+        </div>
         <div class="counter">
           <p><span>Milestone checks</span><b><span data-gates-done>0</span>/<span data-gates-total>0</span></b></p>
           <div class="meter"><span data-gates-bar></span></div>
@@ -663,7 +700,8 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   var DATA = JSON.parse(document.getElementById("site-data").textContent);
   var R = DATA.routes, ORDER = DATA.order, GATES = DATA.gates, TASKS = DATA.tasks, TIERS = DATA.tiers, PRES = DATA.pageRes;
   var LEVELS = DATA.levels, RES = DATA.resources, IV = DATA.interview || [], ALIASES = DATA.aliases || {};
-  var OPT = {}, FAST = {}, RESBYID = {};
+  var OPT = {}, FAST = {}, RESBYID = {}, DONEABLE = {};
+  (DATA.doneable || []).forEach(function (id) { DONEABLE[id] = true; });
   DATA.optional.forEach(function (id) { OPT[id] = true; });
   (DATA.fastSkip || []).forEach(function (id) { FAST[id] = true; });
   var TRACKS = { core: "Core path", full: "Everything", fast: "Fast track" };
@@ -719,6 +757,39 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     out.push("capstone");
     return out;
   }
+  // pages: a learner marks a page complete with the button at its end; the key is "<page id>-done"
+  function isDone(pid) { return !!state[pid + "-done"]; }
+  function countDone(list) { var c = 0; list.forEach(function (p) { if (isDone(p)) c++; }); return { c: c, t: list.length }; }
+  function levelPages(lid) {
+    var out = [];
+    LEVELS.forEach(function (l) {
+      if (l.id !== lid) return;
+      l.modules.forEach(function (m) { if (inTrack(m)) out.push(m); });
+      out.push(l.project);
+    });
+    return out;
+  }
+  function renderDone(el) {
+    var pid = el.getAttribute("data-done-for"), done = isDone(pid);
+    var counted = IV.indexOf(pid) !== -1 ? "Interview prep pages are tracked separately from your path." :
+      (inTrack(pid) ? "" : "This page isn't part of your " + TRACKS[track] + ", so it isn't counted in your totals.");
+    el.classList.toggle("is-done", done);
+    el.innerHTML = done
+      ? '<p class="done-text"><span class="done-title">\u2713 You marked this page complete</span>' + (counted ? '<span class="done-sub">' + esc(counted) + "</span>" : "") + "</p>" +
+        '<button type="button" class="btn-quiet" data-done-toggle="' + pid + '">Mark as not done</button>'
+      : '<p class="done-text"><span class="done-title">Finished with this page?</span><span class="done-sub">' +
+        esc(counted || "Mark it complete to tick it off in the sidebar and your progress.") + "</span></p>" +
+        '<button type="button" class="btn" data-done-toggle="' + pid + '">Mark page as complete</button>';
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-done-toggle]");
+    if (!b) return;
+    var pid = b.getAttribute("data-done-toggle");
+    if (!DONEABLE[pid]) return;
+    setTick(pid + "-done", !isDone(pid));
+    var again = document.querySelector('[data-done-toggle="' + pid + '"]');
+    if (again) again.focus();
+  });
   function gateCount(lid) {
     var t = GATES[lid] || 0, c = 0;
     for (var i = 1; i <= t; i++) if (state[lid + "-gate-" + i]) c++;
@@ -775,7 +846,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     return out;
   }
   function totals() {
-    var t = { gates: { c: 0, t: 0 }, M: { c: 0, t: 0 }, X: { c: 0, t: 0 }, res: { c: 0, t: 0 } };
+    var t = { gates: { c: 0, t: 0 }, M: { c: 0, t: 0 }, X: { c: 0, t: 0 }, res: { c: 0, t: 0 }, pages: countDone(countedPages()) };
     LEVELS.forEach(function (l) { var g = gateCount(l.id); t.gates.c += g.c; t.gates.t += g.t; });
     var seen = {};
     countedPages().forEach(function (p) {
@@ -808,12 +879,24 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
       el.textContent = r.c + "/" + r.t;
       el.classList.toggle("complete", r.t > 0 && r.c === r.t);
     });
-    var iv = ivTasks();
+    var iv = countDone(IV);
     document.querySelectorAll("[data-iv-count]").forEach(function (el) { el.textContent = iv.c + "/" + iv.t; el.classList.toggle("complete", iv.t > 0 && iv.c === iv.t); });
+    LEVELS.forEach(function (l) {
+      var pg = countDone(levelPages(l.id));
+      document.querySelectorAll('[data-pages-for="' + l.id + '"]').forEach(function (el) { el.textContent = pg.c + "/" + pg.t; el.classList.toggle("complete", pg.t > 0 && pg.c === pg.t); });
+    });
+    Object.keys(DONEABLE).forEach(function (pid) {
+      var done = isDone(pid);
+      document.querySelectorAll('[data-route="' + pid + '"], a.topic[href="#' + pid + '"], a.project-card[href="#' + pid + '"]').forEach(function (a) { a.classList.toggle("is-done", done); });
+      document.querySelectorAll('[data-done-flag="' + pid + '"]').forEach(function (el) { el.hidden = !done; });
+    });
+    document.querySelectorAll("[data-done-for]").forEach(renderDone);
     document.querySelectorAll("[data-extra-for]").forEach(function (el) { var r = tasksFor(el.getAttribute("data-extra-for"), "X"); el.textContent = r.c + "/" + r.t; });
     document.querySelectorAll("[data-res-for]").forEach(function (el) { var r = resFor(el.getAttribute("data-res-for")); el.textContent = r.c + "/" + r.t; });
     document.querySelectorAll("li.res").forEach(function (li) { li.classList.toggle("done", !!state[li.getAttribute("data-res")]); });
     var t = totals();
+    setAll("[data-pages-done]", t.pages.c); setAll("[data-pages-total]", t.pages.t);
+    document.querySelectorAll("[data-pages-bar]").forEach(function (el) { el.style.width = pct(t.pages.c, t.pages.t); });
     setAll("[data-gates-done]", t.gates.c); setAll("[data-gates-total]", t.gates.t);
     setAll("[data-must-done]", t.M.c); setAll("[data-must-total]", t.M.t);
     setAll("[data-res-done]", t.res.c); setAll("[data-res-total]", t.res.t);
@@ -832,6 +915,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   function applyTrack(next, persist) {
     track = validTrack(next);
     if (persist) store(TRACK_KEY, track);
+    document.documentElement.setAttribute("data-track", track);
+    setAll("[data-track-hint]", {
+      core: "Optional modules are dimmed and not counted.",
+      full: "Every module, including optional ones, is counted.",
+      fast: "Optional modules and four Level 0 modules are dimmed and not counted."
+    }[track]);
     document.querySelectorAll('input[name="track-home"], input[name="track-side"]').forEach(function (r) { r.checked = r.value === track; });
     document.querySelectorAll("[data-track-view]").forEach(function (el) { el.hidden = el.getAttribute("data-track-view") !== track; });
     setAll("[data-dur-weeks]", DATA.duration[track].weeks);
@@ -1191,15 +1280,18 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   function validId(id) {
     var m = id.match(/^(.+)-gate-(\d+)$/);
     if (m) return !!GATES[m[1]] && +m[2] >= 1 && +m[2] <= GATES[m[1]];
+    m = id.match(/^(.+)-done$/);
+    if (m && DONEABLE[m[1]]) return true;
     m = id.match(/^(.+)-todo-(\d+)$/);
     if (m) return !!TASKS[m[1]] && +m[2] >= 1 && +m[2] <= TASKS[m[1]];
     return !!RESBYID[id];
   }
   function tickedIds() { return Object.keys(state).filter(function (k) { return state[k] && validId(k); }).sort(); }
   function describe(ids) {
-    var g = 0, t = 0, r = 0;
-    ids.forEach(function (k) { if (/-gate-\d+$/.test(k)) g++; else if (/-todo-\d+$/.test(k)) t++; else r++; });
-    return g + (g === 1 ? " milestone check, " : " milestone checks, ") + t + (t === 1 ? " task and " : " tasks and ") + r + (r === 1 ? " resource" : " resources");
+    var g = 0, t = 0, r = 0, p = 0;
+    ids.forEach(function (k) { if (/-gate-\d+$/.test(k)) g++; else if (/-todo-\d+$/.test(k)) t++; else if (/-done$/.test(k)) p++; else r++; });
+    return p + (p === 1 ? " completed page, " : " completed pages, ") + g + (g === 1 ? " milestone check, " : " milestone checks, ") +
+      t + (t === 1 ? " task and " : " tasks and ") + r + (r === 1 ? " resource" : " resources");
   }
   function backupJson() { return JSON.stringify({ app: APP_ID, version: 1, exported_at: new Date().toISOString(), track: track, checks: tickedIds() }); }
   function fmtDate(iso) { var d = new Date(iso); return isNaN(d) ? "an unknown date" : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); }
@@ -1209,26 +1301,27 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     var box = document.getElementById("prog-table");
     if (!box) return;
     var rows = LEVELS.map(function (l) {
-      var g = gateCount(l.id), m = levelMust(l.id), r = levelRes(l.id);
+      var g = gateCount(l.id), m = levelMust(l.id), r = levelRes(l.id), pg = countDone(levelPages(l.id));
       var done = g.t > 0 && g.c === g.t;
       return "<tr" + (done ? ' class="complete"' : "") + '><td><a href="#' + l.id + '">Level ' + l.num + " · " + esc(l.t) + "</a></td><td>" +
-        g.c + "/" + g.t + "</td><td>" + m.c + "/" + m.t + "</td><td>" + r.c + "/" + r.t + "</td></tr>";
+        pg.c + "/" + pg.t + "</td><td>" + g.c + "/" + g.t + "</td><td>" + m.c + "/" + m.t + "</td><td>" + r.c + "/" + r.t + "</td></tr>";
     });
     var cm = tasksFor("capstone", "M"), cr = resFor("capstone");
-    rows.push("<tr" + (cm.t && cm.c === cm.t ? ' class="complete"' : "") + '><td><a href="#capstone">Capstone</a></td><td>–</td><td>' + cm.c + "/" + cm.t + "</td><td>" + cr.c + "/" + cr.t + "</td></tr>");
+    rows.push("<tr" + (cm.t && cm.c === cm.t ? ' class="complete"' : "") + '><td><a href="#capstone">Capstone</a></td><td>' + (isDone("capstone") ? 1 : 0) + "/1</td><td>–</td><td>" + cm.c + "/" + cm.t + "</td><td>" + cr.c + "/" + cr.t + "</td></tr>");
     if (IV.length) {
-      var im = ivTasks("M"), ir = ivRes();
-      rows.push("<tr" + (im.t && im.c === im.t ? ' class="complete"' : "") + '><td><a href="#interview">Interview prep (not counted)</a></td><td>–</td><td>' + im.c + "/" + im.t + "</td><td>" + ir.c + "/" + ir.t + "</td></tr>");
+      var im = ivTasks("M"), ir = ivRes(), ip = countDone(IV);
+      rows.push("<tr" + (im.t && im.c === im.t ? ' class="complete"' : "") + '><td><a href="#interview">Interview prep (not counted)</a></td><td>' + ip.c + "/" + ip.t + "</td><td>–</td><td>" + im.c + "/" + im.t + "</td><td>" + ir.c + "/" + ir.t + "</td></tr>");
     }
-    box.innerHTML = '<div class="table-scroll"><table class="prog-table"><thead><tr><th>Level</th><th>Milestone</th><th>Must ship</th><th>Resources</th></tr></thead><tbody>' + rows.join("") + "</tbody></table></div>";
+    box.innerHTML = '<div class="table-scroll"><table class="prog-table"><thead><tr><th>Level</th><th>Pages</th><th>Milestone</th><th>Must ship</th><th>Resources</th></tr></thead><tbody>' + rows.join("") + "</tbody></table></div>";
   }
   function renderProgress() {
     var t = totals();
     view.innerHTML =
       '<header class="page-head"><p class="eyebrow">' + TRACKS[track] + "</p>" +
       '<h1 tabindex="-1">Your progress</h1>' +
-      '<p class="standfirst">Milestone checks sit at the bottom of each level page. Must-ship tasks are the core of each module and project. Your ticks live in this browser only, so keep a backup.</p></header>' +
+      '<p class="standfirst">Mark a page complete with the button at its end. Milestone checks sit at the bottom of each level page, and must-ship tasks are the core of each module and project. Your ticks live in this browser only, so keep a backup.</p></header>' +
       '<div class="prose"><dl class="stats">' +
+      '<div class="stat"><dt>Pages completed</dt><dd><span class="stat-big">' + t.pages.c + " of " + t.pages.t + '</span><span class="stat-sub">modules, projects and the capstone in your path</span></dd></div>' +
       '<div class="stat"><dt>Milestone checks</dt><dd><span class="stat-big">' + t.gates.c + " of " + t.gates.t + '</span><span class="stat-sub">across seven levels</span></dd></div>' +
       '<div class="stat"><dt>Must-ship tasks</dt><dd><span class="stat-big">' + t.M.c + " of " + t.M.t + '</span><span class="stat-sub">modules and projects</span></dd></div>' +
       '<div class="stat"><dt>Resources done</dt><dd><span class="stat-big">' + t.res.c + " of " + t.res.t + '</span><span class="stat-sub">read, watched or completed</span></dd></div>' +

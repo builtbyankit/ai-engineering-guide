@@ -26,6 +26,7 @@ At 10 to 12 hours a week, the core path takes about 32.5 to 43.5 weeks. Experien
 | `content/projects/` | One page per level project, plus `capstone.md` |
 | `content/interview/` | The Interview prep section, one page per topic |
 | `content/pages/start.md` | The "How to use this guide" page |
+| `learning.js` | Assessment, lesson briefs, project showcase, mastery stages and bookmarks; inlined by the build |
 | `workspace.css` | Responsive workspace design shared by the dashboard, lessons, resources and progress |
 | `tests/dashboard.cjs` | Dashboard resume, track selection and completion regression checks |
 | `template.html` | The single-page app shell: styles, navigation, progress and the resource library |
@@ -48,6 +49,7 @@ To check the dashboard behavior after building (requires Node.js, no npm depende
 
 ```bash
 node tests/dashboard.cjs
+node tests/learning.cjs
 ```
 
 The overview offers a next-step card, selectable learning paths, per-level progress and an expandable timeline. It resumes the last unfinished lesson in the selected path, otherwise picks the first incomplete page. All existing progress keys, resource IDs and page URLs are retained. Theme selection still supports system, light and dark modes.
@@ -62,3 +64,28 @@ Broken link, outdated resource or a better pick? Open an issue or a pull request
 
 Progress ids are tied to the order of checklist items and to resource URLs, so reordering checklist items shifts learners' saved ticks. Add new items at the end of a list where you can.
 
+
+## Learning experience
+
+- **Find your starting point:** six experience self-checks recommend the earliest level with a skills gap. Choosing a start never completes earlier lessons or changes saved ticks.
+- **Lesson at a glance:** prerequisites, effort, readiness outcomes and a practical task come from the curriculum and existing Markdown. Projects also preview their deliverables.
+- **Learning stages:** Read, Practiced and Completed are independent self-reported states. Only Completed counts toward the existing page totals. Old completed pages do not acquire invented reading or practice history.
+- **Resource priorities:** lesson cards show Essential, Optional deep dive, Reference or companion status. The lesson focus control hides nonessential resources without hiding practice or requirements. The library labels resources essential in at least one module and retains its essential-only filter.
+- **Project showcase:** browse all seven level projects and the capstone, with expected outputs and requirement previews. The full project page contains the full rubric.
+- **Saved for later:** bookmark pages and resources for revision. Saved items and learning stages are included in version 2 progress backups. Version 1 backups still restore; older versions of the app ignore new keys.
+- **Accessibility:** larger text and targets, explicit mobile menu close control, focus containment, inert background content, pressed-state buttons and live status messages.
+
+### Browser smoke check before publishing
+
+Serve `site/` over HTTP after rebuilding. Check desktop and 390px mobile widths, both themes and keyboard-only navigation:
+
+1. Submit the assessment with beginner, backend and agent experience; verify the suggested level and that choosing it preserves completion counts.
+2. Open a module. Verify its brief and resource priority labels. Toggle essential focus; practice and requirements must remain visible.
+3. Toggle Read, Practiced and Completed independently. Reload and confirm all three persist. Check the stage totals on Your progress.
+4. Save a lesson and resource, open Saved for later, follow both links and remove each bookmark.
+5. Export a progress backup, restore it using merge and replace, and confirm stages/bookmarks survive. Use disposable browser data for reset testing.
+6. Open the project showcase and inspect all eight project links and requirement previews.
+7. On mobile, open navigation, cycle Tab/Shift+Tab, and close with Escape or the close button. Background content must stay inert only while the drawer is open. Resize to desktop and verify scrolling is restored.
+8. Search lessons and resources, switch tracks, navigate previous/next lessons, and check for console errors or horizontal overflow.
+
+The build, generated-data checks and Node regression tests can run in a restricted environment. They do not replace browser visual or interaction testing.

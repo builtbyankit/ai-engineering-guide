@@ -392,9 +392,36 @@ def li_attrs(m):
     return (" data-opt" if m["kind"] == "optional" else "") + (" data-fast" if m.get("fast_skip") else "")
 
 
+# Concise entry points derived from the existing curriculum, never separate lesson copies.
+learning = {}
+
+
+def section_items(soup, title, limit=3):
+    heading = next((h for h in soup.find_all(["h2", "h3"]) if h.get_text().strip() == title), None)
+    if not heading:
+        return []
+    items = []
+    for node in heading.next_siblings:
+        if getattr(node, "name", None) in ("h2", "h3"):
+            break
+        if getattr(node, "name", None) in ("ul", "ol"):
+            for li in node.find_all("li", recursive=False):
+                text = li.get_text(" ", strip=True)
+                text = re.sub(r"^\[ \]\s*\[(?:Must ship|Recommended|Stretch)\]\s*", "", text)
+                items.append(text)
+    return items[:limit]
+
+
 def module_page(lv, idx, n_mods, m, fm, body):
     mid = m["id"]
     soup, resources = md_to_soup(body)
+    previous = [item for item in lv["modules"][:idx - 1] if item["kind"] == "core"]
+    prereq = previous[-1]["id"] if previous else (f'L{lv["num"] - 1}' if lv["num"] else None)
+    learning[mid] = {
+        "outcomes": section_items(soup, "You're ready when"),
+        "practice": section_items(soup, "Practice", 1),
+        "prerequisite": prereq, "effort": m["hours"] + " hours",
+    }
     info = finish(soup, mid)
     task_totals[mid] = info["todos"]
     task_tiers[mid] = info["tiers"]
@@ -414,6 +441,15 @@ def module_page(lv, idx, n_mods, m, fm, body):
 
 def project_page(lv, pid, pfm, pbody, capstone=False):
     soup, resources = md_to_soup(pbody)
+    learning[pid] = {
+        "outcomes": section_items(soup, "What you'll practise"),
+        "practice": section_items(soup, "Requirements", 1),
+        "deliverables": section_items(soup, "Show your work"),
+        "criteria": section_items(soup, "Requirements"),
+        "prerequisite": "L6" if capstone else lv["id"],
+        "effort": pfm["weeks"] + " weeks",
+        "rubric": pid + "--how-to-evaluate-it",
+    }
     info = finish(soup, pid)
     task_totals[pid] = info["todos"]
     task_tiers[pid] = info["tiers"]
@@ -526,9 +562,17 @@ for pid, frag in fragments.items():
 assert not broken, broken
 
 # ---------------- navigation ----------------
+for rid, title, summary in [
+    ("assessment", "Find your starting point", "Choose a starting level based on what you can already build."),
+    ("projects", "Project showcase", "Explore eight portfolio projects, deliverables and completion criteria."),
+    ("saved", "Saved for later", "Your bookmarked lessons and resources, ready for revision."),
+]:
+    routes[rid] = {"t": title, "k": "page", "s": rid, "e": "Workspace", "sum": summary, "h": []}
+
+
 def nav_html():
     out = ['<div class="nav-group"><p class="nav-heading">Workspace</p><ul class="nav-list"><li><div class="nav-row"><a href="#home" data-route="home"><span class="nav-num">⌂</span><span>Overview</span></a></div></li>']
-    for rid, num in (("start", "→"), ("resources", "◇"), ("progress", "✓")):
+    for rid, num in (("assessment", "↗"), ("start", "→"), ("projects", "◇"), ("resources", "≋"), ("saved", "☆"), ("progress", "✓")):
         out.append(f'<li><div class="nav-row"><a href="#{rid}" data-route="{rid}"><span class="nav-num">{num}</span>'
                    f'<span>{esc(routes[rid]["t"])}</span></a></div></li>')
     out.append('</ul></div><div class="nav-group"><p class="nav-heading">Learning path</p><ul class="nav-list">')
@@ -624,7 +668,7 @@ def home_cards():
 # ---------------- data and output ----------------
 lib = sorted(library.values(), key=lambda r: order.index(r["uses"][0][0]))
 data = {
-    "routes": routes, "order": order, "gates": gate_totals, "tasks": task_totals, "tiers": task_tiers,
+    "learning": learning, "routes": routes, "order": order, "gates": gate_totals, "tasks": task_totals, "tiers": task_tiers,
     "pageRes": page_res, "optional": sorted(optional_ids), "fastSkip": sorted(fast_skip_ids), "resources": lib,
     "interview": IV_IDS, "aliases": ALIASES, "doneable": doneable, "duration": DURATION, "checked": CHECKED,
     "levels": [{"id": lv["id"], "num": lv["num"], "t": lv["title"], "modules": [m["id"] for m, _, _ in mods], "project": pid}
@@ -643,7 +687,8 @@ n_paid = sum(1 for r in lib if r["cost"] == "Paid")
 n_mod_core = sum(1 for lv in levels for m in lv["modules"] if m["kind"] == "core")
 n_mod_opt = len(optional_ids)
 tpl = (ROOT / "template.html").read_text(encoding="utf-8")
-page = (tpl.replace("%%NAV%%", nav_html())
+page = (tpl.replace("%%LEARNING_JS%%", (ROOT / "learning.js").read_text(encoding="utf-8"))
+        .replace("%%NAV%%", nav_html())
         .replace("%%ROUTE%%", "".join(route_figure(tr) for tr in TRACKS))
         .replace("%%CARDS%%", home_cards())
         .replace("%%DATA%%", json.dumps(data, ensure_ascii=True).replace("</", "<\\/"))

@@ -26,6 +26,8 @@ At 10 to 12 hours a week, the core path takes about 32.5 to 43.5 weeks. Experien
 | `content/projects/` | One page per level project, plus `capstone.md` |
 | `content/interview/` | The Interview prep section, one page per topic |
 | `content/pages/start.md` | The "How to use this guide" page |
+| `workspace.css` | Responsive workspace design shared by the dashboard, lessons, resources and progress |
+| `tests/dashboard.cjs` | Dashboard resume, track selection and completion regression checks |
 | `template.html` | The single-page app shell: styles, navigation, progress and the resource library |
 | `build.py` | Renders the content into `site/` |
 | `check.py` | Validates page structure, resource-line format, checklists and links |
@@ -42,6 +44,14 @@ python -m http.server --directory site 8000
 
 Then open http://localhost:8000.
 
+To check the dashboard behavior after building (requires Node.js, no npm dependencies):
+
+```bash
+node tests/dashboard.cjs
+```
+
+The overview offers a next-step card, selectable learning paths, per-level progress and an expandable timeline. It resumes the last unfinished lesson in the selected path, otherwise picks the first incomplete page. All existing progress keys, resource IDs and page URLs are retained. Theme selection still supports system, light and dark modes.
+
 ## Deploying
 
 Every push to `main` runs `.github/workflows/deploy.yml`. It checks the content, builds the site and publishes `site/` to the `gh-pages` branch, which GitHub Pages serves.
@@ -51,3 +61,4 @@ Every push to `main` runs `.github/workflows/deploy.yml`. It checks the content,
 Broken link, outdated resource or a better pick? Open an issue or a pull request. Edit the Markdown in `content/`, follow `WRITING_GUIDE.md`, and run `python check.py --all` before you push. Run `python check.py --due` to list time-sensitive claims that are due for a re-check.
 
 Progress ids are tied to the order of checklist items and to resource URLs, so reordering checklist items shifts learners' saved ticks. Add new items at the end of a list where you can.
+

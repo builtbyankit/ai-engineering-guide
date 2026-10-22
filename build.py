@@ -527,11 +527,11 @@ assert not broken, broken
 
 # ---------------- navigation ----------------
 def nav_html():
-    out = ['<div class="nav-group"><p class="nav-heading">Start here</p><ul class="nav-list">']
+    out = ['<div class="nav-group"><p class="nav-heading">Workspace</p><ul class="nav-list"><li><div class="nav-row"><a href="#home" data-route="home"><span class="nav-num">⌂</span><span>Overview</span></a></div></li>']
     for rid, num in (("start", "→"), ("resources", "◇"), ("progress", "✓")):
         out.append(f'<li><div class="nav-row"><a href="#{rid}" data-route="{rid}"><span class="nav-num">{num}</span>'
                    f'<span>{esc(routes[rid]["t"])}</span></a></div></li>')
-    out.append('</ul></div><div class="nav-group"><p class="nav-heading">Levels</p><ul class="nav-list">')
+    out.append('</ul></div><div class="nav-group"><p class="nav-heading">Learning path</p><ul class="nav-list">')
     for lv, lfm, lbody, mods, pid, pfm, pbody in level_info:
         lid = lv["id"]
         subs = []
@@ -589,7 +589,7 @@ def route_figure(tr):
     name = {"core": "Core path", "full": "Everything, including optional modules",
             "fast": "Fast track, skipping the Level 0 modules experienced developers already know"}[tr]
     cap = (f"{name}: {DURATION[tr]['weeks']} at 10–12 hours a week. Each bar starts where the previous level ends and uses the "
-           "midpoint of its estimate. Modules are blue, projects amber. The buffer runs to the top of the range.")
+           "midpoint of its estimate. Modules are indigo, projects amber. The buffer runs to the top of the range.")
     return (f'<figure class="route" data-track-view="{tr}" style="--axis:{axis}"{" hidden" if tr != "core" else ""} '
             f'aria-labelledby="route-title-{tr}"><div class="route-top"><p class="route-title" id="route-title-{tr}">The path, to scale</p>'
             '<ul class="legend"><li><span class="sw sw-stage"></span>Modules</li><li><span class="sw sw-proj"></span>Project</li>'
@@ -601,19 +601,24 @@ def route_figure(tr):
 
 def home_cards():
     cards = []
+    icons = ["{ }", "✳", "≋", "⌘", "◇", "⊙", "↗"]
     for lv, lfm, *_ in level_info:
         lid = lv["id"]
-        cards.append(f'<li><a class="card" href="#{lid}"><span class="card-eyebrow">Level {lv["num"]} · {esc(lv["tier"])}</span>'
+        estimates = "".join(
+            f'<span data-track-view="{tr}"{" hidden" if tr != "core" else ""}>{fmt_range(*level_weeks[lid][tr], "wk")}</span>'
+            for tr in TRACKS
+        )
+        cards.append(f'<li><a class="card level-card" href="#{lid}"><span class="card-top"><span class="level-icon level-{lv["num"]}" aria-hidden="true">{icons[lv["num"]]}</span><span class="card-arrow" aria-hidden="true">↗</span></span><span class="card-eyebrow">Level {lv["num"]} · {esc(lv["tier"])}</span>'
                      f'<span class="card-title">{esc(lv["title"])}</span><span class="card-sum">{esc(lv["summary"])}</span>'
-                     f'<span class="card-foot"><span>{fmt_range(*level_weeks[lid]["core"], "wk")}</span>'
-                     f'<span class="card-prog"><span data-pages-for="{lid}">0/0</span> pages</span></span></a></li>')
+                     f'<span class="card-foot"><span>{estimates}</span>'
+                     f'<span class="card-prog"><span data-pages-for="{lid}">0/0</span> pages</span></span><span class="meter card-meter"><span data-card-bar="{lid}"></span></span></a></li>')
     cards.append(f'<li><a class="card card-cap" href="#capstone"><span class="card-eyebrow">Finish</span>'
                  f'<span class="card-title">Capstone</span><span class="card-sum">{esc(cap_fm["summary"])}</span>'
                  f'<span class="card-foot"><span>{fmt_range(*cap_weeks, "wk")}</span><span class="card-prog" data-must-for="capstone">0/0</span></span></a></li>')
     cards.append(f'<li><a class="card card-iv" href="#interview"><span class="card-eyebrow">Any time</span>'
                  f'<span class="card-title">Interview prep</span><span class="card-sum">{esc(IV["summary"])}</span>'
                  f'<span class="card-foot"><span>{IV_HOURS}</span><span class="card-prog"><span data-iv-count>0/0</span> pages</span></span></a></li>')
-    return f'<section class="home-group"><h2>The path</h2><ul class="cards">{"".join(cards)}</ul></section>'
+    return f'<section class="home-group"><div class="section-heading"><div><p class="eyebrow">A LITTLE FURTHER, EVERY DAY</p><h2>Your learning path</h2></div><span>7 levels · 1 capstone · endless possibilities</span></div><ul class="cards">{"".join(cards)}</ul></section>'
 
 
 # ---------------- data and output ----------------
@@ -662,8 +667,10 @@ assert "%%" not in page, re.findall(r"%%\w+%%", page)
     f'<title>Page not found · {SITE_TITLE}</title><meta http-equiv="refresh" content="0; url=./"></head>'
     '<body><p>Page not found. <a href="./">Go to the guide</a>.</p></body></html>', encoding="utf-8")
 shutil.copy(ROOT / "favicon.svg", OUT / "favicon.svg")
+shutil.copy(ROOT / "workspace.css", OUT / "workspace.css")
 
 size = sum(f.stat().st_size for f in OUT.rglob("*") if f.is_file())
 print(f"pages {len(fragments)} | gates {sum(gate_totals.values())} | tasks {sum(task_totals.values())} | "
       f"must {sum(v.count('M') for v in task_tiers.values())} | resources {n_res} ({n_free} free) | "
       f"core {DURATION['core']['weeks']} | full {DURATION['full']['weeks']} | fast {DURATION['fast']['weeks']} | {size / 1e6:.2f} MB")
+

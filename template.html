@@ -612,16 +612,17 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
 <link rel="stylesheet" href="workspace.css">
 </head>
 <body>
+<div id="learning-status" class="sr-only" role="status" aria-live="polite"></div>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="app">
   <header class="topbar">
-    <button class="menu-btn" id="menu-btn" type="button" aria-controls="sidebar" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span>Menu</button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-label="Navigation menu" aria-controls="sidebar" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
     <a class="topbar-title" href="#home">AI Agent Engineering Guide</a>
   </header>
   <div class="scrim" id="scrim" hidden></div>
 
   <aside class="sidebar" id="sidebar" aria-label="Site navigation">
-    <div class="side-inner">
+    <div class="side-inner"><button type="button" class="drawer-close" id="drawer-close">Close navigation ×</button>
       <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">a<span>i</span></span><span>AI Engineering<span class="brand-sub">THE OPEN LEARNING GUIDE</span></span></a>
       <div class="search" role="search"><kbd class="search-key" aria-hidden="true">/</kbd>
         <label for="search-input" class="sr-only">Search the guide</label>
@@ -668,7 +669,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
           <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> FREE &amp; OPEN SOURCE · BUILT FOR BUILDERS</p>
           <h1>Understand AI.<br><span>Build what’s next.</span></h1>
           <p class="standfirst">Your path from the fundamentals to production-ready agents. Learn the concepts, build real projects, and make every step count.</p>
-          <div class="hero-actions"><a class="btn" href="#start">Find your starting point <span aria-hidden="true">↗</span></a><a class="hero-text-link" href="#resources">Explore resources <span aria-hidden="true">→</span></a></div>
+          <div class="hero-actions"><a class="btn" href="#assessment">Find your starting point <span aria-hidden="true">↗</span></a><a class="hero-text-link" href="#resources">Explore resources <span aria-hidden="true">→</span></a></div>
           <p class="hero-caption">Self-paced. Hands-on. Yours to explore.</p>
         </div>
         <div class="hero-art" aria-hidden="true">
@@ -814,12 +815,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     var counted = IV.indexOf(pid) !== -1 ? "Interview prep pages are tracked separately from your path." :
       (inTrack(pid) ? "" : "This page isn't part of your " + TRACKS[track] + ", so it isn't counted in your totals.");
     el.classList.toggle("is-done", done);
-    el.innerHTML = done
-      ? '<p class="done-text"><span class="done-title">\u2713 You marked this page complete</span>' + (counted ? '<span class="done-sub">' + esc(counted) + "</span>" : "") + "</p>" +
-        '<button type="button" class="btn-quiet" data-done-toggle="' + pid + '">Mark as not done</button>'
-      : '<p class="done-text"><span class="done-title">Finished with this page?</span><span class="done-sub">' +
-        esc(counted || "Mark it complete to tick it off in the sidebar and your progress.") + "</span></p>" +
-        '<button type="button" class="btn" data-done-toggle="' + pid + '">Mark page as complete</button>';
+    el.innerHTML = '<div class="done-text"><span class="done-title">Track your learning</span><span class="done-sub">Read: understand the concepts. Practiced: attempt the exercises. Completed: meet the readiness criteria. Toggle each independently.</span>' + (counted ? '<span class="done-sub">' + esc(counted) + '</span>' : '') + '</div>' + masteryControls(pid);
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest("[data-done-toggle]");
@@ -944,6 +940,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     document.querySelectorAll("[data-must-bar]").forEach(function (el) { el.style.width = pct(t.M.c, t.M.t); });
     document.querySelectorAll("[data-res-bar]").forEach(function (el) { el.style.width = pct(t.res.c, t.res.t); });
     updateDashboard();
+    syncLearningUI();
     if (currentId() === "progress") renderProgressTable();
   }
   function setTick(id, on) {
@@ -955,7 +952,9 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   /* Keep the next step aligned with the selected path and existing completion data. */
   function updateDashboard() {
     var pages = countedPages(), last = read("ai-agent-guide:last-page");
-    var next = pages.indexOf(last) !== -1 && !isDone(last) ? last : pages.find(function (id) { return !isDone(id); });
+    var lastIndex = pages.indexOf(last);
+    var resumeOrder = lastIndex === -1 ? pages : pages.slice(lastIndex).concat(pages.slice(0, lastIndex));
+    var next = resumeOrder.find(function (id) { return !isDone(id); });
     var link = document.getElementById("continue-link");
     LEVELS.forEach(function (l) {
       var p = countDone(levelPages(l.id));
@@ -1009,6 +1008,9 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     sidebar.setAttribute("data-open", "true");
     scrim.hidden = false;
     document.body.classList.add("drawer-open");
+    document.getElementById("main").inert = true;
+    document.querySelector(".topbar").inert = true;
+    document.getElementById("rail").inert = true;
     menuBtn.setAttribute("aria-expanded", "true");
     var cur = sidebar.querySelector('[aria-current="page"]') || sidebar.querySelector("a");
     if (cur) cur.focus({ preventScroll: false });
@@ -1018,10 +1020,14 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     sidebar.removeAttribute("data-open");
     scrim.hidden = true;
     document.body.classList.remove("drawer-open");
+    document.getElementById("main").inert = false;
+    document.querySelector(".topbar").inert = false;
+    document.getElementById("rail").inert = false;
     menuBtn.setAttribute("aria-expanded", "false");
     if (returnFocus) menuBtn.focus();
   }
   menuBtn.addEventListener("click", function () { if (sidebar.getAttribute("data-open") === "true") closeDrawer(true); else openDrawer(); });
+  document.getElementById("drawer-close").addEventListener("click", function () { closeDrawer(true); });
   scrim.addEventListener("click", function () { closeDrawer(true); });
 
   /* ---------- nav tree: one level open at a time ---------- */
@@ -1065,7 +1071,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   }
 
   /* ---------- search ---------- */
-  var INDEX = ORDER.concat(["resources", "progress"]).map(function (id) {
+  var INDEX = ORDER.concat(["resources", "progress", "assessment", "projects", "saved"]).map(function (id) {
     var r = R[id];
     return { id: id, title: r.t.toLowerCase(), text: [r.t, r.sum || "", (r.h || []).join(" "), r.e || "", r.opt ? "optional" : ""].join(" ").toLowerCase() };
   });
@@ -1218,6 +1224,8 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     document.title = title ? title + " · " + SITE : SITE;
   }
   function afterRender(id) {
+    addLessonOverview(id);
+    view.querySelectorAll("h2:not([id])").forEach(function (h, index) { h.id = id + "--section-" + index; });
     buildOnThisPage(id);
     setCurrentNav(id);
     window.scrollTo(0, 0);
@@ -1243,6 +1251,9 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     document.body.dataset.page = id;
     if (DONEABLE[id] && IV.indexOf(id) === -1) store("ai-agent-guide:last-page", id);
     if (id === "home") { showHome(); return; }
+    if (id === "assessment") { showView("Find your starting point"); renderAssessment(); afterRender(id); return; }
+    if (id === "projects") { showView("Project showcase"); renderProjects(); afterRender(id); return; }
+    if (id === "saved") { showView("Saved for later"); renderSaved(); afterRender(id); return; }
     if (id === "progress") { showView("Your progress"); renderProgress(); afterRender(id); return; }
     if (id === "resources") { showView("Resource library"); renderLibrary(parsed.params); afterRender(id); return; }
     if (!R[id] && ALIASES[id]) { location.replace("#" + ALIASES[id]); return; }
@@ -1310,6 +1321,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     list.innerHTML = rows.length ? rows.map(resCard).join("") : "";
     document.getElementById("lib-empty").hidden = rows.length > 0;
     wireTicks(list);
+    addResourceTools(list);
     updateProgress();
   }
   function renderLibrary(params) {
@@ -1329,7 +1341,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
       '<label class="sr-only" for="lib-q">Search resources</label><input type="search" id="lib-q" placeholder="Search titles, authors and notes" value="' + esc(lib.q) + '">' +
       '<div class="type-chips" role="group" aria-label="Resource type">' + chips + "</div>" +
       '<div class="lib-row"><label class="sr-only" for="lib-level">Level</label><select id="lib-level">' + levelOpts + "</select>" +
-      '<label class="lib-toggle"><input type="checkbox" id="lib-start"' + (lib.start ? " checked" : "") + "> Start here picks only</label>" +
+      '<label class="lib-toggle"><input type="checkbox" id="lib-start"' + (lib.start ? " checked" : "") + "> Essential picks only</label>" +
       '<label class="lib-toggle"><input type="checkbox" id="lib-free"' + (lib.free ? " checked" : "") + "> Hide paid</label>" +
       '<label class="lib-toggle"><input type="checkbox" id="lib-hide"' + (lib.hide ? " checked" : "") + "> Hide done</label></div></div>" +
       '<p class="lib-count" id="lib-count" role="status"></p><ul class="res-list" id="lib-list"></ul>' +
@@ -1352,6 +1364,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   /* ---------- progress page, backup and restore ---------- */
   var pendingRestore = null;
   function validId(id) {
+    if (validLearningKey(id)) return true;
     var m = id.match(/^(.+)-gate-(\d+)$/);
     if (m) return !!GATES[m[1]] && +m[2] >= 1 && +m[2] <= GATES[m[1]];
     m = id.match(/^(.+)-done$/);
@@ -1362,12 +1375,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   }
   function tickedIds() { return Object.keys(state).filter(function (k) { return state[k] && validId(k); }).sort(); }
   function describe(ids) {
-    var g = 0, t = 0, r = 0, p = 0;
-    ids.forEach(function (k) { if (/-gate-\d+$/.test(k)) g++; else if (/-todo-\d+$/.test(k)) t++; else if (/-done$/.test(k)) p++; else r++; });
+    var g = 0, t = 0, r = 0, p = 0, stages = 0, bookmarks = 0;
+    ids.forEach(function (k) { if (k.indexOf("bookmark:") === 0) bookmarks++; else if (/-(read|practiced)$/.test(k)) stages++; else if (/-gate-\d+$/.test(k)) g++; else if (/-todo-\d+$/.test(k)) t++; else if (/-done$/.test(k)) p++; else r++; });
     return p + (p === 1 ? " completed page, " : " completed pages, ") + g + (g === 1 ? " milestone check, " : " milestone checks, ") +
-      t + (t === 1 ? " task and " : " tasks and ") + r + (r === 1 ? " resource" : " resources");
+      t + (t === 1 ? " task and " : " tasks and ") + r + (r === 1 ? " resource" : " resources") + ", " + stages + " learning stages and " + bookmarks + " bookmarks";
   }
-  function backupJson() { return JSON.stringify({ app: APP_ID, version: 1, exported_at: new Date().toISOString(), track: track, checks: tickedIds() }); }
+  function backupJson() { return JSON.stringify({ app: APP_ID, version: 2, exported_at: new Date().toISOString(), track: track, checks: tickedIds() }); }
   function fmtDate(iso) { var d = new Date(iso); return isNaN(d) ? "an unknown date" : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); }
   function status(msg, ok) { var el = document.getElementById("bk-status"); if (!el) return; el.textContent = msg; el.classList.toggle("ok", !!ok); }
 
@@ -1393,8 +1406,8 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     view.innerHTML =
       '<header class="page-head"><p class="eyebrow">' + TRACKS[track] + "</p>" +
       '<h1 tabindex="-1">Your progress</h1>' +
-      '<p class="standfirst">Mark a page complete with the button at its end. Milestone checks sit at the bottom of each level page, and must-ship tasks are the core of each module and project. Your ticks live in this browser only, so keep a backup.</p></header>' +
-      '<div class="prose"><dl class="stats">' +
+      '<p class="standfirst">Mark a page complete with the button at its end. Milestone checks sit at the bottom of each level page, and must-ship tasks are the core of each module and project. Your progress, learning stages and bookmarks live in this browser only, so keep a backup.</p></header>' +
+      '<div id="mastery-summary">' + masterySummary() + '</div><div class="prose"><dl class="stats">' +
       '<div class="stat"><dt>Pages completed</dt><dd><span class="stat-big">' + t.pages.c + " of " + t.pages.t + '</span><span class="stat-sub">modules, projects and the capstone in your path</span></dd></div>' +
       '<div class="stat"><dt>Milestone checks</dt><dd><span class="stat-big">' + t.gates.c + " of " + t.gates.t + '</span><span class="stat-sub">across seven levels</span></dd></div>' +
       '<div class="stat"><dt>Must-ship tasks</dt><dd><span class="stat-big">' + t.M.c + " of " + t.M.t + '</span><span class="stat-sub">modules and projects</span></dd></div>' +
@@ -1413,7 +1426,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
       '<label for="rs-code" class="sr-only">Backup code</label><textarea class="code-box" id="rs-code" spellcheck="false" placeholder="Paste the code you copied"></textarea>' +
       '<button type="button" class="btn-quiet" id="rs-code-go">Check this code</button></details>' +
       '<div class="restore-preview" id="rs-preview" hidden></div>' +
-      '<div class="danger-zone"><h3 id="progress--reset">Start over</h3><p>Clear every tick in this browser. Download a backup first if you might want it back.</p>' +
+      '<div class="danger-zone"><h3 id="progress--reset">Start over</h3><p>Clear every tick, learning stage and bookmark in this browser. Download a backup first if you might want it back.</p>' +
       '<div class="backup-row" id="reset-row"><button type="button" class="btn-danger" id="reset-go">Clear my progress</button></div></div>' +
       "</div>";
     renderProgressTable();
@@ -1481,10 +1494,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     document.getElementById("reset-go").addEventListener("click", function () {
       var row = document.getElementById("reset-row");
       row.innerHTML = '<span>Clear all ' + tickedIds().length + ' ticks in this browser?</span><button type="button" class="btn-danger" id="reset-yes">Yes, clear them</button><button type="button" class="btn-quiet" id="reset-no">Cancel</button>';
-      document.getElementById("reset-yes").addEventListener("click", function () { state = {}; save(); updateProgress(); renderProgress(); status("Progress cleared.", true); });
+      document.getElementById("reset-yes").addEventListener("click", function () { state = {}; store("ai-agent-guide:last-page", null); save(); updateProgress(); renderProgress(); status("Progress and bookmarks cleared.", true); });
       document.getElementById("reset-no").addEventListener("click", function () { renderProgress(); });
     });
   }
+
+  %%LEARNING_JS%%
 
   window.addEventListener("hashchange", route);
   window.addEventListener("storage", function (e) {
@@ -1492,6 +1507,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     try { state = JSON.parse(e.newValue || "{}") || {}; } catch (err) { state = {}; }
     view.querySelectorAll('ul.checks input[type="checkbox"], input.res-box').forEach(function (b) { b.checked = !!state[b.id]; });
     updateProgress();
+    if (currentId() === "saved") renderSaved();
   });
   applyTrack(track, false);
   route();

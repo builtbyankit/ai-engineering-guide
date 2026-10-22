@@ -280,3 +280,99 @@ figure.code pre { padding: 20px; line-height: 1.8; }
   .content { padding: 0; }
   .page { max-width: none; }
 }
+
+/* Learning tools and accessibility refinements. */
+:root { --ink-3: #606a80; }
+:root[data-theme="dark"] { --ink-3: #a4aec7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink-3: #a4aec7; } }
+.nav-row > a, .nav-sub a { font-size: 14px; min-height: 44px; }
+.nav-toggle { min-width: 44px; min-height: 44px; }
+.nav-num, .nav-count, .nav-heading, .brand-sub { font-size: 11px; }
+.search input, .track-name, .card-foot, .overview-stats dt, .overview-stats dd span,
+.continue-progress, .path-picker .track-name, .path-picker .track-sub, .path-picker .path-hours,
+.path-estimate span, .hero-caption, .section-heading > span, .side-foot, .counter p,
+.progress-head, .progress-link, .page-meta, .meta, .res-meta, .prose .res-meta,
+.page-foot, .explore-card p, .timeline-hint { font-size: 12px; }
+.card-sum, .explore-card h2, .continue-card > p:not(.eyebrow), .path-picker > p,
+.lib-toggle, .done-sub, .prose .res-note, .t-sum { font-size: 14px; }
+.btn, .btn-quiet, .hero-text-link, .path-picker .path-estimate strong { font-size: 13px; }
+.type-chips button, .copy, .bookmark-btn, .drawer-close { min-height: 44px; }
+.hero .eyebrow, .card-eyebrow, .section-heading .eyebrow { font-size: 11px; letter-spacing: 1px; }
+.side-foot a, .side-foot button, .hero-text-link, .progress-link { display: inline-flex; align-items: center; min-height: 44px; }
+.prose .res-box { width: 20px; height: 20px; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+.page-tools { display: flex; justify-content: flex-end; margin-top: 16px; }
+.bookmark-btn, .drawer-close { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; background: var(--surface); color: var(--ink-2); font: 600 12px/1.5 var(--font-body); cursor: pointer; }
+.bookmark-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.bookmark-btn:hover { border-color: var(--accent); }
+.resource-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-top: 14px; }
+.priority-badge { font-size: 12px; color: var(--ink-2); background: var(--surface-2); padding: 5px 10px; border-radius: 6px; }
+.priority-badge.essential { color: var(--pass); background: var(--pass-soft); font-weight: 600; }
+.resource-priority-control { padding: 18px; margin: 16px 0; border: 1px solid var(--rule); border-radius: 10px; background: var(--accent-soft); }
+.resource-priority-control label { display: flex; gap: 10px; min-height: 44px; align-items: center; font-weight: 600; cursor: pointer; }
+.resource-priority-control p, #essential-status { font-size: 13px; color: var(--ink-2); }
+.lesson-overview { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; margin: 22px 0 32px; }
+.lesson-facts { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--rule-soft); }
+.lesson-facts p { margin: 8px 0 0; font-size: 14px; }
+.lesson-facts small { color: var(--ink-3); font-size: 12px; }
+.lesson-overview a { color: var(--accent); text-underline-offset: 3px; }
+.lesson-overview h2 { font: 700 18px/1.5 var(--font-display); margin: 22px 0 12px; }
+.lesson-overview ul, .showcase-card ul { padding-left: 20px; font-size: 14px; line-height: 1.8; }
+.lesson-overview li, .showcase-card li { margin-bottom: 8px; }
+.lesson-overview details { border-top: 1px solid var(--rule-soft); padding-top: 8px; margin-top: 12px; }
+.lesson-overview summary, .showcase-card summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+.overview-note { font-size: 12px; color: var(--ink-3); margin: 18px 0 0; }
+.mastery-actions { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; }
+.mastery-actions button { flex: 1; min-width: 115px; }
+.mastery-actions [aria-pressed="true"] { background: var(--pass-soft); color: var(--pass); border-color: var(--pass); }
+.mastery-summary { background: var(--accent-soft); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+.mastery-summary h2 { font: 700 19px/1.5 var(--font-display); margin: 0 0 10px; }
+.mastery-summary p { font-size: 14px; color: var(--ink-2); }
+.mastery-counts { display: flex; flex-wrap: wrap; gap: 24px; font-size: 14px; }
+.mastery-counts strong { font-size: 24px; }
+.assessment-form fieldset { min-width: 0; margin: 0 0 18px; padding: 20px; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); }
+.assessment-form legend { padding: 0 8px; font-weight: 600; }
+.assessment-form legend > span { display: inline-block; color: var(--accent); margin-right: 8px; font: 600 12px/1.5 var(--font-mono); }
+.assessment-options { display: flex; flex-wrap: wrap; gap: 12px; }
+.assessment-options label { display: flex; gap: 10px; min-height: 48px; padding: 12px; border: 1px solid var(--rule); border-radius: 8px; align-items: center; cursor: pointer; font-size: 14px; }
+.assessment-options label:has(:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.assessment-options input { width: 18px; height: 18px; }
+.assessment-result { padding: 26px; margin-top: 28px; border: 1px solid var(--accent); background: var(--accent-soft); border-radius: 14px; }
+.assessment-result h2 { font-size: 24px; }
+.project-showcase { display: grid; gap: 24px; }
+.showcase-card { padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; }
+.showcase-card h2 { font: 750 23px/1.5 var(--font-display); margin: 10px 0; }
+.showcase-card h2 a { color: var(--ink); text-decoration: none; }
+.showcase-card h2 a:hover { color: var(--accent); }
+.showcase-card h3 { font-size: 16px; margin-bottom: 8px; }
+.showcase-card p { color: var(--ink-2); }
+.showcase-card .backup-row { margin-top: 18px; }
+.prose ul.saved-pages { padding: 0; list-style: none; }
+.saved-pages li { display: flex; justify-content: space-between; align-items: start; gap: 20px; padding: 20px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+.saved-pages li > div { min-width: 0; }
+.saved-pages p { color: var(--ink-2); font-size: 14px; }
+.saved-pages .bookmark-btn { flex-shrink: 0; }
+.drawer-close { display: none; }
+@media (max-width: 1099px) {
+  .drawer-close { display: block; margin: 0 0 18px auto; }
+  .topbar-title { font-size: 13px; }
+}
+@media (max-width: 600px) {
+  .lesson-facts { grid-template-columns: 1fr; gap: 18px; }
+  .lesson-overview, .showcase-card, .mastery-summary { padding: 20px; }
+  .saved-pages li { flex-direction: column; gap: 12px; }
+  .assessment-options { flex-direction: column; }
+  .assessment-form fieldset { padding: 16px; }
+  .continue-progress { flex-wrap: wrap; }
+  .path-picker .track-select { grid-template-columns: 1fr; }
+  .path-picker .track-opt { padding: 12px 12px 12px 38px; min-height: 52px; }
+  .path-picker .track-opt input { left: 12px; top: 18px; width: 16px; height: 16px; }
+  .path-picker .track-name { font-size: 14px; }
+  .overview-stats dd span { font-size: 12px; }
+  .workspace-bar { flex-wrap: wrap; }
+}
+@media (forced-colors: active) {
+  .bookmark-btn[aria-pressed="true"], .mastery-actions [aria-pressed="true"], .track-opt:has(input:checked) { outline: 2px solid Highlight; }
+}
+/* Small status labels meet AA contrast against their tinted surfaces. */
+:root { --pass: #196b52; --extra: #88591b; }

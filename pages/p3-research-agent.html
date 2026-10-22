@@ -1,0 +1,161 @@
+<header class="page-head"><p class="eyebrow"><a href="#L3">Level 3</a> · Project<span class="timebox">2 weeks</span></p><h1 tabindex="-1">Personal research agent <span class="chip chip-done" data-done-flag="p3-research-agent" hidden>Completed</span></h1><p class="standfirst">Build a framework-free agent that researches questions with web search, page fetching and your own MCP notes server, stays within budgets, and writes short cited reports.</p><p class="page-meta">Requirements <span data-must-for="p3-research-agent">0/0</span> · Stretch goals <span data-extra-for="p3-research-agent">0/0</span></p></header><div class="prose"><h2 id="p3-research-agent--the-brief">The brief</h2>
+<p>You build a command-line research assistant for yourself. You ask it a question, such as "What are the main ways to run small language models on phones?", and it searches the web, reads the most useful pages, checks your own notes and writes a short report with citations. It remembers past research, so a follow-up question next week starts from what it already found.</p>
+<p>You build it without an agent framework, using one LLM provider's SDK and plain Python. Alongside it you build a small MCP server for your personal notes or bookmarks, which the agent uses as a tool and which also works in other MCP-capable apps. Every run has step and cost budgets, and every step goes into a log you can inspect.</p>
+<h2 id="p3-research-agent--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l3-tool-calling">Tool calling in depth</a>: designing search, fetch and notes tools with clear schemas, capped results and useful errors.</li>
+<li><a href="#l3-agent-loop">The agent loop</a>: a hand-written loop with stop conditions, step and cost budgets, and error recovery.</li>
+<li><a href="#l3-workflow-patterns">Workflows and agent design patterns</a>: choosing between a plain agent, plan-and-execute and an evaluator pass on the report.</li>
+<li><a href="#l3-mcp">Model Context Protocol (MCP)</a>: building a notes or bookmarks server and connecting your agent to it as a client.</li>
+<li><a href="#l3-memory-context">Memory and context engineering</a>: storing past research, recalling it later and keeping long runs inside the context window.</li>
+<li><a href="#l2-rag-pipeline">Building a RAG pipeline</a>: grounding claims in fetched sources and citing them.</li>
+</ul>
+<h2 id="p3-research-agent--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p3-research-agent-todo-1"><input id="p3-research-agent-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write the agent loop yourself in Python with one provider SDK and no agent framework, in a single readable module.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-2"><input id="p3-research-agent-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Provide <code>web_search</code> and <code>fetch_page</code> tools with clear descriptions, JSON Schemas, a size cap on returned text and error results the model can act on.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-3"><input id="p3-research-agent-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Build an MCP server for your notes or bookmarks with at least three tools and one resource, test it in the MCP Inspector, and connect your agent to it over stdio.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-4"><input id="p3-research-agent-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Enforce a maximum number of steps, a cost budget per run and a timeout, and end every run with a stop reason and a partial report if needed.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-5"><input id="p3-research-agent-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write a JSONL run log with one line per step (time, tool, arguments, result size, tokens, cost, latency) and a final summary line.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-6"><input id="p3-research-agent-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Save a summary of each finished run (question, findings, sources, date) and retrieve relevant past research at the start of new runs.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-7"><input id="p3-research-agent-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Produce a Markdown report of 300–800 words with inline citations, a list of source URLs or note IDs, and an open-questions section.</span></label></li>
+<li data-tier="M"><label for="p3-research-agent-todo-8"><input id="p3-research-agent-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Keep 10 test questions and a script that runs them and prints pass rate, cost and steps per question.</span></label></li>
+</ul>
+<p><strong>Safety note:</strong> this agent combines private notes, untrusted web pages and a fetch tool that can send data out, the combination known as the lethal trifecta (see <a href="#l5-security">Security and guardrails</a>). Keep nothing sensitive in its notes, let <code>fetch_page</code> open only URLs that <code>web_search</code> returned, and ask for confirmation before <code>add_note</code> saves text that came from the web.</p>
+<h2 id="p3-research-agent--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p3-research-agent-todo-9"><input id="p3-research-agent-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add a plan-and-execute mode and compare it with the plain loop on your test set.</span></label></li>
+<li data-tier="R"><label for="p3-research-agent-todo-10"><input id="p3-research-agent-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add an evaluator pass that checks every claim in the report has a citation and asks for a fix if not.</span></label></li>
+<li data-tier="S"><label for="p3-research-agent-todo-11"><input id="p3-research-agent-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Run independent searches and fetches in parallel when the model requests several at once.</span></label></li>
+<li data-tier="S"><label for="p3-research-agent-todo-12"><input id="p3-research-agent-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Add compaction so long runs continue past the context limit without losing sources.</span></label></li>
+<li data-tier="S"><label for="p3-research-agent-todo-13"><input id="p3-research-agent-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Serve your MCP server over Streamable HTTP with a bearer token and use it from a second device.</span></label></li>
+</ul>
+<h2 id="p3-research-agent--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td>One provider SDK with tool calling (Anthropic, OpenAI or Gemini) and a small, cheap model</td>
+<td>A local model through Ollama that supports tool calling</td>
+</tr>
+<tr>
+<td>Web search</td>
+<td>Tavily (free plan with 1,000 credits a month at the time of writing)</td>
+<td>Brave Search API, Exa, or your provider's built-in web search tool</td>
+</tr>
+<tr>
+<td>Fetch and extract</td>
+<td>httpx plus Trafilatura for main-text extraction</td>
+<td>readability-lxml, BeautifulSoup</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td>Official MCP Python SDK</td>
+<td>FastMCP</td>
+</tr>
+<tr>
+<td>MCP testing</td>
+<td>MCP Inspector</td>
+<td>A desktop chat app or IDE with MCP support</td>
+</tr>
+<tr>
+<td>Memory store</td>
+<td>SQLite with full-text search (FTS5)</td>
+<td>Chroma or pgvector for embedding search, Mem0</td>
+</tr>
+<tr>
+<td>Run log</td>
+<td>JSONL files plus a small summary script</td>
+<td>An open-source tracing tool such as Langfuse or Arize Phoenix</td>
+</tr>
+<tr>
+<td>Config and secrets</td>
+<td>A <code>.env</code> file loaded with python-dotenv and kept out of git</td>
+<td>pydantic-settings</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p3-research-agent--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Set up the project.</strong> Create a repo with uv, a <code>.env</code> file for keys, and folders for the agent, tools, MCP server and test questions. Write the 10 test questions first so you know what success looks like.</li>
+<li><strong>Write the bare loop.</strong> Implement <code>run_agent()</code> with a stub tool and a final-answer condition. Print every step so you can watch the message list grow.</li>
+<li><strong>Add search and fetch.</strong> Wrap the search API and a page fetcher with clear descriptions, a cap of a few thousand tokens per result, and error results for timeouts and blocked pages. Check that the model picks the right tool for each test question.</li>
+<li><strong>Build the MCP server.</strong> Expose <code>search_notes</code>, <code>read_note</code> and <code>add_note</code> (or bookmark equivalents) plus a resource listing all titles. Test it in the MCP Inspector, then in a desktop app or IDE.</li>
+<li><strong>Connect the agent to MCP.</strong> Start the server over stdio from your agent, list its tools, convert them to your provider's format and route calls back through the client. Your agent now has search, fetch and notes tools.</li>
+<li><strong>Add budgets and the log.</strong> Track tokens and cost from each response, stop on max steps, budget or timeout, and write one JSONL line per step. When a limit fires, make the agent write a partial report instead of nothing.</li>
+<li><strong>Add memory.</strong> After each run, save a summary with its sources and date. At the start of a run, search past summaries and put the best two or three into context, labelled with their dates.</li>
+<li><strong>Write and check the report.</strong> Ask for a structured report with citations, check in code that every cited URL was actually fetched, and run your test set. Fix the worst failures you find in the logs.</li>
+</ol>
+<h2 id="p3-research-agent--how-to-evaluate-it">How to evaluate it</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Answer quality</td>
+<td>7 of 10 test questions get a report you rate as useful</td>
+<td>9 of 10, judged against a short written rubric</td>
+</tr>
+<tr>
+<td>Citations</td>
+<td>Every cited URL appears in the run log as fetched</td>
+<td>Spot-checks of 10 claims find each one supported by its source</td>
+</tr>
+<tr>
+<td>Budgets</td>
+<td>No run exceeds its step or cost limit</td>
+<td>Median cost per question is reported and under a target you set</td>
+</tr>
+<tr>
+<td>Robustness</td>
+<td>A failing tool or blocked page never crashes a run</td>
+<td>Runs recover from injected tool failures and still produce a report</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>A follow-up question retrieves the earlier run's summary</td>
+<td>Follow-up runs are measurably cheaper or better than first-time runs</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td>Works in the Inspector and in your agent</td>
+<td>Also works in a third-party host and has a short threat note</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p3-research-agent--show-your-work">Show your work</h2>
+<ul>
+<li>A README with a one-paragraph overview, a text diagram of the loop and its tools, setup steps and one sample report.</li>
+<li>A short demo video or GIF of one research run, showing the step log and the final report.</li>
+<li>A write-up of what broke and how you fixed it, with numbers from your test set such as pass rate, median cost and steps.</li>
+<li>A CV line with your real numbers, for example "Built a framework-free research agent with a custom MCP server, budgets, run logging and long-term memory; 9 of 10 test questions answered under $0.05 each" (example figures).</li>
+</ul>
+<h2 id="p3-research-agent--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>Research papers instead of the web, using the free arXiv API as the search tool and a reading-list MCP server.</li>
+<li>A recipe researcher that checks your pantry notes and remembers dietary preferences.</li>
+<li>A product comparison helper that tracks prices and reviews across runs and reports what changed.</li>
+<li>A weekly monitor for an open-source project or a local news topic that writes "what's new since last time".</li>
+<li>A study companion that builds on your course notes and points out gaps in them.</li>
+</ul>
+<h2 id="p3-research-agent--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-4ed94514cc"><input aria-label="Mark “How to Build an Agent” as done" class="res-box" id="res-4ed94514cc" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://ampcode.com/how-to-build-an-agent" rel="noopener noreferrer" target="_blank">How to Build an Agent</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Thorsten Ball</span><span>45 min</span></p><p class="res-note">The closest template for a framework-free loop with simple tools, and easy to port to Python.</p></div></li>
+<li class="res" data-res="res-37ed91c908"><input aria-label="Mark “How we built our multi-agent research system” as done" class="res-box" id="res-37ed91c908" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://www.anthropic.com/engineering/multi-agent-research-system" rel="noopener noreferrer" target="_blank">How we built our multi-agent research system</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Anthropic</span><span>30 min</span></p><p class="res-note">Lessons from a production research agent on scaling effort to the question, prompting for search and evaluating results.</p></div></li>
+<li class="res" data-res="res-018f5d129d"><input aria-label="Mark “MCP quickstart resources” as done" class="res-box" id="res-018f5d129d" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/modelcontextprotocol/quickstart-resources" rel="noopener noreferrer" target="_blank">MCP quickstart resources</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>MCP project</span><span>reference</span></p><p class="res-note">Complete example servers and chatbot clients in Python and other languages to start your notes server and client from.</p></div></li>
+<li class="res" data-res="res-3e88b739ed"><input aria-label="Mark “Quickstart” as done" class="res-box" id="res-3e88b739ed" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://docs.tavily.com/documentation/quickstart" rel="noopener noreferrer" target="_blank">Quickstart</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Tavily</span><span>15 min</span><span class="res-cost">Free tier</span></p><p class="res-note">Gets a search API key and a first search running from Python in a few minutes.</p></div></li>
+<li class="res" data-res="res-9e94651ccc"><input aria-label="Mark “Trafilatura” as done" class="res-box" id="res-9e94651ccc" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://trafilatura.readthedocs.io/en/latest/" rel="noopener noreferrer" target="_blank">Trafilatura</a><p class="res-meta"><span class="res-type t-tool">Tool</span><span>Trafilatura</span><span>reference</span></p><p class="res-note">Extracts the main text and metadata from web pages so your fetch tool returns clean content instead of raw HTML.</p></div></li>
+<li class="res" data-res="res-c2414e3a01"><input aria-label="Mark “Effective harnesses for long-running agents” as done" class="res-box" id="res-c2414e3a01" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents" rel="noopener noreferrer" target="_blank">Effective harnesses for long-running agents</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Anthropic</span><span>20 min</span></p><p class="res-note">Shows how progress files and logs let an agent pick up work across sessions, a good model for your run log and memory.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p3-research-agent" aria-label="Page completion"></section>

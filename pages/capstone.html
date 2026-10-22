@@ -1,0 +1,185 @@
+<header class="page-head"><p class="eyebrow">Capstone<span class="timebox">3–4 weeks</span></p><h1 tabindex="-1">Capstone: ship a production agent <span class="chip chip-done" data-done-flag="capstone" hidden>Completed</span></h1><p class="standfirst">Design, build, evaluate, secure and deploy a new agent end to end, then present it as portfolio work a reviewer or hiring manager can judge.</p><p class="page-meta">Requirements <span data-must-for="capstone">0/0</span> · Stretch goals <span data-extra-for="capstone">0/0</span></p></header><div class="prose"><h2 id="capstone--the-brief">The brief</h2>
+<p>You build one new system from an empty repository and run it on the internet, where its first users can be you and two friends. It answers from your own data and acts through tools on your own MCP (Model Context Protocol) server. It pauses for a human before anything risky and proves its quality with numbers. Pick one of these three briefs, or propose your own of similar size.</p>
+<ul>
+<li><strong>Meeting-notes agent.</strong> For a small team, it reads meeting transcripts and extracts decisions and action items with owners and dates. It searches past meetings to answer questions such as when a decision was made. It drafts follow-up emails and tickets, and a person approves each one before it is sent.</li>
+<li><strong>Docs and codebase assistant.</strong> For contributors to an open-source project, it answers questions about the code and docs with citations to files and pages. When an answer exposes a gap in the docs, it drafts a fix and opens a draft pull request once you approve the diff. The optional <a href="#l4-coding-agents">Coding agents</a> module helps with this one.</li>
+<li><strong>Small-business operations agent.</strong> For a small shop, it reads supplier invoices, matches them to purchase orders and stock levels, and flags mismatches. It answers questions from the shop's own records and policies. It proposes payments, reorders and supplier emails, and a person approves anything that moves money or stock.</li>
+</ul>
+<p>Whichever brief you pick, these constraints apply.</p>
+<ul>
+<li>Use public, synthetic or your own data. Never load other people's private records.</li>
+<li>Send every side effect to a sandbox, such as a test inbox, a repository you own or a payment provider's test mode.</li>
+<li>Support at least two user accounts, so data separation and per-user budgets are real.</li>
+<li>Set a spending cap before you start (for example $20 of model and hosting costs for the whole project) and enforce it in code.</li>
+<li>Start a new repository. Copying small helpers from earlier projects is fine.</li>
+</ul>
+<h2 id="capstone--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l0-python-for-ai">Python for AI engineering</a>, <a href="#l1-llm-apis">Calling LLM APIs</a>, <a href="#l1-prompt-engineering">Prompt engineering</a> and <a href="#l1-structured-outputs">Structured outputs and function calling basics</a>: a typed, tested codebase with versioned prompts, validated outputs and a model choice you can defend on cost and latency.</li>
+<li><a href="#l2-rag-pipeline">Building a RAG pipeline</a>, <a href="#l2-advanced-retrieval">Better retrieval: hybrid search and reranking</a> and <a href="#l2-rag-evaluation">Evaluating RAG</a>: grounded answers with citations, and retrieval quality measured separately from answer quality.</li>
+<li><a href="#l3-tool-calling">Tool calling in depth</a>, <a href="#l3-agent-loop">The agent loop</a>, <a href="#l3-workflow-patterns">Workflows and agent design patterns</a>, <a href="#l3-mcp">Model Context Protocol (MCP)</a> and <a href="#l3-memory-context">Memory and context engineering</a>: well-designed tools behind your own MCP server, a bounded loop, the simplest pattern that works and a managed context window.</li>
+<li><a href="#l4-langgraph">Stateful agents with LangGraph</a> or <a href="#l4-agent-sdks">Agent SDKs compared</a>, plus <a href="#l4-multi-agent">Multi-agent systems</a> and <a href="#l4-human-in-the-loop">Human in the loop</a>: durable runs that pause for approval and resume, and a reasoned choice between one agent and several.</li>
+<li><a href="#l5-evals-in-depth">Evals in depth</a>, <a href="#l5-observability">Observability and tracing</a> and <a href="#l5-security">Security and guardrails</a>: regression evals in CI (continuous integration, automated checks on every push), a trace for every run and an attack suite aimed at your own system.</li>
+<li><a href="#l0-apis-and-http">Web APIs, HTTP and JSON</a>, <a href="#l0-dev-tooling">Git, the command line and Docker</a>, <a href="#l6-deployment">Deploying agent applications</a> and <a href="#l6-reliability-cost">Reliability, latency and cost</a>: a containerised API behind CI/CD, with timeouts, fallbacks and per-user budgets.</li>
+</ul>
+<h2 id="capstone--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="capstone-todo-1"><input id="capstone-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Answer questions from your corpus with hybrid search (keyword plus vector) and a reranker. Cite the source of each claim, and refuse when the retrieved context lacks the answer.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-2"><input id="capstone-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Define at least four tools with clear names, typed schemas and validated outputs. Serve every side-effecting tool from an MCP server you wrote, and connect your agent to it as an MCP client.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-3"><input id="capstone-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Run the agent in a bounded loop with a step limit, a per-run token and cost budget, and tool errors returned to the model. Trim or summarise context so long runs stay inside the window.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-4"><input id="capstone-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Pause for human approval before every side-effecting action, showing the proposed action, the reason and the sources. Support approve, edit and reject, resume runs after a server restart, and log every decision.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-5"><input id="capstone-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Build an eval set of at least 50 cases (an example floor; size it to your spec) covering retrieval, tool choice and final output. Check any LLM judge against your own labels, and run the suite in CI so a regression blocks the merge.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-6"><input id="capstone-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Trace every run with spans for model calls, retrieval and tool calls. Show tokens, cost and latency per task on a dashboard.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-7"><input id="capstone-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write a threat model that checks your design against the lethal trifecta (private data, untrusted content and a way to send data out). Give each tool least privilege. Run an attack suite of at least 20 cases (example floor), including indirect injection through retrieved documents, and record the results.</span></label></li>
+<li data-tier="M"><label for="capstone-todo-8"><input id="capstone-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Deploy a container to a public HTTPS URL, with secrets kept outside the repository and CI/CD that runs tests and evals. Add timeouts, retries, a fallback model and a per-user spending cap.</span></label></li>
+</ul>
+<h2 id="capstone--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="capstone-todo-9"><input id="capstone-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Ship a prompt or model change as a canary to a slice of traffic, and compare quality, cost and latency from traces before full rollout.</span></label></li>
+<li data-tier="R"><label for="capstone-todo-10"><input id="capstone-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Collect feedback signals, such as thumbs up or down and how often reviewers edit proposed actions. Turn the worst cases into new eval cases each week.</span></label></li>
+<li data-tier="S"><label for="capstone-todo-11"><input id="capstone-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Connect a second MCP client, such as Claude Desktop or an IDE, to your server, and document what changes for remote access and authorization.</span></label></li>
+<li data-tier="S"><label for="capstone-todo-12"><input id="capstone-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Build a multi-agent or orchestrator-worker version, and keep it only if your evals show better quality per dollar than the single agent.</span></label></li>
+<li data-tier="S"><label for="capstone-todo-13"><input id="capstone-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Route one narrow sub-task to a smaller or fine-tuned open model from <a href="#l6-open-models">Open models, fine-tuning and serving</a>, and report the cost and quality trade-off.</span></label></li>
+</ul>
+<h2 id="capstone--suggested-stack">Suggested stack</h2>
+<p>Pick tools you already used in earlier levels. A familiar stack beats a new one learned under deadline. Postgres can hold vectors, keyword search, run checkpoints and the audit log, so one database is often enough.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service and tests</td>
+<td>Python, FastAPI, Pydantic, pytest</td>
+<td>TypeScript with an equivalent stack</td>
+</tr>
+<tr>
+<td>Model access</td>
+<td>A hosted model through its official SDK, behind LiteLLM for fallbacks</td>
+<td>Direct SDK calls only; Ollama for cheap local development</td>
+</tr>
+<tr>
+<td>Agent orchestration</td>
+<td>LangGraph, for checkpoints and interrupts</td>
+<td>OpenAI Agents SDK, Claude Agent SDK, Pydantic AI, or a plain loop with a job queue</td>
+</tr>
+<tr>
+<td>Retrieval</td>
+<td>Postgres with pgvector and full-text search, plus an open cross-encoder reranker</td>
+<td>Qdrant or Chroma; a hosted reranker such as Cohere Rerank</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td>Official MCP Python SDK</td>
+<td>FastMCP; the official TypeScript SDK</td>
+</tr>
+<tr>
+<td>Durable runs and approvals</td>
+<td>LangGraph checkpointer on Postgres, with a small web page or chat buttons for approve, edit and reject</td>
+<td>Temporal or Inngest for durable execution</td>
+</tr>
+<tr>
+<td>Evals</td>
+<td>pytest harness plus promptfoo or Inspect AI</td>
+<td>DeepEval, Braintrust, LangSmith datasets</td>
+</tr>
+<tr>
+<td>Tracing</td>
+<td>Langfuse (open source, self-hostable)</td>
+<td>Arize Phoenix, LangSmith, OpenLLMetry</td>
+</tr>
+<tr>
+<td>Security testing</td>
+<td>promptfoo red teaming, garak</td>
+<td>PyRIT; a guard model such as Llama Guard</td>
+</tr>
+<tr>
+<td>Deployment and CI</td>
+<td>Docker, GitHub Actions and a managed container service such as Google Cloud Run or Render</td>
+<td>Fly.io, Railway, Kubernetes</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="capstone--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Write the spec and threat model first.</strong> Fill a one-page design doc with users, jobs, the actions the agent may take, target metrics and a cost cap. Mark each tool as read-only or side-effecting, and note where untrusted text enters the system.</li>
+<li><strong>Collect data and seed the eval set.</strong> Gather the corpus and 20 to 30 realistic tasks before you write agent code. Label the expected outcome for each, including cases the agent should refuse or escalate.</li>
+<li><strong>Build a thin end-to-end slice.</strong> One request enters through the API, the model calls one read-only tool, and an answer comes back with a trace. Deploy this slice in week 1 so hosting problems appear early.</li>
+<li><strong>Add retrieval and measure it alone.</strong> Index the corpus with hybrid search and a reranker. Report recall@k (how often the right chunk is in the top k) before the agent uses retrieval as a tool.</li>
+<li><strong>Move actions into your MCP server.</strong> Implement the side-effecting tools with narrow inputs and idempotency keys, so a retried call never sends twice. Connect the agent as a client and add step, token and cost limits to the loop.</li>
+<li><strong>Add durable approval.</strong> Pause the run on every risky tool call and store its state in a checkpointer. Build a minimal approval screen, then test that a paused run resumes after you restart the server.</li>
+<li><strong>Wire evals, tracing and attacks into CI.</strong> Grow the eval set past 50 cases using failures you find in traces, and fail the build on regressions. Run the attack suite in the same pipeline, then fix what breaks with tighter tool permissions and approval rules.</li>
+<li><strong>Operate it for a week and write it up.</strong> Use it daily, review traces, and track cost per task and p95 latency (the time 95% of requests finish within). Turn each new failure into an eval case, then produce the items in "Show your work".</li>
+</ol>
+<h2 id="capstone--how-to-evaluate-it">How to evaluate it</h2>
+<p>Use this table as a rubric. A reviewer should be able to check every cell from the README, the eval report, the traces and 10 minutes with the live system. Thresholds are example targets, so state your own in the spec and justify them.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Task success</td>
+<td>Meets the spec's target on a held-out set of at least 50 cases, with the case count stated</td>
+<td>Also meets it on repeated runs (for example all 3 of 3 attempts pass), with failures grouped by cause</td>
+</tr>
+<tr>
+<td>Grounding and retrieval</td>
+<td>Answers cite sources, and most "not in the corpus" cases are refused</td>
+<td>Recall@5 and faithfulness reported separately, for example 90% or more of claims supported by the cited source</td>
+</tr>
+<tr>
+<td>Action safety</td>
+<td>Every side-effecting tool needs approval, and the audit log shows who approved what</td>
+<td>Zero unapproved side effects across the full attack suite, and the threat model maps each risk to a control</td>
+</tr>
+<tr>
+<td>Engineering quality</td>
+<td>Tests and evals run in CI on every pull request, and one command starts the system locally</td>
+<td>An eval regression has visibly blocked a merge, and prompt and model versions are pinned with a changelog</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>Every run is traced, and cost per task and p95 latency are known</td>
+<td>A dashboard shows cost, latency and quality over time, and budget caps, fallbacks and timeouts are all tested</td>
+</tr>
+<tr>
+<td>Communication</td>
+<td>The README explains what it does, how to run it and how it is built</td>
+<td>A stranger can follow the README, demo and write-up and explain your main trade-offs back to you</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="capstone--show-your-work">Show your work</h2>
+<ul>
+<li><strong>README</strong>: the problem and who it is for, a 30-second GIF, a quick start, architecture, dated eval results, costs and known limits. Write it for a hiring manager who will spend 3 minutes on it.</li>
+<li><strong>Architecture diagram</strong>: one screen showing the user, API, agent loop, MCP server, retrieval store, approval step, tracing and hosting, with trust boundaries marked. Draw it as a text diagram in the README or as an image from any drawing tool.</li>
+<li><strong>Demo video</strong>: 3 to 5 minutes showing a real task, a reviewer editing a proposed action, a blocked injection attempt and the matching trace. Record real, unedited runs so viewers can trust what they see.</li>
+<li><strong>Eval report</strong>: how you built the dataset, metrics with sample sizes, judge agreement with your labels and attack suite results. End with the three biggest failure types and what you changed.</li>
+<li><strong>Blog post</strong>: 1,000 to 2,000 words on what you built, what surprised you and what you would do differently, following <a href="#l6-staying-current">Staying current and building a portfolio</a>. Add one CV line with an outcome and a number, for example "Meeting agent: 87% task success on 60 cases at $0.04 per task".</li>
+</ul>
+<h2 id="capstone--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>A research-group assistant that answers questions over a shared paper library and drafts reading-list emails for approval.</li>
+<li>A household admin agent that reads bills and warranties, tracks renewal dates and drafts cancellation or renewal emails.</li>
+<li>An issue triage helper for a repository you maintain that finds duplicates, suggests labels and drafts replies.</li>
+<li>A meal-planning agent that plans a week from your pantry, builds a shopping list and asks before placing any order.</li>
+<li>A club or society assistant that answers member questions from past minutes and drafts announcements for the committee to approve.</li>
+</ul>
+<h2 id="capstone--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-77db393f27"><input aria-label="Mark “Agents from scratch” as done" class="res-box" id="res-77db393f27" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/langchain-ai/agents-from-scratch" rel="noopener noreferrer" target="_blank">Agents from scratch</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>LangChain</span><span>self-paced</span></p><p class="res-note">Builds an email assistant in stages with triage, human review of tool calls, memory and pytest-based evals, close to the meeting-notes brief.</p></div></li>
+<li class="res" data-res="res-26b52d229f"><input aria-label="Mark “Claude Quickstarts” as done" class="res-box" id="res-26b52d229f" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/anthropics/claude-quickstarts" rel="noopener noreferrer" target="_blank">Claude Quickstarts</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>Anthropic</span><span>reference</span></p><p class="res-note">Small reference apps, including a customer support agent over a knowledge base and a TypeScript MCP server, to compare against your own structure.</p></div></li>
+<li class="res" data-res="res-2baeb4feb1"><input aria-label="Mark “Building a Generative AI Platform” as done" class="res-box" id="res-2baeb4feb1" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://huyenchip.com/2024/07/25/genai-platform.html" rel="noopener noreferrer" target="_blank">Building a Generative AI Platform</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Chip Huyen</span><span>30 min</span></p><p class="res-note">Walks through context construction, guardrails, routing, gateways, caching, write actions and observability, which makes a good checklist for your architecture diagram.</p></div></li>
+<li class="res" data-res="res-eaa7bea0e7"><input aria-label="Mark “What We've Learned From a Year of Building with LLMs” as done" class="res-box" id="res-eaa7bea0e7" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://applied-llms.org/" rel="noopener noreferrer" target="_blank">What We've Learned From a Year of Building with LLMs</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Eugene Yan et al.</span><span>1 h</span></p><p class="res-note">Six practitioners share tactical, operational and strategic lessons on evals, retrieval, human-in-the-loop design and model versioning to test your design choices against.</p></div></li>
+<li class="res" data-res="res-53a8eda63a"><input aria-label="Mark “How to Write Design Docs for Machine Learning Systems” as done" class="res-box" id="res-53a8eda63a" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://eugeneyan.com/writing/ml-design-docs/" rel="noopener noreferrer" target="_blank">How to Write Design Docs for Machine Learning Systems</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Eugene Yan</span><span>15 min</span></p><p class="res-note">A section-by-section template covering motivation, success criteria, methodology, implementation and rejected alternatives that fits your spec and README.</p></div></li>
+<li class="res" data-res="res-90258829a6"><input aria-label="Mark “What to blog about” as done" class="res-box" id="res-90258829a6" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://simonwillison.net/2022/Nov/6/what-to-blog-about/" rel="noopener noreferrer" target="_blank">What to blog about</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Simon Willison</span><span>5 min</span></p><p class="res-note">Makes the case that writing up a project is part of finishing it, with practical advice on short posts and animated GIFs.</p></div></li>
+</ul></div><section class="page-done" data-done-for="capstone" aria-label="Page completion"></section>

@@ -1,0 +1,155 @@
+<header class="page-head"><p class="eyebrow"><a href="#L4">Level 4</a> · Project<span class="timebox">2 weeks</span></p><h1 tabindex="-1">Support triage with human approval <span class="chip chip-done" data-done-flag="p4-triage-team" hidden>Completed</span></h1><p class="standfirst">Build a support triage workflow that classifies tickets, researches a knowledge base, drafts replies and waits for human approval, with persisted state and an audit log.</p><p class="page-meta">Requirements <span data-must-for="p4-triage-team">0/0</span> · Stretch goals <span data-extra-for="p4-triage-team">0/0</span></p></header><div class="prose"><h2 id="p4-triage-team--the-brief">The brief</h2>
+<p>A small software company receives a steady stream of support email: password problems, billing questions, bug reports and the occasional angry customer. One person reads every message, searches the help centre, writes a reply and decides whether an engineer needs to see it. You will build the assistant that does the first pass of that work while the person keeps the final say.</p>
+<p>Your workflow reads tickets from a sample inbox and classifies each by category and urgency. It searches a small knowledge base and drafts a reply that cites the articles it used. Then it stops. Nothing is sent until a reviewer approves, edits or rejects the draft. Run state lives in a database, so a crash or redeploy never loses a pending approval, and every step lands in an audit log.</p>
+<h2 id="p4-triage-team--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l4-langgraph">Stateful agents with LangGraph</a>: typed state, conditional routing, checkpoints and resuming a thread after a restart.</li>
+<li><a href="#l4-agent-sdks">Agent SDKs compared</a>: choosing LangGraph or an SDK for this job and defending the choice in your README.</li>
+<li><a href="#l4-multi-agent">Multi-agent systems</a>: deciding whether classify, research and draft are steps in one workflow or separate agents, and measuring the cost of each option.</li>
+<li><a href="#l4-human-in-the-loop">Human in the loop</a>: an approval policy, approve, edit and reject paths, an audit log and timeouts.</li>
+<li><a href="#l2-rag-pipeline">Building a RAG pipeline</a>: retrieving help articles and citing them in the draft.</li>
+<li><a href="#l1-structured-outputs">Structured outputs and function calling basics</a>: reliable classification into a fixed schema.</li>
+</ul>
+<h2 id="p4-triage-team--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p4-triage-team-todo-1"><input id="p4-triage-team-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Load at least 50 sample tickets from a file or local mailbox, and a knowledge base of at least 15 help articles.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-2"><input id="p4-triage-team-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Classify each ticket into a fixed set of categories and an urgency level, validated against a schema.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-3"><input id="p4-triage-team-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Retrieve relevant articles and draft a reply that cites them, or flag the ticket when no article answers it.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-4"><input id="p4-triage-team-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Pause before any send action and let a reviewer approve, edit or reject the draft, with a reason required for rejections.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-5"><input id="p4-triage-team-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Persist run state in SQLite or Postgres so pending approvals survive a process restart, and send each approved reply exactly once.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-6"><input id="p4-triage-team-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write an append-only audit log of every step, decision, reviewer and timestamp, keyed by ticket and run ID.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-7"><input id="p4-triage-team-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Build it with LangGraph or one agent SDK, and explain the choice in the README.</span></label></li>
+<li data-tier="M"><label for="p4-triage-team-todo-8"><input id="p4-triage-team-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Report classification accuracy on a hand-labelled test set of at least 20 tickets.</span></label></li>
+</ul>
+<h2 id="p4-triage-team--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p4-triage-team-todo-9"><input id="p4-triage-team-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Auto-approve low-risk categories above a confidence threshold and report how many tickets still reach a person.</span></label></li>
+<li data-tier="R"><label for="p4-triage-team-todo-10"><input id="p4-triage-team-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Build a small review page or chat-tool integration that shows the ticket, sources and draft side by side.</span></label></li>
+<li data-tier="S"><label for="p4-triage-team-todo-11"><input id="p4-triage-team-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Split research and drafting into separate agents and compare quality, latency and tokens with the single workflow.</span></label></li>
+<li data-tier="S"><label for="p4-triage-team-todo-12"><input id="p4-triage-team-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Escalate approvals that nobody answers within a set time to a second reviewer.</span></label></li>
+<li data-tier="S"><label for="p4-triage-team-todo-13"><input id="p4-triage-team-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Feed reviewer edits back in as examples so later drafts need fewer changes.</span></label></li>
+</ul>
+<h2 id="p4-triage-team--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Orchestration</td>
+<td>LangGraph</td>
+<td>OpenAI Agents SDK, Pydantic AI, Claude Agent SDK, Microsoft Agent Framework</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>SQLite checkpointer (<code>langgraph-checkpoint-sqlite</code>)</td>
+<td>Postgres checkpointer, or your SDK's own run-state storage in a database</td>
+</tr>
+<tr>
+<td>Model</td>
+<td>Any tool-calling model with structured output on a free tier</td>
+<td>A local open model through Ollama for the classifier</td>
+</tr>
+<tr>
+<td>Knowledge base search</td>
+<td>Chroma or SQLite full-text search</td>
+<td>pgvector, Qdrant, plain BM25</td>
+</tr>
+<tr>
+<td>Sample tickets</td>
+<td>A public synthetic support dataset, or 50 tickets you write</td>
+<td>Exported emails from a test mailbox</td>
+</tr>
+<tr>
+<td>Review interface</td>
+<td>Command-line prompt</td>
+<td>A FastAPI page, Agent Inbox, a chat-tool bot</td>
+</tr>
+<tr>
+<td>Audit log</td>
+<td>JSONL file or a SQLite table</td>
+<td>A Postgres table, or traces in a tool such as Langfuse</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p4-triage-team--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Collect the data.</strong> Gather at least 50 tickets and 15 short help articles. Hand-label 20 tickets with the category and urgency you expect, and keep them as your test set.</li>
+<li><strong>Design the state.</strong> Write the state schema first: ticket, category, urgency, retrieved articles, draft, review decision and status. Sketch the nodes and the conditional edges between them.</li>
+<li><strong>Classify reliably.</strong> Build the classify step with a Pydantic schema and a retry on validation errors. Measure accuracy on your 20 labelled tickets before you move on.</li>
+<li><strong>Research and draft.</strong> Add retrieval over the knowledge base and a draft step that cites article titles or IDs. If nothing relevant comes back, mark the ticket "needs human answer" instead of guessing.</li>
+<li><strong>Add the human gate.</strong> Put an interrupt, or your SDK's approval mechanism, before the send step. Support approve, edit and reject with a reason, and send rejected drafts back for one more attempt.</li>
+<li><strong>Make it durable.</strong> Switch to a SQLite or Postgres checkpointer with one thread per ticket. Kill the process while drafts wait for review, restart it, and confirm every pending approval is still there.</li>
+<li><strong>Log and send safely.</strong> Write each step and decision to the audit log. Make sending idempotent, for example by naming outbox files after the ticket ID and skipping tickets already marked sent.</li>
+<li><strong>Measure and write up.</strong> Run the full set and report accuracy, the share of drafts approved without edits, average tokens per ticket and time to first draft.</li>
+</ol>
+<h2 id="p4-triage-team--how-to-evaluate-it">How to evaluate it</h2>
+<p>The thresholds below are example targets. Adjust them to your data and say so in your README.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Classification accuracy</td>
+<td>80% or more on your 20 labelled tickets</td>
+<td>90% or more, with a confusion table and notes on each miss</td>
+</tr>
+<tr>
+<td>Draft quality</td>
+<td>Most drafts cite a relevant article or correctly flag that none fits</td>
+<td>Reviewers approve at least half of drafts without edits</td>
+</tr>
+<tr>
+<td>Durability</td>
+<td>Pending approvals survive one restart</td>
+<td>Repeated kills at random points cause no lost or duplicate sends</td>
+</tr>
+<tr>
+<td>Human control</td>
+<td>Approve, edit and reject all work from the terminal</td>
+<td>A review page shows ticket, sources and draft, with timeouts and escalation</td>
+</tr>
+<tr>
+<td>Audit trail</td>
+<td>Every decision is logged with reviewer and time</td>
+<td>You can reconstruct any ticket's full history from the log and checkpoints</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Tokens per ticket are reported</td>
+<td>Cost per ticket is reported and compared across two designs</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p4-triage-team--show-your-work">Show your work</h2>
+<ul>
+<li>A README with an architecture sketch, the state schema, your approval policy, and why you chose LangGraph or an SDK.</li>
+<li>A two-minute demo video or GIF where a ticket arrives, the draft pauses, you restart the process, then approve and the reply lands in the outbox.</li>
+<li>A short write-up of your measurements, including one failure you found and how you fixed it.</li>
+<li>A CV line such as "Built a durable support-triage agent with human approval and audit logging; 90% accuracy on a labelled test set." Use your real numbers.</li>
+</ul>
+<h2 id="p4-triage-team--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>Triage GitHub issues for an open-source project: label them, find related issues and docs, and draft a maintainer reply.</li>
+<li>Process invoices sent to an accounts inbox: classify them, match them against purchase orders, and hold payments for approval.</li>
+<li>Screen messages sent to a club or community group and route each one to the right volunteer with a suggested reply.</li>
+<li>Support two languages: detect the customer's language, retrieve from translated articles and draft in that language.</li>
+</ul>
+<h2 id="p4-triage-team--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-77db393f27"><input aria-label="Mark “langchain-ai/agents-from-scratch” as done" class="res-box" id="res-77db393f27" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/langchain-ai/agents-from-scratch" rel="noopener noreferrer" target="_blank">langchain-ai/agents-from-scratch</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>LangChain</span><span>self-paced</span></p><p class="res-note">Builds an email assistant step by step, with notebooks on the agent, evaluation, human-in-the-loop review and memory; the closest template to this project.</p></div></li>
+<li class="res" data-res="res-6a3d74a049"><input aria-label="Mark “Thinking in LangGraph” as done" class="res-box" id="res-6a3d74a049" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" rel="noopener noreferrer" target="_blank">Thinking in LangGraph</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>LangChain</span><span>20 min</span></p><p class="res-note">Designs a customer support email agent node by node, including a human review interrupt and checkpointing.</p></div></li>
+<li class="res" data-res="res-4af934f63b"><input aria-label="Mark “openai/openai-cs-agents-demo” as done" class="res-box" id="res-4af934f63b" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/openai/openai-cs-agents-demo" rel="noopener noreferrer" target="_blank">openai/openai-cs-agents-demo</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>OpenAI</span><span>self-paced</span></p><p class="res-note">A customer service demo on the OpenAI Agents SDK with a triage agent, specialist handoffs, guardrails and a UI that shows the orchestration.</p></div></li>
+<li class="res" data-res="res-2c9bca8323"><input aria-label="Mark “Customer support tickets dataset” as done" class="res-box" id="res-2c9bca8323" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://huggingface.co/datasets/Tobi-Bueck/customer-support-tickets" rel="noopener noreferrer" target="_blank">Customer support tickets dataset</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>Tobi-Bueck on Hugging Face</span><span>reference</span></p><p class="res-note">Tens of thousands of labelled sample tickets with subject, body, agent answer, queue, priority and language, under a non-commercial licence.</p></div></li>
+<li class="res" data-res="res-0a57cdfbff"><input aria-label="Mark “langgraph-checkpoint-sqlite” as done" class="res-box" id="res-0a57cdfbff" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://pypi.org/project/langgraph-checkpoint-sqlite/" rel="noopener noreferrer" target="_blank">langgraph-checkpoint-sqlite</a><p class="res-meta"><span class="res-type t-tool">Tool</span><span>LangChain</span><span>reference</span></p><p class="res-note">The SQLite checkpointer package, with sync and async savers, for persisting runs to a local file.</p></div></li>
+<li class="res" data-res="res-e32b754e25"><input aria-label="Mark “Module 6: Human Approval and Retry-Safe Actions” as done" class="res-box" id="res-e32b754e25" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-module-06-human-approval-outbox.md" rel="noopener noreferrer" target="_blank">Module 6: Human Approval and Retry-Safe Actions</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>1 h</span></p><p class="res-note">A runnable approval and transactional outbox lab where approvals bind to an exact proposal digest, with nine checks for stale, repeated and racing approvals.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p4-triage-team" aria-label="Page completion"></section>

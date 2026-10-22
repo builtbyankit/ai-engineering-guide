@@ -1,0 +1,121 @@
+<header class="page-head"><p class="eyebrow">Start here</p><h1 tabindex="-1">How to use this guide</h1><p class="standfirst">What the guide covers, how levels, modules, milestones and projects fit together, how long it takes and how your progress is saved.</p></header><div class="prose"><h2 id="start--who-this-guide-is-for">Who this guide is for</h2>
+<p>This guide is for anyone who can write small programs and wants to build AI agents professionally. You might be a student, a developer from another field or a career switcher. You should be able to write a short program on your own in any language, using variables, loops, functions and files, and fix it by reading the error message. You do not need machine learning experience or advanced maths. If you are newer to programming than that, take a beginner course such as Harvard's free CS50P first, then come back.</p>
+<p>By the end you will be able to design, build, evaluate, secure and deploy agents that use tools, retrieve knowledge and ask a person before risky actions. You will also have eight projects on GitHub to show for it.</p>
+<p>The guide uses Python throughout. It does not cover TypeScript agent stacks or voice and realtime agents. The ideas carry over, but for those you will need each platform's own documentation.</p>
+<h2 id="start--how-the-guide-is-organised">How the guide is organised</h2>
+<p>The guide has seven levels and a capstone. Each level has a few modules, one project and a milestone. Work through them in order, because each level builds on the one before.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>What you learn</th>
+<th>Project</th>
+<th>Core weeks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#L0">0. Foundations</a></td>
+<td>The Python, API, SQL and tooling skills every later level assumes.</td>
+<td><a href="#p0-api-service">A tested API service</a></td>
+<td>4–5.5</td>
+</tr>
+<tr>
+<td><a href="#L1">1. LLM fundamentals</a></td>
+<td>How large language models work and how to use them reliably from code.</td>
+<td><a href="#p1-extraction-service">Structured extraction service</a></td>
+<td>4–6</td>
+</tr>
+<tr>
+<td><a href="#L2">2. Retrieval and RAG</a></td>
+<td>Grounding model answers in your own data with search, retrieval and citations.</td>
+<td><a href="#p2-docs-qa">Docs Q&amp;A with citations</a></td>
+<td>4–6</td>
+</tr>
+<tr>
+<td><a href="#L3">3. Tools and agents</a></td>
+<td>Letting models take actions: tool calling, the agent loop, workflow patterns, MCP and memory.</td>
+<td><a href="#p3-research-agent">Personal research agent</a></td>
+<td>5.5–6.5</td>
+</tr>
+<tr>
+<td><a href="#L4">4. Frameworks and multi-agent systems</a></td>
+<td>Stateful agent frameworks, multi-agent designs, human approval and specialised agents.</td>
+<td><a href="#p4-triage-team">Support triage with human approval</a></td>
+<td>4.5–5.5</td>
+</tr>
+<tr>
+<td><a href="#L5">5. Evaluation, observability and safety</a></td>
+<td>Measuring agent quality, seeing what agents do in production and defending them against attack.</td>
+<td><a href="#p5-harden-agent">Harden an agent: evals, tracing and red-teaming</a></td>
+<td>4–5</td>
+</tr>
+<tr>
+<td><a href="#L6">6. Production and scale</a></td>
+<td>Deploying, scaling and operating agents reliably and affordably.</td>
+<td><a href="#p6-production-deploy">Take an agent to production</a></td>
+<td>3.5–5</td>
+</tr>
+<tr>
+<td><a href="#capstone">Capstone</a></td>
+<td>Build and ship a new production agent that uses every core skill.</td>
+<td><a href="#capstone">Ship a production agent</a></td>
+<td>3–4</td>
+</tr>
+<tr>
+<td><a href="#interview">Interview prep</a></td>
+<td>Turn what you built into interview answers: agentic system design, a question bank, product, evaluation, coding and enterprise rounds, behavioural stories and timed mocks.</td>
+<td>Mock interviews</td>
+<td>Not counted; any time</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <strong>Interview prep</strong> section sits outside the levels. It doesn't count toward the time estimates or progress totals, so open it whenever an interview is coming up. It works best after <a href="#L3">Level 3</a>.</p>
+<h2 id="start--how-a-module-works">How a module works</h2>
+<p>Every module page has the same parts, so you always know where you are.</p>
+<ul>
+<li><strong>Why it matters</strong>: the problem this module solves for someone building agents.</li>
+<li><strong>What to learn</strong>: the core ideas in plain words. Read this first, then use the resources to go deeper.</li>
+<li><strong>Resources</strong>: hand-picked links in three groups. <em>Start here</em> is the minimum path. <em>Go deeper</em> is for topics you want to master. <em>Reference</em> is documentation to keep open while you build.</li>
+<li><strong>Practice</strong>: small exercises that turn reading into skill.</li>
+<li><strong>Checklist</strong>: tasks with a label. <em>Must ship</em> tasks are the core of the module and fit inside its time estimate. <em>Recommended</em> and <em>Stretch</em> tasks are extra.</li>
+<li><strong>You're ready when</strong>: statements to test yourself against before you move on.</li>
+</ul>
+<p>Tick a resource when you have read or watched it. Tick a task when it is done. When you finish a page, press <strong>Mark page as complete</strong> at its end. Completed pages get a tick in the sidebar and in the module lists, and every tick counts towards your progress.</p>
+<h2 id="start--milestones-and-projects">Milestones and projects</h2>
+<p>Each level ends with a project and a milestone. The project is a portfolio piece you build on your own, using what the level taught. Its page gives you a brief, requirements, stretch goals, a suggested stack, step-by-step guidance and a rubric to judge your work.</p>
+<p>The milestone is a short list of checks at the bottom of each level page. Tick them when you can honestly say yes. When every check is ticked, the level is complete.</p>
+<p>The <a href="#capstone">capstone</a> comes last. You build a new agent from scratch that uses every core skill in the guide, then deploy it and write it up.</p>
+<h2 id="start--core-path-and-optional-modules">Core path and optional modules</h2>
+<p>Most modules are core. A few are marked <strong>Optional</strong> because they suit particular roles, such as coding agents, browser agents, fine-tuning open models or system design. Choose the <strong>Core path</strong>, <strong>Everything</strong> or the <strong>Fast track</strong> in the sidebar. Your choice changes the time estimate, the progress totals and the next and previous links. Modules outside your choice stay readable, but they are dimmed in the sidebar and in the level lists and aren't counted.</p>
+<p>At 10 to 12 hours a week, the core path takes about 32.5–43.5 weeks, everything takes about 36–48.5 weeks and the fast track takes about 30–40 weeks. Time estimates cover the Start here resources, the practice, the must-ship tasks and the projects. Treat them as time boxes. If a module runs long, finish its must-ship tasks and move on; you can come back for the rest.</p>
+<h2 id="start--fast-track-for-experienced-developers">Fast track for experienced developers</h2>
+<p>If you already write Python and use web APIs, SQL, git and Docker at work, choose the <strong>Fast track</strong>. It skips four Level 0 modules: Python, web APIs, SQL and tooling. It keeps <a href="#l0-ml-concepts">Just enough machine learning</a>, because most developers have not met those ideas at work.</p>
+<p>Build the <a href="#p0-api-service">Level 0 project</a> anyway. It doubles as a placement check. If it takes you a few evenings, the skipped modules would have been review. If it takes much longer, go back to the module where you got stuck.</p>
+<p>In every other module, read <strong>You're ready when</strong> first. If you can already do everything it lists, do the must-ship tasks and move on. Expect most of the new material in Levels 1 to 5. Level 6 deployment will feel familiar, so spend that time on the parts specific to agents, such as durable runs, gateways and eval gates.</p>
+<h2 id="start--how-your-progress-is-saved">How your progress is saved</h2>
+<p>Your ticks are saved in your browser's local storage on this device. Nothing is sent to a server and you do not need an account. This also means a different browser, a different device or clearing your site data starts you from zero.</p>
+<p>To keep your progress safe, open <a href="#progress">Your progress</a> and download a backup file now and then. You can restore it on any device, and you can choose to merge it with what is already there or replace it.</p>
+<h2 id="start--choosing-between-resources">Choosing between resources</h2>
+<ul>
+<li><strong>Start with the Start here picks.</strong> They are chosen so that, with the practice, they fit the module's time estimate.</li>
+<li><strong>Prefer official docs for anything that changes.</strong> API parameters, SDK names and model lists change often. Articles and videos teach the ideas; docs tell you the current details.</li>
+<li><strong>Most resources are free.</strong> A few are marked "Free tier", which means free to use with paid extras such as certificates or higher limits. Anything marked "Paid" is optional. You can finish the guide without paying for any course.</li>
+<li><strong>Use the <a href="#resources">resource library</a></strong> to search every link in the guide by type, level or cost, or to hide what you have already finished.</li>
+</ul>
+<p>Every link was checked on 16 October 2026. Links move and pages change, so if one breaks, use the page's title to search for it, and report it on the guide's <a href="https://github.com/builtbyankit/ai-engineering-guide/issues" rel="noopener noreferrer" target="_blank">GitHub repository</a>.</p>
+<h2 id="start--what-you-need">What you need</h2>
+<ul>
+<li>A computer that can run Python 3.11 or later, Git and a code editor such as VS Code.</li>
+<li>A GitHub account for your projects.</li>
+<li>Access to at least one LLM. Many providers offer free tiers or starter credits, and you can run open models locally with Ollama for free. If you pay for API access, set a monthly spending cap in the provider's console; most exercises use small models and cost little.</li>
+<li>About 10 to 12 hours a week. Less is fine; the guide simply takes longer.</li>
+</ul>
+<h2 id="start--study-tips">Study tips</h2>
+<ul>
+<li><strong>Keep one learning repository.</strong> Put your practice code, notes and checklists in it from day one. It becomes evidence of your work.</li>
+<li><strong>Build before you feel ready.</strong> Start each level's project as soon as you have the basics, and let it pull you back into the resources.</li>
+<li><strong>Write as you go.</strong> A short note per module, in your own words, is the fastest way to find gaps.</li>
+<li><strong>Measure, don't guess.</strong> From Level 1 onwards, every change you make to a prompt, model or retriever should come with a number that shows whether it helped.</li>
+<li><strong>Share your work.</strong> Post your projects and what you learned. Employers look for evidence that you can ship, evaluate and explain.</li>
+</ul></div>

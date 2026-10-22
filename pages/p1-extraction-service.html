@@ -1,0 +1,154 @@
+<header class="page-head"><p class="eyebrow"><a href="#L1">Level 1</a> · Project<span class="timebox">1–1.5 weeks</span></p><h1 tabindex="-1">Structured extraction service <span class="chip chip-done" data-done-flag="p1-extraction-service" hidden>Completed</span></h1><p class="standfirst">Build a service that turns messy text into validated JSON with an LLM, backed by a golden set, an accuracy report and a measured cost per document.</p><p class="page-meta">Requirements <span data-must-for="p1-extraction-service">0/0</span> · Stretch goals <span data-extra-for="p1-extraction-service">0/0</span></p></header><div class="prose"><h2 id="p1-extraction-service--the-brief">The brief</h2>
+<p>You will build a small web service that takes messy text, such as a job posting, a pasted receipt or a customer support email, and returns clean, validated JSON. Pick one document type. The output should be something a spreadsheet, database or another program can use directly. For example, a job posting becomes title, company, location, salary range, seniority and required skills.</p>
+<p>Imagine a small team that receives hundreds of these documents a week and copies fields out by hand. Before they trust your tool, they want to know how accurate it is, what each document costs and what happens when extraction fails. So your service ships with a golden test set, an accuracy report and cost numbers.</p>
+<h2 id="p1-extraction-service--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l1-how-llms-work">How LLMs work</a>: reasoning about tokens, temperature and why a model might invent a missing field.</li>
+<li><a href="#l1-llm-apis">Calling LLM APIs</a>: a robust client with retries, token logging and cost per call.</li>
+<li><a href="#l1-prompt-engineering">Prompt engineering</a>: a versioned extraction prompt with clear rules and examples.</li>
+<li><a href="#l1-structured-outputs">Structured outputs and function calling basics</a>: Pydantic schemas, provider structured-output modes, validators and retry on validation error.</li>
+<li><a href="#l1-first-evals">Your first evals</a>: a golden set, field-level accuracy and comparisons across prompt and model versions.</li>
+</ul>
+<h2 id="p1-extraction-service--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p1-extraction-service-todo-1"><input id="p1-extraction-service-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Define a Pydantic schema for one document type with at least eight fields, including a nested list, an enum and optional fields that may be null.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-2"><input id="p1-extraction-service-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Extract with a provider structured-output mode or Instructor, validate with Pydantic, and retry with the validation error at most twice before returning a clear failure.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-3"><input id="p1-extraction-service-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Expose a <code>POST /extract</code> endpoint with FastAPI that returns the JSON plus metadata: model, prompt version, input and output tokens, cost and latency.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-4"><input id="p1-extraction-service-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Build a golden set of at least 25 hand-labelled documents, with at least five hard cases such as missing fields, odd formats or two items in one document.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-5"><input id="p1-extraction-service-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write an eval script that reports field-level accuracy, the share of documents that are fully correct and the validation failure rate.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-6"><input id="p1-extraction-service-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Report average cost per document and median latency, computed from the token usage the API returns.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-7"><input id="p1-extraction-service-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Compare at least two prompt versions or two models in one results table, and state which you would ship and why.</span></label></li>
+<li data-tier="M"><label for="p1-extraction-service-todo-8"><input id="p1-extraction-service-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Keep API keys in environment variables and write a README that explains how to run the service and the eval.</span></label></li>
+</ul>
+<h2 id="p1-extraction-service--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p1-extraction-service-todo-9"><input id="p1-extraction-service-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add a business-rule validator, for example that receipt line items sum to the total, and measure how often it triggers a retry.</span></label></li>
+<li data-tier="R"><label for="p1-extraction-service-todo-10"><input id="p1-extraction-service-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Run the same golden set against a local model through Ollama and compare accuracy and cost.</span></label></li>
+<li data-tier="S"><label for="p1-extraction-service-todo-11"><input id="p1-extraction-service-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Port the eval to promptfoo and run it in GitHub Actions on every push.</span></label></li>
+<li data-tier="S"><label for="p1-extraction-service-todo-12"><input id="p1-extraction-service-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Add an LLM-graded check for one free-text field, such as a one-line summary, and measure its agreement with your labels.</span></label></li>
+<li data-tier="S"><label for="p1-extraction-service-todo-13"><input id="p1-extraction-service-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Accept photos of receipts as well as text, and compare accuracy and cost for images against text.</span></label></li>
+</ul>
+<h2 id="p1-extraction-service--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language and packaging</td>
+<td>Python 3.11+ with uv</td>
+<td>venv and pip</td>
+</tr>
+<tr>
+<td>Schemas and validation</td>
+<td>Pydantic v2</td>
+<td>dataclasses with hand-written checks</td>
+</tr>
+<tr>
+<td>Model access</td>
+<td>A provider SDK on a free tier, such as Gemini</td>
+<td>OpenAI or Anthropic SDKs, Instructor across providers, Ollama for local models</td>
+</tr>
+<tr>
+<td>Web API</td>
+<td>FastAPI</td>
+<td>Flask, or a command-line tool with Typer</td>
+</tr>
+<tr>
+<td>Evals</td>
+<td>pytest with parametrized cases</td>
+<td>promptfoo</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>JSONL files in the repo</td>
+<td>SQLite</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>GitHub Actions</td>
+<td>GitLab CI</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p1-extraction-service--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Pick and collect.</strong> Choose one document type and gather 30 to 40 real examples from public sources or your own inbox. Remove personal details before you send any document to an API, not only before you commit. Free tiers, including Gemini's, may use your inputs to improve the provider's products, so use public or synthetic documents there, or a local model through Ollama for anything private.</li>
+<li><strong>Design the schema.</strong> Write the Pydantic model, decide which fields may be null, and use enums for any field with a fixed set of values. Add field descriptions, because they are sent to the model as part of the schema.</li>
+<li><strong>Label the golden set.</strong> Hand-label at least 25 documents into a JSONL file, one line per document with the input text and the expected JSON. Keep the remaining documents aside as unseen test data.</li>
+<li><strong>Make a first extraction.</strong> Write a prompt template, call the model in structured-output mode and validate the result. Log tokens, cost and latency for every call from the start.</li>
+<li><strong>Score it.</strong> Write the eval script. Use exact match for IDs, numbers and enums, use normalised match for free text, and print a per-field accuracy table.</li>
+<li><strong>Improve and compare.</strong> Read every failure, adjust the prompt or schema, and save the change as a new version. Rerun the eval on each version and on a second model.</li>
+<li><strong>Wrap it in an API.</strong> Add the FastAPI endpoint, return metadata with every response, and return a clear error body when extraction fails after retries.</li>
+<li><strong>Write it up.</strong> Fill in the README with the results table, cost per document, known failure cases and what you would try next.</li>
+</ol>
+<h2 id="p1-extraction-service--how-to-evaluate-it">How to evaluate it</h2>
+<p>The numbers below are example targets. Adjust them to your document type and say why in your README.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Field-level accuracy on the golden set</td>
+<td>85% or more</td>
+<td>95% or more, with every remaining error explained</td>
+</tr>
+<tr>
+<td>Valid output</td>
+<td>Every response is valid JSON or a clear error</td>
+<td>Over 98% valid on the first attempt, before retries</td>
+</tr>
+<tr>
+<td>Cost per document</td>
+<td>Measured and reported</td>
+<td>Compared across two models, with a justified choice</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>Median reported</td>
+<td>Median and 95th percentile reported for each model</td>
+</tr>
+<tr>
+<td>Golden set</td>
+<td>25 documents including 5 hard cases</td>
+<td>50 or more documents, with hard cases tagged by type</td>
+</tr>
+<tr>
+<td>Reproducibility</td>
+<td>The eval runs with one command</td>
+<td>The eval runs in CI on every push</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p1-extraction-service--show-your-work">Show your work</h2>
+<ul>
+<li>A README with the schema, a sample input and output, the results table, cost per document and a short list of known failures.</li>
+<li>A 60 to 90 second demo video or GIF that sends a messy document to the endpoint and shows the JSON and the eval report.</li>
+<li>A short write-up on what moved accuracy most, such as a schema change, a new example or a model switch.</li>
+<li>A CV line with your real numbers, for example "Built an LLM extraction API with 94% field accuracy on a 40-document golden set at under one cent per document" (illustrative figures).</li>
+</ul>
+<h2 id="p1-extraction-service--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>Recipes from cooking blogs into ingredients, quantities, steps and total time.</li>
+<li>Event announcements into calendar entries with date, time, venue and price.</li>
+<li>Research paper abstracts into title, task, dataset, method and headline result.</li>
+<li>Rental listings into rent, deposit, size, location and pet policy.</li>
+<li>Product reviews into rating, product aspects mentioned and sentiment for each aspect.</li>
+</ul>
+<h2 id="p1-extraction-service--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-681c2294a3"><input aria-label="Mark “Receipt Data Extraction with GPT-4 Vision” as done" class="res-box" id="res-681c2294a3" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://python.useinstructor.com/examples/extracting_receipts/" rel="noopener noreferrer" target="_blank">Receipt Data Extraction with GPT-4 Vision</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Instructor</span><span>20 min</span></p><p class="res-note">A Pydantic receipt schema with a model validator that checks the line items add up to the total.</p></div></li>
+<li class="res" data-res="res-19d6a5fa9e"><input aria-label="Mark “Extracting structured JSON using Claude and tool use” as done" class="res-box" id="res-19d6a5fa9e" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://platform.claude.com/cookbook/tool-use-extracting-structured-json" rel="noopener noreferrer" target="_blank">Extracting structured JSON using Claude and tool use</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Anthropic</span><span>30 min</span></p><p class="res-note">Five worked extraction and classification examples that use tool definitions as output schemas.</p></div></li>
+<li class="res" data-res="res-fa027c4c62"><input aria-label="Mark “Classification with Claude” as done" class="res-box" id="res-fa027c4c62" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://platform.claude.com/cookbook/capabilities-classification-guide" rel="noopener noreferrer" target="_blank">Classification with Claude</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Anthropic</span><span>1 h</span></p><p class="res-note">A support-ticket classifier evaluated after each prompt change, including a promptfoo setup you can adapt for your report.</p></div></li>
+<li class="res" data-res="res-d9106b0103"><input aria-label="Mark “Cost Optimization on the Claude API” as done" class="res-box" id="res-d9106b0103" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://platform.claude.com/cookbook/cost-optimization-cost-optimization" rel="noopener noreferrer" target="_blank">Cost Optimization on the Claude API</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Anthropic</span><span>1 h</span></p><p class="res-note">Shows how to turn the usage block of each response into cost per task and compare configurations on cost and pass rate.</p></div></li>
+<li class="res" data-res="res-aaea8967ad"><input aria-label="Mark “Structured data extraction from unstructured content using LLM schemas” as done" class="res-box" id="res-aaea8967ad" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://simonwillison.net/2025/Feb/28/llm-schemas/" rel="noopener noreferrer" target="_blank">Structured data extraction from unstructured content using LLM schemas</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Simon Willison</span><span>20 min</span></p><p class="res-note">A command-line route to a quick extraction baseline before you write any service code.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p1-extraction-service" aria-label="Page completion"></section>

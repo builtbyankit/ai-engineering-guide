@@ -1,0 +1,170 @@
+<header class="page-head"><p class="eyebrow"><a href="#L6">Level 6</a> · Project<span class="timebox">1.5–2 weeks</span></p><h1 tabindex="-1">Take an agent to production <span class="chip chip-done" data-done-flag="p6-production-deploy" hidden>Completed</span></h1><p class="standfirst">Deploy your hardened agent as a streaming, durable, budget-aware service with a gateway, prompt caching, an eval-gated CI/CD pipeline and canary releases for prompt changes.</p><p class="page-meta">Requirements <span data-must-for="p6-production-deploy">0/0</span> · Stretch goals <span data-extra-for="p6-production-deploy">0/0</span></p></header><div class="prose"><h2 id="p6-production-deploy--the-brief">The brief</h2>
+<p>You take the agent you hardened in <a href="#p5-harden-agent">Harden an agent</a> and run it as a real service that other people can use. Users send a task over HTTP and watch progress stream back. Short tasks answer in place, and long ones run in the background as durable workflows that survive restarts and crashes.</p>
+<p>Behind the API, every model call goes through a gateway that handles fallbacks, per-user budgets and caching. Every change ships through CI that runs your evals, and prompt changes reach a small slice of traffic before everyone else. You host it on a free tier or for a few dollars a month. The audience is a small group of real testers, such as classmates, friends or an online community you belong to.</p>
+<h2 id="p6-production-deploy--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l6-deployment">Deploying agent applications</a>: SSE streaming, background jobs, durable execution, containers, configuration, CI/CD and canaries.</li>
+<li><a href="#l6-reliability-cost">Reliability, latency and cost</a>: a gateway with timeouts, fallbacks, per-user budgets, prompt caching and cost per task.</li>
+<li><a href="#l5-evals-in-depth">Evals in depth</a>: your eval suite becomes the gate every change must pass.</li>
+<li><a href="#l5-observability">Observability and tracing</a>: traces carry the prompt version, model and cost, so you can compare canary and baseline.</li>
+<li><a href="#l5-security">Security and guardrails</a>: secrets live in the platform's secret store, and the public endpoint needs auth and rate limits.</li>
+</ul>
+<h2 id="p6-production-deploy--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p6-production-deploy-todo-1"><input id="p6-production-deploy-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Expose a FastAPI (or equivalent) endpoint that streams typed progress events over SSE and requires an API key or login.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-2"><input id="p6-production-deploy-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Run any task expected to take longer than about 30 seconds as a background job that returns a job id, with a status endpoint or event stream to follow it.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-3"><input id="p6-production-deploy-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Execute long runs as durable workflows (Temporal, Restate, Inngest or LangGraph with a persistent checkpointer) and demonstrate recovery after killing a worker mid-run.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-4"><input id="p6-production-deploy-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Route all model calls through an LLM gateway with timeouts, retries, at least one cross-provider fallback and per-user budgets that return a clear error when exceeded.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-5"><input id="p6-production-deploy-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Enable prompt caching on your main agent prompt and report the cache hit rate and cost per completed task.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-6"><input id="p6-production-deploy-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Ship from a container image that takes all config and secrets from environment variables, deployed to a public URL.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-7"><input id="p6-production-deploy-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Run unit tests and your eval suite in CI on every pull request, block merges below your threshold, and deploy main automatically.</span></label></li>
+<li data-tier="M"><label for="p6-production-deploy-todo-8"><input id="p6-production-deploy-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Release prompt changes as a canary to a fixed share of users, log the prompt version on every trace, and document how to promote or roll back.</span></label></li>
+</ul>
+<h2 id="p6-production-deploy--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p6-production-deploy-todo-9"><input id="p6-production-deploy-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add a semantic cache for repeated questions, scoped per tenant, and measure hit rate and wrong-hit rate on 50 test queries.</span></label></li>
+<li data-tier="R"><label for="p6-production-deploy-todo-10"><input id="p6-production-deploy-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Move a nightly eval run or backfill to a provider batch API and record the savings.</span></label></li>
+<li data-tier="S"><label for="p6-production-deploy-todo-11"><input id="p6-production-deploy-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Route easy steps to a smaller or self-served open model and compare cost and quality against the baseline.</span></label></li>
+<li data-tier="S"><label for="p6-production-deploy-todo-12"><input id="p6-production-deploy-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Add a human approval step that pauses a durable run and resumes it from a link or button.</span></label></li>
+<li data-tier="S"><label for="p6-production-deploy-todo-13"><input id="p6-production-deploy-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Load test with 50 concurrent users and report p50 and p95 time to first event.</span></label></li>
+</ul>
+<h2 id="p6-production-deploy--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API and streaming</td>
+<td>FastAPI with its built-in SSE support</td>
+<td>Starlette, Litestar, a Node.js server</td>
+</tr>
+<tr>
+<td>Background jobs</td>
+<td>RQ or Celery with Redis</td>
+<td>Arq, Cloud Run jobs, a managed cloud queue</td>
+</tr>
+<tr>
+<td>Durable execution</td>
+<td>LangGraph with a Postgres checkpointer (no extra service) or Temporal (dev server locally, Temporal Cloud or self-hosted in production)</td>
+<td>Restate, Inngest</td>
+</tr>
+<tr>
+<td>LLM gateway</td>
+<td>LiteLLM proxy in Docker with Postgres</td>
+<td>Cloudflare AI Gateway, OpenRouter, your cloud's gateway</td>
+</tr>
+<tr>
+<td>Prompt caching</td>
+<td>Provider-native caching (automatic on OpenAI; on Anthropic, one top-level cache setting or explicit breakpoints)</td>
+<td>An exact-match cache in the gateway</td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>Google Cloud Run (monthly free tier) or Render (free web service that sleeps after 15 idle minutes)</td>
+<td>Fly.io (pay as you go after a short trial), Railway (small monthly credit), a small VPS with Docker Compose</td>
+</tr>
+<tr>
+<td>Database and cache</td>
+<td>Free tiers of managed Postgres and Redis</td>
+<td>SQLite on a volume for a single instance</td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>GitHub Actions with promptfoo or your pytest eval harness</td>
+<td>GitLab CI, Buildkite</td>
+</tr>
+<tr>
+<td>Canary and flags</td>
+<td>A hash of the user id plus a rollout percentage in config</td>
+<td>A feature-flag tool such as Unleash or GrowthBook</td>
+</tr>
+<tr>
+<td>Tracing and cost</td>
+<td>Langfuse or Arize Phoenix (open source)</td>
+<td>LangSmith, your gateway's spend logs</td>
+</tr>
+</tbody>
+</table></div>
+<p>Free tiers and trial terms change often, so check each platform's pricing page before you commit.</p>
+<h2 id="p6-production-deploy--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Containerise what you have.</strong> Write a Dockerfile for your Level 5 agent and move every setting and key into validated environment variables. Confirm <code>docker run</code> works with a <code>.env</code> file that is never committed.</li>
+<li><strong>Add the streaming API.</strong> Create a POST endpoint that starts a run and streams SSE events for status, tool calls, tokens and completion. Test it with <code>curl -N</code> and a minimal web page.</li>
+<li><strong>Split short and long work.</strong> Send long tasks to a queue or durable workflow and return a job id. Make each LLM call and tool call a recorded step, and give side-effecting tools idempotency keys.</li>
+<li><strong>Put the gateway in the middle.</strong> Run LiteLLM with a database and create a virtual key per user with a budget and rate limit. Configure a timeout, retries and a fallback to a second provider, then point the agent at the gateway URL.</li>
+<li><strong>Turn on prompt caching and measure.</strong> Reorder prompts so stable content comes first and enable caching. Add cached tokens and cost per task to your traces and dashboard.</li>
+<li><strong>Wire up CI/CD.</strong> In GitHub Actions, run unit tests and your eval suite on pull requests and fail below your threshold. On merge to main, build the image, push it and deploy to your host.</li>
+<li><strong>Add the canary.</strong> Store prompts as versioned files and choose the version per request from a hash of the user id and a rollout percentage in config. Tag every trace with the version, and compare eval scores, error rate and cost before promoting.</li>
+<li><strong>Break it on purpose.</strong> Kill a worker mid-run, revoke the primary provider key and exhaust a test user's budget. Record what happened in each case and fix anything that failed badly.</li>
+</ol>
+<h2 id="p6-production-deploy--how-to-evaluate-it">How to evaluate it</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Responsiveness</td>
+<td>First SSE event within 2 s at p95 for 10 concurrent users</td>
+<td>First event within 1 s at p95 for 50 concurrent users, with load test results in the README</td>
+</tr>
+<tr>
+<td>Durability</td>
+<td>A run resumes after a worker restart</td>
+<td>A kill at any step resumes with zero repeated model calls or duplicate side effects, shown in traces</td>
+</tr>
+<tr>
+<td>Resilience</td>
+<td>The fallback works when the primary key is revoked</td>
+<td>Fallbacks, timeouts and retries are exercised by a scripted failure test, with success rate reported</td>
+</tr>
+<tr>
+<td>Cost control</td>
+<td>Per-user budget enforced and cost per task reported</td>
+<td>Cost per task cut by a measured amount (for example 30%) through caching or routing, with eval scores held</td>
+</tr>
+<tr>
+<td>Release safety</td>
+<td>CI blocks merges that fail evals</td>
+<td>A canary with automated comparison and one-command rollback, demonstrated on a real prompt change</td>
+</tr>
+<tr>
+<td>Hosting cost</td>
+<td>Runs on a free tier or for under about $10 a month</td>
+<td>Monthly cost per 1,000 tasks documented and split into model and infrastructure</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p6-production-deploy--show-your-work">Show your work</h2>
+<ul>
+<li>A README with an architecture diagram, one-command setup, the endpoints, how durability and fallbacks work, and a table of cost per task, cache hit rate and p95 latency.</li>
+<li>A two-minute demo video that starts a long run, kills the worker, shows the run resuming, then trips a user's budget.</li>
+<li>A short write-up of one failure you caused on purpose, what broke and how you fixed it.</li>
+<li>One CV line with numbers, for example "Deployed a durable agent service with eval-gated CI; cut cost per task 35% with prompt caching and routing."</li>
+</ul>
+<h2 id="p6-production-deploy--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>Deploy a research assistant that runs 10-minute literature searches and emails a report when it finishes.</li>
+<li>Turn the support triage team from <a href="#L4">Level 4</a> into a service with approval links that resume paused runs.</li>
+<li>Build a recipe or meal-planning agent with a per-user daily budget and semantic caching for common questions.</li>
+<li>Run an invoice-extraction agent where uploads go to a background queue and results arrive by webhook.</li>
+<li>Serve part of the workload from a small open model you fine-tuned in <a href="#l6-open-models">Open models, fine-tuning and serving</a>.</li>
+</ul>
+<h2 id="p6-production-deploy--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-79c1363201"><input aria-label="Mark “temporal-ai-agent” as done" class="res-box" id="res-79c1363201" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/temporal-community/temporal-ai-agent" rel="noopener noreferrer" target="_blank">temporal-ai-agent</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>Temporal</span><span>reference</span></p><p class="res-note">A multi-turn agent running inside a Temporal workflow with native and MCP tools, using LiteLLM so you can swap providers.</p></div></li>
+<li class="res" data-res="res-422e335ae8"><input aria-label="Mark “Quickstart” as done" class="res-box" id="res-422e335ae8" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://docs.litellm.ai/docs/proxy/docker_quick_start" rel="noopener noreferrer" target="_blank">Quickstart</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>LiteLLM</span><span>30 min</span></p><p class="res-note">Start the gateway with Docker Compose and Postgres, create virtual keys with budgets, and see why budgets need a database.</p></div></li>
+<li class="res" data-res="res-f2c628921c"><input aria-label="Mark “Quickstart: Build and deploy a Python (FastAPI) web app to Cloud Run” as done" class="res-box" id="res-f2c628921c" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://docs.cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-python-fastapi-service" rel="noopener noreferrer" target="_blank">Quickstart: Build and deploy a Python (FastAPI) web app to Cloud Run</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Google Cloud</span><span>30 min</span><span class="res-cost">Free tier</span></p><p class="res-note">Deploys a FastAPI app from source with one command onto a platform that has a monthly free tier.</p></div></li>
+<li class="res" data-res="res-6fbf4def2a"><input aria-label="Mark “Deploy for Free” as done" class="res-box" id="res-6fbf4def2a" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://render.com/docs/free" rel="noopener noreferrer" target="_blank">Deploy for Free</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Render</span><span>10 min</span></p><p class="res-note">What the free web service, Postgres and Key Value tiers include, and limits such as spin-down after 15 idle minutes.</p></div></li>
+<li class="res" data-res="res-112190abbb"><input aria-label="Mark “FastAPI in Containers - Docker” as done" class="res-box" id="res-112190abbb" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://fastapi.tiangolo.com/deployment/docker/" rel="noopener noreferrer" target="_blank">FastAPI in Containers - Docker</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>FastAPI</span><span>30 min</span></p><p class="res-note">The recommended FastAPI Dockerfile, layer caching, exec-form CMD and one process per container under an orchestrator.</p></div></li>
+<li class="res" data-res="res-ef0b0b41ba"><input aria-label="Mark “full-stack-fastapi-template” as done" class="res-box" id="res-ef0b0b41ba" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/fastapi/full-stack-fastapi-template" rel="noopener noreferrer" target="_blank">full-stack-fastapi-template</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>FastAPI</span><span>reference</span></p><p class="res-note">A production-style template with Postgres, Docker Compose, Traefik and GitHub Actions to borrow structure from.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p6-production-deploy" aria-label="Page completion"></section>

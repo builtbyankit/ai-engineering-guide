@@ -1,0 +1,119 @@
+<header class="page-head"><p class="eyebrow"><a href="#interview">Interview prep</a> · Page 8 of 8<span class="timebox">4–6 h</span></p><h1 tabindex="-1">Mock interviews and scoring <span class="chip chip-done" data-done-flag="iv-mocks" hidden>Completed</span></h1><p class="standfirst">Run five timed mock rounds, score each one on six dimensions, retake your weakest area with new scenarios and know when you are ready.</p><p class="page-meta">Tasks done <span data-all-for="iv-mocks">0/6</span> · Resources done <span data-res-for="iv-mocks">0/4</span> · Links checked 19 Oct 2026</p></header><div class="prose"><h2 id="iv-mocks--why-mocks-matter">Why mocks matter</h2>
+<p>Knowing an answer and giving it under time pressure, while someone changes the assumptions, are different skills. Mocks train the second one. They also show you which areas need work, so you stop spending equal time on everything.</p>
+<p>Treat each mock like the real thing. Set a timer, speak out loud, draw on paper or a whiteboard tool and don't look anything up. Record yourself if you are practising alone, because you will hear gaps in the recording that you missed while talking.</p>
+<h2 id="iv-mocks--five-mock-rounds">Five mock rounds</h2>
+<h3 id="iv-mocks--round-a-system-design-45-minutes">Round A: system design (45 minutes)</h3>
+<p><strong>Prompt:</strong> Design a permission-aware assistant that answers questions from company documents for 10,000 employees. Documents change daily, people gain and lose access, and traffic peaks at about 5 requests a second.</p>
+<p>Follow the timeline on <a href="#iv-system-design">Agentic system design rounds</a>. By the end you should have:</p>
+<ul>
+<li>stated your assumptions;</li>
+<li>drawn ingestion and query paths with trust boundaries;</li>
+<li>done the storage, quota and cost numbers;</li>
+<li>walked through a permission change and an index rebuild;</li>
+<li>named your first release.</li>
+</ul>
+<h3 id="iv-mocks--round-b-coding-and-debugging-45-minutes">Round B: coding and debugging (45 minutes)</h3>
+<p><strong>Prompt:</strong> Pick one of the six problems on <a href="#iv-coding">Coding and debugging rounds</a> that you haven't solved before. Write the contract and tests first, implement, then walk one failing case out loud.</p>
+<p>Swap to a debugging round every other time: break your own agent in a way a friend chooses, and find the bug from the trace alone.</p>
+<h3 id="iv-mocks--round-c-incident-review-30-minutes">Round C: incident review (30 minutes)</h3>
+<p><strong>Prompt:</strong> A refund was approved and sent to the payment provider. The worker timed out before recording the result, its lease expired and a second worker picked up the job. The customer says they were refunded twice.</p>
+<p>Draw the states from approval to confirmed refund. Explain how the second worker should have used the original idempotency key and checked the provider before doing anything. Say how you would confirm what actually happened, what you tell the customer, which alert should have fired and which regression test you would add.</p>
+<p><strong>Probe to expect:</strong> a cancellation request arrived after the refund was sent. What do you tell the user?</p>
+<h3 id="iv-mocks--round-d-evaluation-review-30-minutes">Round D: evaluation review (30 minutes)</h3>
+<p><strong>Prompt:</strong> Your team compares two retrievers. Keyword search scores 95% on answerable questions but refuses only 1 of 2 unanswerable ones. Hybrid search finds more right answers but refuses less often. Which do you ship, and what experiment do you run first?</p>
+<p>Ask what the numbers are based on and how many cases each one covers. <a href="#iv-evals">Evaluation and debugging rounds</a> works through the arithmetic. Point out that one of two is not a stable 50%. Separate retrieval metrics from answer quality, propose a larger labelled set with a fresh holdout and say which failure matters more for these users.</p>
+<h3 id="iv-mocks--round-e-customer-conversation-30-minutes">Round E: customer conversation (30 minutes)</h3>
+<p><strong>Prompt:</strong> Your partner plays the head of a finance team: "We process thousands of supplier invoices a month and it takes forever. Can AI help?" They answer your questions but volunteer nothing.</p>
+<p>Follow the shape on <a href="#iv-product">AI product and customer rounds</a>. Ask questions that change the design, say which parts should not use an LLM, define outcome, quality and guardrail metrics, and propose a pilot. Finish by summarising the plan and asking what you missed.</p>
+<p><strong>Probe to expect:</strong> the customer says every invoice must be 100% correct. How do you respond?</p>
+<h2 id="iv-mocks--score-every-mock">Score every mock</h2>
+<p>Score each mock on six dimensions from 0 to 4, right after you finish and before you look anything up.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>What it covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requirements</td>
+<td>Clarified the job, risk, traffic and success before designing</td>
+</tr>
+<tr>
+<td>Technical mechanism</td>
+<td>Explained how the parts actually work, not just their names</td>
+</tr>
+<tr>
+<td>Failure and trust control</td>
+<td>Kept authority in code, handled timeouts, retries, injection and unknown outcomes</td>
+</tr>
+<tr>
+<td>Numbers and trade-offs</td>
+<td>Put figures on cost, latency and limits, and named what was traded away</td>
+</tr>
+<tr>
+<td>Evaluation evidence</td>
+<td>Said how quality would be measured and what would block a release</td>
+</tr>
+<tr>
+<td>Communication and ownership</td>
+<td>Clear structure, honest about what is built versus assumed, adapted to follow-ups</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Missing, or unsafe</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Vocabulary without a workable example</td>
+</tr>
+<tr>
+<td>2</td>
+<td>A coherent example, but weak on failures or evidence</td>
+</tr>
+<tr>
+<td>3</td>
+<td>A defensible design with concrete controls and a way to validate them</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Handles changed assumptions, limits and interacting failures, and states what is still uncertain</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="iv-mocks--run-mocks-alone-or-with-a-partner">Run mocks alone or with a partner</h2>
+<ul>
+<li><strong>Alone:</strong> record yourself, score the recording the next day and write down the one change that would most improve the score.</li>
+<li><strong>With a partner:</strong> give them the prompt, the follow-ups on <a href="#iv-system-design">Agentic system design rounds</a> and the scoring table. Ask them to interrupt and change one assumption halfway.</li>
+<li><strong>With an AI interviewer:</strong> an assistant can play the interviewer and ask follow-ups. Score yourself anyway, because it may be too generous, and never paste in anything confidential.</li>
+</ul>
+<h2 id="iv-mocks--retake-the-weakest-dimension">Retake the weakest dimension</h2>
+<p>After each mock, pick your lowest-scoring dimension and practise it with a new scenario, not the same prompt with better wording. Rehearsing one answer teaches you that answer. A new scenario teaches the skill.</p>
+<p>A reasonable target before a real loop is three mocks on different prompts, each scoring at least 18 of 24 with no dimension below 2. None of your answers should rely on the model as a security boundary or claim experience you don't have. This is a self-check, not a prediction of the outcome.</p>
+<h2 id="iv-mocks--checklist">Checklist</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="iv-mocks-todo-1"><input id="iv-mocks-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Complete Round A under time and score it on all six dimensions.</span></label></li>
+<li data-tier="M"><label for="iv-mocks-todo-2"><input id="iv-mocks-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Complete Round C or Round D under time and score it.</span></label></li>
+<li data-tier="M"><label for="iv-mocks-todo-3"><input id="iv-mocks-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Retake your weakest dimension with a new scenario and compare the scores.</span></label></li>
+<li data-tier="R"><label for="iv-mocks-todo-4"><input id="iv-mocks-todo-4" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Complete all five rounds at least once.</span></label></li>
+<li data-tier="R"><label for="iv-mocks-todo-5"><input id="iv-mocks-todo-5" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Run at least one mock with a partner who changes an assumption halfway.</span></label></li>
+<li data-tier="S"><label for="iv-mocks-todo-6"><input id="iv-mocks-todo-6" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Reach 18 of 24 on three different mocks with no dimension below 2.</span></label></li>
+</ul>
+<h2 id="iv-mocks--resources">Resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-44ee269f57"><input aria-label="Mark “Interview Workbook: Explain, Defend, Build” as done" class="res-box" id="res-44ee269f57" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-interview-workbook.md" rel="noopener noreferrer" target="_blank">Interview Workbook: Explain, Defend, Build</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>1 h</span></p><p class="res-note">The original four mock rounds with minute-by-minute plans, strong and weak answers, the scoring scheme and a personal project narrative template.</p></div></li>
+<li class="res" data-res="res-6afdbd481f"><input aria-label="Mark “Worked Capacity, Latency, and Cost Design” as done" class="res-box" id="res-6afdbd481f" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-worked-capacity-and-cost.md" rel="noopener noreferrer" target="_blank">Worked Capacity, Latency, and Cost Design</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>45 min</span></p><p class="res-note">The assumptions and worked numbers behind Round A, so you can check your arithmetic after the mock.</p></div></li>
+<li class="res" data-res="res-e32b754e25"><input aria-label="Mark “Module 6: Human Approval and Retry-Safe Actions” as done" class="res-box" id="res-e32b754e25" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-module-06-human-approval-outbox.md" rel="noopener noreferrer" target="_blank">Module 6: Human Approval and Retry-Safe Actions</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>1 h</span></p><p class="res-note">A runnable approval and outbox lab whose crash and retry checks mirror the Round C incident.</p></div></li>
+<li class="res" data-res="res-db017bad53"><input aria-label="Mark “Evaluation Metrics for Search and Recommendation Systems” as done" class="res-box" id="res-db017bad53" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://weaviate.io/blog/retrieval-evaluation-metrics" rel="noopener noreferrer" target="_blank">Evaluation Metrics for Search and Recommendation Systems</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Weaviate</span><span>10 min</span></p><p class="res-note">Short definitions of recall@k, MRR and nDCG to refresh before Round D.</p></div></li>
+</ul></div><section class="page-done" data-done-for="iv-mocks" aria-label="Page completion"></section>

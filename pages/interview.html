@@ -1,0 +1,174 @@
+<header class="page-head"><p class="eyebrow">Interview prep · Not counted in the path<span class="timebox">38–51 hours in all</span></p><h1 tabindex="-1">Agentic AI interview prep <span class="chip chip-done" data-done-flag="interview" hidden>Completed</span></h1><p class="standfirst">Prepare for the AI-specific rounds of AI engineering interviews with design, product, evaluation, coding and enterprise practice, stories and timed mocks built on your projects.</p><p class="page-meta">Tasks done <span data-all-for="interview">0/5</span> · Resources done <span data-res-for="interview">0/3</span> · Links checked 19 Oct 2026</p></header><div class="prose"><h2 id="interview--who-this-is-for">Who this is for</h2>
+<p>This section is for anyone preparing for interviews for AI engineer, agent engineer or applied AI roles. It sits outside the levels, so it doesn't count toward the time estimates or the progress totals. Use it whenever you have an interview coming up.</p>
+<p>It works best once you have finished <a href="#L3">Level 3</a>, because most questions assume you have built an agent loop yourself. Every project you finish after that gives you more to talk about. If an interview is close and you are earlier in the guide, start with the <a href="#iv-questions">question bank</a> and the <a href="#iv-behavioural">behavioural stories</a>. Say plainly what you have and haven't built yet.</p>
+<h2 id="interview--what-the-interviews-look-like">What the interviews look like</h2>
+<p>Loops differ between companies, so ask the recruiter which rounds to expect and how long each one is. Most mix the AI-specific rounds below, and many add a general algorithms round that this guide doesn't cover. Senior and architect roles weight design, trade-offs and leadership more heavily.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Round</th>
+<th>Typical length</th>
+<th>What it tests</th>
+<th>Where in the guide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agentic system design</td>
+<td>45–60 min</td>
+<td>Requirements, a simple baseline, trust boundaries, failure handling, evals, cost</td>
+<td><a href="#L3">Level 3</a> to <a href="#L6">Level 6</a>, <a href="#l6-system-design">system design and capacity</a></td>
+</tr>
+<tr>
+<td>Product or customer conversation</td>
+<td>30–45 min</td>
+<td>Scoping a fuzzy request, deciding whether AI fits, success metrics, a first release</td>
+<td><a href="#iv-product">AI product and customer rounds</a></td>
+</tr>
+<tr>
+<td>Fundamentals</td>
+<td>30–45 min</td>
+<td>Tokens, attention, decoding, embeddings, retrieval metrics, fine-tuning, serving</td>
+<td><a href="#iv-questions">Question bank</a>, <a href="#L1">Level 1</a>, <a href="#L2">Level 2</a>, <a href="#l6-open-models">open models</a></td>
+</tr>
+<tr>
+<td>Coding</td>
+<td>45–60 min</td>
+<td>Runtime code such as tool loops, retries, concurrency and parsing, with tests</td>
+<td><a href="#L0">Level 0</a>, <a href="#l3-agent-loop">The agent loop</a>, <a href="#l3-tool-calling">Tool calling</a></td>
+</tr>
+<tr>
+<td>Debugging or incident review</td>
+<td>30–45 min</td>
+<td>Reading a trace, finding the first failure, reconciling an unknown outcome</td>
+<td><a href="#iv-evals">Evaluation and debugging rounds</a>, <a href="#l6-deployment">Deploying agents</a></td>
+</tr>
+<tr>
+<td>Evaluation review</td>
+<td>30 min</td>
+<td>Reading eval results critically, sample sizes, holdout sets, judge calibration</td>
+<td><a href="#iv-evals">Evaluation and debugging rounds</a>, <a href="#l5-evals-in-depth">Evals in depth</a></td>
+</tr>
+<tr>
+<td>Governance (regulated companies)</td>
+<td>Often part of design or behavioural</td>
+<td>Approvals, personal data, audit, explainability, vendor models</td>
+<td><a href="#iv-enterprise">Enterprise and regulated settings</a></td>
+</tr>
+<tr>
+<td>Behavioural</td>
+<td>30–45 min</td>
+<td>Ownership, judgement, disagreement and honesty about your own work</td>
+<td>Your projects</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="interview--the-pages">The pages</h2>
+<ol class="topics"><li><a class="topic" href="#iv-system-design"><span class="t-num">01</span><span class="t-body"><span class="t-title">Agentic system design rounds</span><span class="t-sum">Answer an agent design question in 45 minutes with a repeatable structure, worked prompts, failure walks, numbers and the trade-offs interviewers probe.</span></span><span class="t-meta"><span>6–8 h</span><span class="t-tasks"><span data-all-for="iv-system-design">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-questions"><span class="t-num">02</span><span class="t-body"><span class="t-title">Question bank</span><span class="t-sum">About 40 common agentic AI interview questions with short model answers and a follow-up each, from LLM fundamentals to evaluation and operations.</span></span><span class="t-meta"><span>6–8 h</span><span class="t-tasks"><span data-all-for="iv-questions">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-product"><span class="t-num">03</span><span class="t-body"><span class="t-title">AI product and customer rounds</span><span class="t-sum">Handle the round where a customer or product manager describes a fuzzy problem, and you scope it, decide whether AI fits, define success and propose a first release.</span></span><span class="t-meta"><span>4–5 h</span><span class="t-tasks"><span data-all-for="iv-product">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-evals"><span class="t-num">04</span><span class="t-body"><span class="t-title">Evaluation and debugging rounds</span><span class="t-sum">Work the numbers interviewers ask about in evaluation rounds, from judge calibration to small samples, and debug five common agent failures from their traces.</span></span><span class="t-meta"><span>5–6 h</span><span class="t-tasks"><span data-all-for="iv-evals">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-coding"><span class="t-num">05</span><span class="t-body"><span class="t-title">Coding and debugging rounds</span><span class="t-sum">Practise the runtime code agent interviews ask for, with a contract-first method, warm-ups, six timed problems, a trace-debugging round and a scoring guide.</span></span><span class="t-meta"><span>6–8 h</span><span class="t-tasks"><span data-all-for="iv-coding">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-enterprise"><span class="t-num">06</span><span class="t-body"><span class="t-title">Enterprise and regulated settings</span><span class="t-sum">Answer the governance, privacy, audit and model-risk questions that banks, insurers and other regulated companies ask AI engineers, with model answers and follow-ups.</span></span><span class="t-meta"><span>3–4 h</span><span class="t-tasks"><span data-all-for="iv-enterprise">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-behavioural"><span class="t-num">07</span><span class="t-body"><span class="t-title">Behavioural and leadership stories</span><span class="t-sum">Build a small bank of true, specific stories from your projects, tell them with STAR plus reflection, and handle the leadership questions senior AI roles add.</span></span><span class="t-meta"><span>3–4 h</span><span class="t-tasks"><span data-all-for="iv-behavioural">0/0</span> tasks</span></span></a></li><li><a class="topic" href="#iv-mocks"><span class="t-num">08</span><span class="t-body"><span class="t-title">Mock interviews and scoring</span><span class="t-sum">Run five timed mock rounds, score each one on six dimensions, retake your weakest area with new scenarios and know when you are ready.</span></span><span class="t-meta"><span>4–6 h</span><span class="t-tasks"><span data-all-for="iv-mocks">0/0</span> tasks</span></span></a></li></ol>
+<h2 id="interview--plan-your-preparation">Plan your preparation</h2>
+<p>Pick the plan that matches your time. Both assume 10 to 12 hours a week, like the rest of the guide. Start with a diagnostic mock so you spend time on your weakest areas, not on everything equally.</p>
+<p><strong>Six-week plan</strong>, for when the interview is a month or more away:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Focus</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Diagnostic design mock, fundamentals questions</td>
+<td>Scores for six dimensions and a list of gaps</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Agents, tools, state and approvals questions; one product role-play; two warm-up coding problems</td>
+<td>Two-minute answers you have revised after a follow-up</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Retrieval, context and security questions; one worked design prompt</td>
+<td>A design sketch with failure walks and an eval plan</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Evaluation and debugging rounds; capacity and cost numbers; enterprise questions if relevant</td>
+<td>Judge and confidence-interval numbers you can redo from memory</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Coding and debugging rounds under time; two stories</td>
+<td>Working code with tests, and two stories with linked evidence</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Three full mocks on new prompts; retake the weakest dimension</td>
+<td>A score trend and a short list of what still needs work</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Two-week sprint</strong>, for when the interview is close. Compress the practice, but keep the mocks.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Days</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1–2</td>
+<td>Diagnostic mock, then the fundamentals and agents questions</td>
+</tr>
+<tr>
+<td>3–4</td>
+<td>State, approvals and unknown outcomes; one design prompt end to end</td>
+</tr>
+<tr>
+<td>5–6</td>
+<td>Retrieval and security questions; evaluation numbers and two worked debugging cases</td>
+</tr>
+<tr>
+<td>7–8</td>
+<td>Two coding problems and one debugging round under time</td>
+</tr>
+<tr>
+<td>9–10</td>
+<td>A second design prompt; incident and evaluation review mocks</td>
+</tr>
+<tr>
+<td>11–12</td>
+<td>A product role-play; enterprise questions if relevant; write and rehearse two stories</td>
+</tr>
+<tr>
+<td>13–14</td>
+<td>A fresh full mock, then retake your weakest dimension</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="interview--bring-an-evidence-pack">Bring an evidence pack</h2>
+<p>Interviewers trust answers they can check. Keep these artifacts from your projects in one place, each dated, with measurements kept apart from assumptions:</p>
+<ul>
+<li>An architecture diagram of one agent you built, with trust boundaries marked.</li>
+<li>A run state machine or crash walk-through for a long-running or approval flow.</li>
+<li>An eval report with sample sizes, a failure taxonomy and before and after numbers.</li>
+<li>A capacity and cost sheet with formulas and units.</li>
+<li>A threat model showing which leg of the lethal trifecta you removed or gated.</li>
+<li>Links to code, traces or a demo for each project you will mention.</li>
+</ul>
+<h2 id="interview--checklist">Checklist</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="interview-todo-1"><input id="interview-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Find out which rounds your target loop includes and how long each one runs.</span></label></li>
+<li data-tier="M"><label for="interview-todo-2"><input id="interview-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Take a timed diagnostic design mock and score it before you study.</span></label></li>
+<li data-tier="M"><label for="interview-todo-3"><input id="interview-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Choose the six-week plan or the two-week sprint and put the sessions in your calendar.</span></label></li>
+<li data-tier="R"><label for="interview-todo-4"><input id="interview-todo-4" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Collect your evidence pack in one folder or repository.</span></label></li>
+<li data-tier="S"><label for="interview-todo-5"><input id="interview-todo-5" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Find a practice partner and book two mock sessions with them.</span></label></li>
+</ul>
+<h2 id="interview--resources">Resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-4254ce5664"><input aria-label="Mark “Mastery and Interview Preparation Plan” as done" class="res-box" id="res-4254ce5664" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-mastery-and-interview-plan.md" rel="noopener noreferrer" target="_blank">Mastery and Interview Preparation Plan</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Agentic AI Mastery</span><span>15 min</span></p><p class="res-note">A six-week path and a fourteen-day sprint for agentic AI roles, each with weekly deliverables, an evidence pack and completion gates.</p></div></li>
+<li class="res" data-res="res-1faf59e811"><input aria-label="Mark “Agentic AI Interview Preparation” as done" class="res-box" id="res-1faf59e811" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-interview-preparation.md" rel="noopener noreferrer" target="_blank">Agentic AI Interview Preparation</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Agentic AI Mastery</span><span>45 min</span></p><p class="res-note">Thirty-five senior-level questions with model answers, an answer structure for design questions and a scorecard of strong and weak signals.</p></div></li>
+<li class="res" data-res="res-eaa7bea0e7"><input aria-label="Mark “What We've Learned From A Year of Building with LLMs” as done" class="res-box" id="res-eaa7bea0e7" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://applied-llms.org/" rel="noopener noreferrer" target="_blank">What We've Learned From A Year of Building with LLMs</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Applied LLMs</span><span>1.5–2 h</span></p><p class="res-note">Tactical, operational and strategic lessons from six practitioners, a strong base for answers about building and running LLM products.</p></div></li>
+</ul></div><section class="page-done" data-done-for="interview" aria-label="Page completion"></section>

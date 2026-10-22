@@ -1,0 +1,144 @@
+<header class="page-head"><p class="eyebrow"><a href="#interview">Interview prep</a> · Page 1 of 8<span class="timebox">6–8 h</span></p><h1 tabindex="-1">Agentic system design rounds <span class="chip chip-done" data-done-flag="iv-system-design" hidden>Completed</span></h1><p class="standfirst">Answer an agent design question in 45 minutes with a repeatable structure, worked prompts, failure walks, numbers and the trade-offs interviewers probe.</p><p class="page-meta">Tasks done <span data-all-for="iv-system-design">0/6</span> · Resources done <span data-res-for="iv-system-design">0/6</span> · Links checked 19 Oct 2026</p></header><div class="prose"><h2 id="iv-system-design--what-the-round-tests">What the round tests</h2>
+<p>A design round asks you to sketch a system, such as "design an agent that resolves support tickets and can issue refunds". The interviewer is not checking whether you know a particular framework. They want to see how you think. Do you clarify the job, start from a simple baseline, keep authority out of the model, plan for failure, measure quality and reason about cost?</p>
+<p>There is rarely one right answer. A good answer states its assumptions, picks the simplest design that meets them and says what evidence would change the choice. Drawing well matters less than walking through what happens when things go wrong.</p>
+<h2 id="iv-system-design--a-45-minute-timeline">A 45-minute timeline</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Minutes</th>
+<th>Do this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0–5</td>
+<td>Clarify users, the job, what counts as success, risk, traffic and latency. Write the assumptions down where the interviewer can see them.</td>
+</tr>
+<tr>
+<td>5–10</td>
+<td>Name a baseline (a person, a fixed workflow or one model call) and say where an agent adds value. Draw the autonomy boundary.</td>
+</tr>
+<tr>
+<td>10–20</td>
+<td>Draw the runtime: entry point and identity, control loop, model adapter, tool gateway, retrieval, state store, approvals and external systems.</td>
+</tr>
+<tr>
+<td>20–30</td>
+<td>Walk one normal run, then two or three failures, such as a tool timeout, an injected instruction and a crash after a write.</td>
+</tr>
+<tr>
+<td>30–38</td>
+<td>Add numbers: calls and tokens per task, peak demand against the provider's limits, cost per useful task and the latency budget.</td>
+</tr>
+<tr>
+<td>38–45</td>
+<td>Describe evals, rollout and monitoring, name the main trade-off and say what you would build first.</td>
+</tr>
+</tbody>
+</table></div>
+<p>If the interviewer steers you somewhere else, follow them. The timeline is a default, not a script.</p>
+<h2 id="iv-system-design--a-six-step-answer-structure">A six-step answer structure</h2>
+<ol>
+<li><strong>Clarify the job.</strong> Who asks for what, how often, and what does a good outcome look like? What happens if the system is wrong, too slow or too expensive?</li>
+<li><strong>Choose the least complex design.</strong> Start from one model call, a fixed workflow or a single bounded agent. Add orchestration or more agents only for a need you can name.</li>
+<li><strong>Draw the runtime and boundaries.</strong> The model proposes. Code enforces identity, permissions, argument checks, budgets and approvals. Mark where untrusted text enters the system.</li>
+<li><strong>Trace one run and its failures.</strong> Follow a request end to end, then break it: a malformed tool call, a timeout, stale data, a retry, a refusal, a partial side effect.</li>
+<li><strong>Define evidence and operations.</strong> Say how you would build an eval set, which metrics gate a release, what you trace, how you roll out and how you roll back.</li>
+<li><strong>Name the trade-offs.</strong> Quality, latency, cost, autonomy, security surface and operational load. Say which one you are giving up and why.</li>
+</ol>
+<h2 id="iv-system-design--worked-prompt-support-agent-that-can-issue-refunds">Worked prompt: support agent that can issue refunds</h2>
+<p><strong>Prompt.</strong> Design an assistant that answers customer questions about orders and can issue refunds up to a set amount.</p>
+<p><strong>Clarify.</strong> What share of tickets are order status, policy questions or refund requests? What is the refund limit, and who may approve above it? What response time do users expect? Is the data in one system or several?</p>
+<p><strong>Baseline and boundary.</strong> Order status and policy questions follow known paths, so a fixed workflow handles most of them without a model loop. A bounded agent handles mixed or unclear requests. The model may look up orders and draft a refund proposal. It may never issue a refund itself.</p>
+<p><strong>Runtime.</strong> The user's identity comes from the session, never from the prompt. A tool gateway checks every call against that identity, validates arguments and enforces budgets. A refund proposal goes to a review step. The approval binds to a digest of the exact proposal, and the decision and an outbox row are written in one transaction. A worker sends the refund with a stable idempotency key.</p>
+<p><strong>Failure walks.</strong></p>
+<ul>
+<li>A user asks about someone else's order. The order service checks ownership and returns the same denial for missing and forbidden orders.</li>
+<li>A help article contains an injected instruction. The model can only call allowed tools with the user's scope, so the worst case is a wrong draft, not a leak.</li>
+<li>The payment call times out after it was sent. Mark it as outcome unknown, query the provider with the same key and only then decide. Never retry with a new key.</li>
+</ul>
+<p><strong>Evidence and rollout.</strong> Keep a labelled set of tickets by intent, including adversarial ones. Release blockers are any cross-customer disclosure, unapproved refund or duplicate refund. Roll out in stages: shadow mode, read-only canary, proposals only, then approved refunds.</p>
+<p><strong>Trade-off.</strong> Human review adds delay and cost, so reserve it for refunds above a threshold or with low-confidence signals, and keep deterministic rules for the rest.</p>
+<h2 id="iv-system-design--worked-prompt-knowledge-assistant-with-permissions">Worked prompt: knowledge assistant with permissions</h2>
+<p><strong>Prompt.</strong> Design an internal assistant that answers questions from company documents and code, for 10,000 employees, where people can only see what they already have access to.</p>
+<p><strong>Clarify.</strong> How many documents, how often they change, and how fast a permission change must take effect. Which sources (wiki, drive, code), and is the answer allowed to quote them?</p>
+<p><strong>Design.</strong> Split it into an ingestion plane and a query plane. Ingestion parses, chunks and embeds documents and stores each chunk with its source, version and access metadata. The query path runs hybrid search and a reranker, then checks the user's current access against the source system before any text reaches the model. The index is derived data and never the authority on who may read what.</p>
+<p><strong>Failure walks.</strong></p>
+<ul>
+<li>A user loses access after a document was indexed. The query-time check denies it, even though the stale index still holds the chunk.</li>
+<li>A source is deleted. Ingestion removes its chunks and any cached answers that quote them.</li>
+<li>A rebuild goes wrong. Build the new index beside the live one and switch only when checks pass, so rollback is a pointer change.</li>
+</ul>
+<p><strong>Numbers.</strong> Estimate chunks from document count and size, vector storage from chunks, dimensions and bytes, and the time a full re-embedding takes at your embedding quota. <a href="#l6-system-design">Agent system design and capacity planning</a> has a worked example.</p>
+<p><strong>Evidence.</strong> Measure retrieval and answers separately: recall@k and MRR for retrieval, faithfulness and correct refusals for answers. Include permission-crossing test cases that must always fail.</p>
+<h2 id="iv-system-design--worked-prompt-long-running-research-with-specialists">Worked prompt: long-running research with specialists</h2>
+<p><strong>Prompt.</strong> Design an agent that produces a sourced research report over 10 to 30 minutes, possibly using several specialist agents.</p>
+<p><strong>Clarify.</strong> How many reports a day, the budget per report, which sources are allowed and whether a partial report is useful.</p>
+<p><strong>Design.</strong> Start with one agent that plans, searches, reads and writes, with step, token and time budgets. Move to an orchestrator with parallel workers only if the single agent is too slow or its context overflows. Give each worker a structured task: objective, allowed tools and sources, deadline, budget and output schema. Treat worker output as evidence to check, not as fact.</p>
+<p><strong>Durability.</strong> A run this long must survive restarts. Record each model and tool call as a durable step, and give the run a lease so only one worker owns it. Stream progress to the user and return a job id for the final report.</p>
+<p><strong>Failure walks.</strong> A worker times out, so the orchestrator returns a partial report and marks the gap. Workers contradict each other, so the merge step flags the conflict instead of picking one. Total cost nears the budget, so the agent writes up what it has.</p>
+<p><strong>Trade-off.</strong> Parallel workers cut wall-clock time but raise total tokens, often by several times. Measure quality per dollar against the single-agent baseline before you keep them.</p>
+<h2 id="iv-system-design--follow-ups-interviewers-use">Follow-ups interviewers use</h2>
+<p>Expect the interviewer to change an assumption halfway through. Practise answering these:</p>
+<ul>
+<li>Traffic grows tenfold. What breaks first, and is it your system or the provider's limit?</li>
+<li>The provider is down for an hour. What still works?</li>
+<li>The model starts returning malformed tool calls after a version change. How do you notice and respond?</li>
+<li>A customer reports that the agent revealed another customer's data. Walk through the incident.</li>
+<li>The budget halves. Which quality do you give up first?</li>
+<li>Legal says no data may leave the region. What changes? (<a href="#iv-enterprise">Enterprise and regulated settings</a> has a model answer.)</li>
+<li>Why not just use a bigger context window instead of retrieval?</li>
+</ul>
+<h2 id="iv-system-design--strong-and-weak-signals">Strong and weak signals</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Strong answer</th>
+<th>Weak answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Starts from the job, the risk and a simpler baseline</td>
+<td>Starts by naming a framework or a model</td>
+</tr>
+<tr>
+<td>Keeps identity and authority in code, outside the model</td>
+<td>Treats the system prompt or a vector filter as a security boundary</td>
+</tr>
+<tr>
+<td>Plans for unknown outcomes and safe retries</td>
+<td>Says retries make an action happen exactly once</td>
+</tr>
+<tr>
+<td>Measures retrieval and answers separately, with refusals</td>
+<td>Reports one overall accuracy number from a demo</td>
+</tr>
+<tr>
+<td>Puts numbers on calls, tokens, quotas and cost</td>
+<td>Promises a latency or cost figure without any working</td>
+</tr>
+<tr>
+<td>Says what is built, what is assumed and what would change the design</td>
+<td>Presents every choice as obvious and final</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="iv-system-design--checklist">Checklist</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="iv-system-design-todo-1"><input id="iv-system-design-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Answer each of the three worked prompts in 45 minutes, out loud, before reading the outline.</span></label></li>
+<li data-tier="M"><label for="iv-system-design-todo-2"><input id="iv-system-design-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Draw the runtime for one prompt with trust boundaries and the points where untrusted text enters.</span></label></li>
+<li data-tier="M"><label for="iv-system-design-todo-3"><input id="iv-system-design-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Answer three follow-ups that change an assumption, and revise your design for each.</span></label></li>
+<li data-tier="R"><label for="iv-system-design-todo-4"><input id="iv-system-design-todo-4" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Do the numbers for one prompt with formulas and units, then redo them with doubled traffic.</span></label></li>
+<li data-tier="R"><label for="iv-system-design-todo-5"><input id="iv-system-design-todo-5" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Write up one design as a one-page document with assumptions, trade-offs and a first release.</span></label></li>
+<li data-tier="S"><label for="iv-system-design-todo-6"><input id="iv-system-design-todo-6" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Design a fourth system from your own work or a product you use, and have a peer probe it.</span></label></li>
+</ul>
+<h2 id="iv-system-design--resources">Resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-9bea969d6c"><input aria-label="Mark “Architecture Decision Cases: Compare Viable Alternatives” as done" class="res-box" id="res-9bea969d6c" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-architecture-decision-cases.md" rel="noopener noreferrer" target="_blank">Architecture Decision Cases: Compare Viable Alternatives</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Agentic AI Mastery</span><span>30 min</span></p><p class="res-note">Five design choices argued both ways, with a reference decision, a benchmark that could overturn it and an interview defence checklist.</p></div></li>
+<li class="res" data-res="res-6afdbd481f"><input aria-label="Mark “Worked Capacity, Latency, and Cost Design” as done" class="res-box" id="res-6afdbd481f" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-worked-capacity-and-cost.md" rel="noopener noreferrer" target="_blank">Worked Capacity, Latency, and Cost Design</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>45 min</span></p><p class="res-note">The numbers behind a knowledge-assistant design, from vector storage and quotas to cost per useful task, ready to adapt for a whiteboard.</p></div></li>
+<li class="res" data-res="res-7d24e5faa2"><input aria-label="Mark “Building effective agents” as done" class="res-box" id="res-7d24e5faa2" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://www.anthropic.com/engineering/building-effective-agents" rel="noopener noreferrer" target="_blank">Building effective agents</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Anthropic</span><span>30 min</span></p><p class="res-note">The workflow and agent patterns interviewers expect you to name, with clear advice on when each one earns its cost.</p></div></li>
+<li class="res" data-res="res-37ed91c908"><input aria-label="Mark “How we built our multi-agent research system” as done" class="res-box" id="res-37ed91c908" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://www.anthropic.com/engineering/multi-agent-research-system" rel="noopener noreferrer" target="_blank">How we built our multi-agent research system</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Anthropic</span><span>30 min</span></p><p class="res-note">A detailed production example of an orchestrator with parallel workers, including token cost and evaluation, useful for the research prompt.</p></div></li>
+<li class="res" data-res="res-2baeb4feb1"><input aria-label="Mark “Building A Generative AI Platform” as done" class="res-box" id="res-2baeb4feb1" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://huyenchip.com/2024/07/25/genai-platform.html" rel="noopener noreferrer" target="_blank">Building A Generative AI Platform</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Chip Huyen</span><span>45 min</span></p><p class="res-note">Where context construction, guardrails, routing, caching and observability sit in a real LLM system, a good checklist for your diagram.</p></div></li>
+<li class="res" data-res="res-e950f4980b"><input aria-label="Mark “The System Design Primer” as done" class="res-box" id="res-e950f4980b" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/donnemartin/system-design-primer" rel="noopener noreferrer" target="_blank">The System Design Primer</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>Donne Martin</span><span>reference</span></p><p class="res-note">General distributed-systems concepts and a step-by-step approach to design questions for the parts of the round that are not specific to AI.</p></div></li>
+</ul></div><section class="page-done" data-done-for="iv-system-design" aria-label="Page completion"></section>

@@ -1,0 +1,131 @@
+<header class="page-head"><p class="eyebrow"><a href="#interview">Interview prep</a> · Page 3 of 8<span class="timebox">4–5 h</span></p><h1 tabindex="-1">AI product and customer rounds <span class="chip chip-done" data-done-flag="iv-product" hidden>Completed</span></h1><p class="standfirst">Handle the round where a customer or product manager describes a fuzzy problem, and you scope it, decide whether AI fits, define success and propose a first release.</p><p class="page-meta">Tasks done <span data-all-for="iv-product">0/6</span> · Resources done <span data-res-for="iv-product">0/5</span> · Links checked 19 Oct 2026</p></header><div class="prose"><h2 id="iv-product--what-this-round-tests">What this round tests</h2>
+<p>Many applied AI loops now include a conversation with a pretend customer or product manager. They describe a problem in business terms, such as "our support team is drowning", and you lead the discussion. There is usually no diagram to draw at first. Candidates who do well in the coding rounds often fail this one, because they jump straight to an architecture before they understand the problem.</p>
+<p>The interviewer is checking four things. Do you ask questions that change the design? Can you say plainly whether an LLM is the right tool? Do you define success in numbers the customer cares about? Do you propose something small that can ship and be measured? Treat it like a real first meeting with a client.</p>
+<h2 id="iv-product--the-shape-of-a-strong-conversation">The shape of a strong conversation</h2>
+<ol>
+<li><strong>Understand the job.</strong> Who has the problem, how often, what they do today and what it costs them. Ask for an example of a good and a bad outcome.</li>
+<li><strong>Find the constraints.</strong> Data you can use, privacy rules, the price of a wrong answer, how fast it must respond, budget, and who must approve actions.</li>
+<li><strong>Decide whether AI fits.</strong> Say what an LLM adds, and what a rule, a search box or a form would do instead. It is fine to recommend no AI for part of the problem.</li>
+<li><strong>Define success.</strong> One outcome metric the customer cares about, one quality metric you can measure offline, and one guardrail metric that must not get worse.</li>
+<li><strong>Propose a first release.</strong> The smallest version that delivers value and can be measured, such as drafts for a person to approve rather than full automation.</li>
+<li><strong>Plan how you'd learn.</strong> How you'd collect examples, build an eval set, run a pilot and decide whether to expand.</li>
+<li><strong>Summarise and check.</strong> Restate the problem, the plan and the open questions, and ask the customer whether you missed anything.</li>
+</ol>
+<h2 id="iv-product--questions-that-change-the-design">Questions that change the design</h2>
+<p>Good questions are the ones whose answer would change what you build. Keep a few ready in each area.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Questions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users and job</td>
+<td>Who uses it, and what do they do today? What does a great result look like? How many requests a day?</td>
+</tr>
+<tr>
+<td>Cost of mistakes</td>
+<td>What happens if the answer is wrong? Who notices, and how quickly? Is anything irreversible?</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Where does the knowledge live, and how often does it change? Are there access rules? Can we use past examples?</td>
+</tr>
+<tr>
+<td>Actions</td>
+<td>Should it only answer, or also act? Who approves actions, and what are the limits?</td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td>Response time? Budget per request or per month? Any rules about where data may go?</td>
+</tr>
+<tr>
+<td>Success</td>
+<td>How do you measure this today? What number would make this a success in three months?</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="iv-product--deciding-whether-an-llm-fits">Deciding whether an LLM fits</h2>
+<p>An LLM tends to fit when:</p>
+<ul>
+<li>inputs are messy natural language;</li>
+<li>the right answer depends on reading and judgement;</li>
+<li>mistakes can be caught, or are cheap;</li>
+<li>there is enough volume to be worth automating.</li>
+</ul>
+<p>It tends not to fit when:</p>
+<ul>
+<li>the logic is a clear rule;</li>
+<li>every answer must be exactly right with no review;</li>
+<li>there is no way to check quality;</li>
+<li>a search box or a form would solve it.</li>
+</ul>
+<p>Say this out loud with the customer's own examples. For instance: "Tracking questions follow a rule, so a lookup handles them without a model. Complaints mixing several issues need reading and judgement, so that's where a model helps."</p>
+<h2 id="iv-product--defining-success">Defining success</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Kind of metric</th>
+<th>Example for a support assistant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Outcome the customer cares about</td>
+<td>Median time to first response, share of tickets resolved without escalation</td>
+</tr>
+<tr>
+<td>Quality you measure offline</td>
+<td>Draft accuracy on a labelled set, share of answers grounded in a help article</td>
+</tr>
+<tr>
+<td>Guardrail that must not get worse</td>
+<td>Customer satisfaction, rate of wrong refunds, privacy incidents</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Cost per resolved ticket, including review time</td>
+</tr>
+</tbody>
+</table></div>
+<p>Agree on a baseline before you build, so you can show the change. If the customer has no measurement today, say that collecting a baseline is the first task.</p>
+<h2 id="iv-product--worked-example-a-support-team-that-is-drowning">Worked example: a support team that is drowning</h2>
+<p><strong>Customer:</strong> "Our support team can't keep up. Customers wait two days for a reply. Can AI fix this?"</p>
+<p><strong>You ask:</strong> How many tickets a day, and what are the main types? What do agents do for each type? How long does a reply take? Do replies follow help articles, or need judgement? Can the system issue refunds, or only reply? What happens today when a reply is wrong?</p>
+<p><strong>Customer answers (example):</strong> About 2,000 tickets a day. Roughly half are order status, a third are returns and refunds, and the rest is a mix. Agents use about 40 help articles. Refunds over a set amount need a manager.</p>
+<p><strong>You propose:</strong></p>
+<ul>
+<li>Answer order status automatically with a lookup and a template. No model is needed, and it removes about half the queue.</li>
+<li>For returns and the mixed tickets, have a model classify the ticket, retrieve the relevant help article and draft a reply with citations. An agent approves or edits the draft before it is sent. The model never issues refunds.</li>
+<li>Measure time to first response and the share of drafts sent without edits. Guard customer satisfaction and wrong-refund rate.</li>
+<li>Pilot on one ticket type for two weeks with a labelled set of 200 past tickets. Expand only if drafts are accepted without edits at a rate the team agrees on in advance.</li>
+</ul>
+<p><strong>You check:</strong> "Have I got the ticket mix right? Is there anything agents do that wouldn't show up in the ticket text, such as checking another system?"</p>
+<h2 id="iv-product--common-traps">Common traps</h2>
+<ul>
+<li>Designing the architecture before asking a single question.</li>
+<li>Promising full automation of a task where mistakes are expensive.</li>
+<li>Naming a model or framework as the answer to a business question.</li>
+<li>Success metrics that only measure the model, such as accuracy, with nothing the customer cares about.</li>
+<li>Ignoring the people in the loop, such as reviewers, their workload and their trust in the system.</li>
+<li>Never saying "I don't know yet; here's how we'd find out."</li>
+</ul>
+<h2 id="iv-product--checklist">Checklist</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="iv-product-todo-1"><input id="iv-product-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write your own list of six questions that would change the design, one per area in the table.</span></label></li>
+<li data-tier="M"><label for="iv-product-todo-2"><input id="iv-product-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Run the worked example as a 30-minute role-play with a friend playing the customer, without reading the answer first.</span></label></li>
+<li data-tier="M"><label for="iv-product-todo-3"><input id="iv-product-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>For one project you built, write success metrics in all four rows of the metrics table.</span></label></li>
+<li data-tier="R"><label for="iv-product-todo-4"><input id="iv-product-todo-4" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Practise two more scenarios: an internal document assistant for a legal team, and invoice processing for a finance team.</span></label></li>
+<li data-tier="R"><label for="iv-product-todo-5"><input id="iv-product-todo-5" type="checkbox"/><span><span class="tier tier-R">Recommended</span>For each scenario, say clearly which part should not use an LLM and why.</span></label></li>
+<li data-tier="S"><label for="iv-product-todo-6"><input id="iv-product-todo-6" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Record a role-play and score it on whether every question you asked changed the plan.</span></label></li>
+</ul>
+<h2 id="iv-product--resources">Resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-ddaa6f4661"><input aria-label="Mark “Errors + Graceful Failure” as done" class="res-box" id="res-ddaa6f4661" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://pair.withgoogle.com/chapter/errors-failing/" rel="noopener noreferrer" target="_blank">Errors + Graceful Failure</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Google PAIR</span><span>30 min</span></p><p class="res-note">A chapter of the People + AI Guidebook on deciding what users will see as an error and giving them a way forward when the AI falls short.</p></div></li>
+<li class="res" data-res="res-f1ebcc3e6b"><input aria-label="Mark “Guidelines for Human-AI Interaction” as done" class="res-box" id="res-f1ebcc3e6b" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://www.microsoft.com/en-us/research/publication/guidelines-for-human-ai-interaction/" rel="noopener noreferrer" target="_blank">Guidelines for Human-AI Interaction</a><p class="res-meta"><span class="res-type t-paper">Paper</span><span>Microsoft Research</span><span>45 min</span></p><p class="res-note">Eighteen tested guidelines for how AI products should behave at the start, during use, when wrong and over time, a useful checklist for scoping.</p></div></li>
+<li class="res" data-res="res-23ef88deb0"><input aria-label="Mark “A practical guide to building agents” as done" class="res-box" id="res-23ef88deb0" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" rel="noopener noreferrer" target="_blank">A practical guide to building agents</a><p class="res-meta"><span class="res-type t-article">Article</span><span>OpenAI</span><span>1 h</span></p><p class="res-note">Opens with how to decide whether a use case needs an agent at all, the core question in a customer round.</p></div></li>
+<li class="res" data-res="res-2b2dee98c3"><input aria-label="Mark “Your AI Product Needs Evals” as done" class="res-box" id="res-2b2dee98c3" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://hamel.dev/blog/posts/evals/" rel="noopener noreferrer" target="_blank">Your AI Product Needs Evals</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Hamel Husain</span><span>20 min</span></p><p class="res-note">A real product case study tying evals to product decisions, good material for the "how would you measure success" part.</p></div></li>
+<li class="res" data-res="res-c0f6f79f8e"><input aria-label="Mark “How to Interview and Hire ML/AI Engineers” as done" class="res-box" id="res-c0f6f79f8e" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://eugeneyan.com/writing/how-to-interview/" rel="noopener noreferrer" target="_blank">How to Interview and Hire ML/AI Engineers</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Eugene Yan and Jason Liu</span><span>25 min</span></p><p class="res-note">What hiring managers look for in AI engineers, including comfort with ambiguity and judgement, seen from the interviewer's side.</p></div></li>
+</ul></div><section class="page-done" data-done-for="iv-product" aria-label="Page completion"></section>

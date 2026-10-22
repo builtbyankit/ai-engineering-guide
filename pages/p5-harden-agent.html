@@ -1,0 +1,157 @@
+<header class="page-head"><p class="eyebrow"><a href="#L5">Level 5</a> · Project<span class="timebox">1.5–2 weeks</span></p><h1 tabindex="-1">Harden an agent: evals, tracing and red-teaming <span class="chip chip-done" data-done-flag="p5-harden-agent" hidden>Completed</span></h1><p class="standfirst">Take your Level 3 or 4 agent and add error analysis, a calibrated judge, trajectory evals, a CI gate, tracing with cost dashboards and a prompt-injection red-team suite.</p><p class="page-meta">Requirements <span data-must-for="p5-harden-agent">0/0</span> · Stretch goals <span data-extra-for="p5-harden-agent">0/0</span></p></header><div class="prose"><h2 id="p5-harden-agent--the-brief">The brief</h2>
+<p>You take an agent you already built, such as the research agent from Level 3 or the support triage agent from Level 4, and make it measurable, observable and harder to attack. You do not add new features. You add the engineering that lets a team change the agent with confidence: evals that catch regressions, traces that explain failures and a security suite that shows how it behaves under attack.</p>
+<p>Imagine handing the agent to a small team who will run it for real users. They need to know what it costs per task, how often it fails and in what ways, and whether a poisoned document can make it leak data. Your deliverable is the repository, the dashboards and a short report that answers those questions with numbers.</p>
+<h2 id="p5-harden-agent--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l5-evals-in-depth">Evals in depth</a>: error analysis on real traces, a judge calibrated against your labels, trajectory evals with repeated runs and a CI gate.</li>
+<li><a href="#l5-observability">Observability and tracing</a>: OpenTelemetry-style spans for model and tool calls, a cost and latency dashboard and feedback scores.</li>
+<li><a href="#l5-security">Security and guardrails</a>: a lethal-trifecta threat model, an injection red-team suite, structural fixes and one guardrail layer.</li>
+<li><a href="#l4-human-in-the-loop">Human in the loop</a>: approval gates on risky tools as a defence that holds even when the model is fooled.</li>
+</ul>
+<h2 id="p5-harden-agent--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p5-harden-agent-todo-1"><input id="p5-harden-agent-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Trace every run with a root span plus child spans for each model call and tool call, including model name, tokens, latency and status.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-2"><input id="p5-harden-agent-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Review at least 50 traces and publish a failure taxonomy with counts per category.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-3"><input id="p5-harden-agent-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write code-based assertions for each failure category code can detect, and at least one binary LLM judge with TPR and TNR reported on a held-out labelled set.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-4"><input id="p5-harden-agent-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Add trajectory evals for at least 10 tasks that check outcome, tool choice and step count, run 3 or more times each with pass^k reported.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-5"><input id="p5-harden-agent-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Run the eval suite in CI on every pull request and fail the build on a regression beyond a stated threshold.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-6"><input id="p5-harden-agent-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Show cost per run, cost per successful task and p95 latency on a dashboard or notebook.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-7"><input id="p5-harden-agent-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Build a prompt-injection suite of at least 20 cases, report attack success rate, apply at least one structural fix and report the rate again.</span></label></li>
+<li data-tier="M"><label for="p5-harden-agent-todo-8"><input id="p5-harden-agent-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write a threat model naming your agent's private data, untrusted inputs and outbound channels, and which one you removed or gated.</span></label></li>
+</ul>
+<h2 id="p5-harden-agent--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p5-harden-agent-todo-9"><input id="p5-harden-agent-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add one guardrail model or filter and report its false positive rate on at least 30 benign inputs.</span></label></li>
+<li data-tier="R"><label for="p5-harden-agent-todo-10"><input id="p5-harden-agent-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Collect thumbs-up and thumbs-down feedback as trace scores and run a sampled online judge on live traces.</span></label></li>
+<li data-tier="S"><label for="p5-harden-agent-todo-11"><input id="p5-harden-agent-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Run an automated multi-turn attack campaign with PyRIT or promptfoo and add the successful attacks to your regression suite.</span></label></li>
+<li data-tier="S"><label for="p5-harden-agent-todo-12"><input id="p5-harden-agent-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Port your trajectory evals to Inspect and run tool-using tasks inside a Docker sandbox.</span></label></li>
+</ul>
+<h2 id="p5-harden-agent--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent under test</td>
+<td>Your Level 3 or Level 4 agent</td>
+<td>Any small tool-using agent you wrote</td>
+</tr>
+<tr>
+<td>Tracing</td>
+<td>OpenTelemetry SDK with OpenLLMetry or OpenInference</td>
+<td>Built-in tracing in your agent SDK</td>
+</tr>
+<tr>
+<td>Trace store and dashboard</td>
+<td>Langfuse, self-hosted with Docker Compose</td>
+<td>Arize Phoenix, LangSmith free tier, a notebook over exported spans</td>
+</tr>
+<tr>
+<td>Eval runner</td>
+<td>pytest plus promptfoo</td>
+<td>Inspect, DeepEval</td>
+</tr>
+<tr>
+<td>Judge model</td>
+<td>A mid-sized hosted model with structured output</td>
+<td>A local open model through Ollama</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>GitHub Actions</td>
+<td>GitLab CI</td>
+</tr>
+<tr>
+<td>Red-teaming</td>
+<td>promptfoo red-team mode and hand-written cases</td>
+<td>garak, PyRIT</td>
+</tr>
+<tr>
+<td>Guardrails</td>
+<td>Llama Guard or Presidio for PII</td>
+<td>NeMo Guardrails, Guardrails AI</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p5-harden-agent--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Freeze a baseline.</strong> Tag the current agent version and record its model, prompts and tools. Pick 3 to 5 core jobs the agent must do well.</li>
+<li><strong>Instrument before you evaluate.</strong> Add OTel spans for the agent loop, model calls and tool calls, and send them to Langfuse or Phoenix. Error analysis is far quicker when you can click through traces.</li>
+<li><strong>Review 100 traces.</strong> Run a mix of realistic and synthetic inputs, write a note on the first failure in each trace and group the notes into categories. Rank the categories by count and by impact.</li>
+<li><strong>Write checks, then the judge.</strong> Turn every code-checkable failure into an assertion. For one subjective failure, label at least 100 outputs, build a binary judge on a small training split and report TPR and TNR on the test split.</li>
+<li><strong>Add trajectory evals and gate CI.</strong> Give each of your 10 or more tasks an expected outcome and allowed tool set, run each several times and compute pass^k. Wire the suite into GitHub Actions with a threshold relative to the main branch.</li>
+<li><strong>Red-team the agent.</strong> Map the lethal trifecta for your tools, then write at least 20 injections hidden in documents, web pages and tool results. Add a scanner run with a capped number of tests against a test copy whose outbound and side-effecting tools are stubbed, set a spending limit first, and record attack success rate.</li>
+<li><strong>Fix by design and re-measure.</strong> Remove or gate one leg of the trifecta, for example with plan-then-execute, a quarantined reader or human approval. Re-run the evals and the red-team suite, and confirm normal tasks still pass.</li>
+<li><strong>Report.</strong> Build the dashboard view for cost and latency, then write a one-page summary with before and after numbers.</li>
+</ol>
+<h2 id="p5-harden-agent--how-to-evaluate-it">How to evaluate it</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Error analysis</td>
+<td>50 traces reviewed, 4 or more categories with counts</td>
+<td>100 or more traces, categories refined in a second pass, each linked to an eval</td>
+</tr>
+<tr>
+<td>Judge calibration</td>
+<td>TPR and TNR reported on 30 or more held-out examples</td>
+<td>Both at or above 0.85 (example target) on 50 or more held-out examples, with notes on every disagreement</td>
+</tr>
+<tr>
+<td>Trajectory evals</td>
+<td>10 tasks with outcome, tool-choice and step-count checks, run 3 times each with pass^3 reported</td>
+<td>20 or more tasks, tool-argument checks and pass^5 per task</td>
+</tr>
+<tr>
+<td>CI gate</td>
+<td>Suite runs on every pull request and blocks regressions</td>
+<td>Results posted on the pull request, runtime under 10 minutes, threshold justified by run-to-run noise</td>
+</tr>
+<tr>
+<td>Tracing and cost</td>
+<td>Every model and tool call traced, cost per run visible</td>
+<td>Cost per successful task, p50 and p95 per span type, feedback scores and redacted personal data</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>20 injection cases, attack success rate measured before and after one fix</td>
+<td>50 or more cases including multi-turn attacks, zero successful exfiltrations after fixes, guardrail false positive rate reported</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p5-harden-agent--show-your-work">Show your work</h2>
+<ul>
+<li>A README with the failure taxonomy, the eval results table, judge TPR and TNR, the threat model and attack success rates before and after your fixes.</li>
+<li>A 2 to 3 minute video: a broken prompt turning CI red, a drill-down from a slow trace to the guilty span, and an injection attempt being blocked.</li>
+<li>A short write-up on what reviewing 100 traces taught you about your agent, with one surprising failure.</li>
+<li>A CV line such as "Built eval, tracing and red-team pipeline for an LLM agent; cut injection success rate from X% to Y% and added a CI regression gate".</li>
+</ul>
+<h2 id="p5-harden-agent--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>Harden a recipe assistant that reads web pages users paste in, where injections hide in recipe blogs.</li>
+<li>Harden an email triage agent where every incoming message is untrusted input.</li>
+<li>Harden an invoice-processing agent that reads PDFs and can call a mock payments API.</li>
+<li>Compare two guardrails on the same injection suite and report the trade-off between blocked attacks and blocked benign inputs.</li>
+<li>Compare two models as the agent's brain using pass^k and cost per successful task.</li>
+</ul>
+<h2 id="p5-harden-agent--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-ab46821605"><input aria-label="Mark “Getting Started by Example” as done" class="res-box" id="res-ab46821605" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://opentelemetry.io/docs/languages/python/getting-started/" rel="noopener noreferrer" target="_blank">Getting Started by Example</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>OpenTelemetry</span><span>30 min</span></p><p class="res-note">The official Python walkthrough for adding traces to an app, the starting point for your own agent spans.</p></div></li>
+<li class="res" data-res="res-8820c09fd7"><input aria-label="Mark “OpenTelemetry (OTEL) for LLM Observability” as done" class="res-box" id="res-8820c09fd7" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://langfuse.com/integrations/native/opentelemetry" rel="noopener noreferrer" target="_blank">OpenTelemetry (OTEL) for LLM Observability</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Langfuse</span><span>reference</span></p><p class="res-note">How to send OTLP traces to Langfuse and how GenAI semantic convention attributes map to its model, usage, input and output fields.</p></div></li>
+<li class="res" data-res="res-3dc737b35f"><input aria-label="Mark “Docker Compose Deployment” as done" class="res-box" id="res-3dc737b35f" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://langfuse.com/self-hosting/deployment/docker-compose" rel="noopener noreferrer" target="_blank">Docker Compose Deployment</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Langfuse</span><span>30 min</span></p><p class="res-note">Runs a self-hosted Langfuse locally or on a small VM, with clear notes on what this setup lacks for real production use.</p></div></li>
+<li class="res" data-res="res-201d5c7741"><input aria-label="Mark “Module 7: Threat-Model the Agent, Not Just the Prompt” as done" class="res-box" id="res-201d5c7741" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-module-07-agent-security-threat-model.md" rel="noopener noreferrer" target="_blank">Module 7: Threat-Model the Agent, Not Just the Prompt</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>45 min</span></p><p class="res-note">A worked threat register for a support agent with controls, evidence and remaining gaps, runnable security checks and release gates to copy into your own threat model.</p></div></li>
+<li class="res" data-res="res-8d01ec7c8b"><input aria-label="Mark “Red Team Quickstart” as done" class="res-box" id="res-8d01ec7c8b" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://promptfoo.dev/docs/red-team/quickstart/" rel="noopener noreferrer" target="_blank">Red Team Quickstart</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Promptfoo</span><span>30 min</span></p><p class="res-note">Sets up an automated adversarial scan against an HTTP endpoint or custom target, covering injection, jailbreak and data-leak plugins.</p></div></li>
+<li class="res" data-res="res-5e81eb4f67"><input aria-label="Mark “AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents” as done" class="res-box" id="res-5e81eb4f67" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://arxiv.org/abs/2406.13352" rel="noopener noreferrer" target="_blank">AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents</a><p class="res-meta"><span class="res-type t-paper">Paper</span><span>Debenedetti et al.</span><span>1 h</span></p><p class="res-note">97 realistic agent tasks and 629 injection cases that show how to structure your own attack suite and measure utility alongside security.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p5-harden-agent" aria-label="Page completion"></section>

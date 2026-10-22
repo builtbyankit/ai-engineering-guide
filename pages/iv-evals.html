@@ -1,0 +1,74 @@
+<header class="page-head"><p class="eyebrow"><a href="#interview">Interview prep</a> · Page 4 of 8<span class="timebox">5–6 h</span></p><h1 tabindex="-1">Evaluation and debugging rounds <span class="chip chip-done" data-done-flag="iv-evals" hidden>Completed</span></h1><p class="standfirst">Work the numbers interviewers ask about in evaluation rounds, from judge calibration to small samples, and debug five common agent failures from their traces.</p><p class="page-meta">Tasks done <span data-all-for="iv-evals">0/6</span> · Resources done <span data-res-for="iv-evals">0/5</span> · Links checked 19 Oct 2026</p></header><div class="prose"><h2 id="iv-evals--why-this-round-trips-people-up">Why this round trips people up</h2>
+<p>Evaluation is the round where many otherwise strong candidates struggle. Saying "we'd use an LLM judge" is easy. Explaining how you know the judge is right, whether a 4-point improvement is real, and what to test before a release is harder. Debugging rounds have the same problem: they reward a calm method, not a lucky guess.</p>
+<p>This page works through the numbers and the debugging method with concrete examples. Do the arithmetic yourself before reading each answer. Interviewers often ask you to do it out loud.</p>
+<h2 id="iv-evals--calibrating-an-llm-judge">Calibrating an LLM judge</h2>
+<p><strong>Setup.</strong> You label 100 agent answers yourself: 20 fail and 80 pass. Your judge marks 14 of the 20 failures as failures, and 76 of the 80 passes as passes. Treat "fail" as the positive class, because catching failures is the judge's job.</p>
+<ul>
+<li><strong>True positive rate (TPR):</strong> 14 / 20 = 70%. The judge catches 70% of real failures.</li>
+<li><strong>True negative rate (TNR):</strong> 76 / 80 = 95%. It rarely flags a good answer.</li>
+<li><strong>Raw agreement:</strong> (14 + 76) / 100 = 90%. This sounds good but hides the fact that the judge misses almost a third of failures.</li>
+</ul>
+<p><strong>Correcting the production rate.</strong> In production the judge flags 12% of 1,000 traces. That is not the true failure rate, because the judge is imperfect. A standard correction estimates the true rate as (flagged + TNR − 1) / (TPR + TNR − 1) = (0.12 + 0.95 − 1) / (0.70 + 0.95 − 1) = 0.07 / 0.65 ≈ 10.8%.</p>
+<p><strong>What to say.</strong> Report TPR and TNR on a held-out labelled set the judge was never tuned on, not raw agreement. Improve the judge by narrowing it to one criterion, asking for pass or fail, and adding labelled examples with written critiques. Re-check it when the model, prompt or data changes.</p>
+<h2 id="iv-evals--is-the-improvement-real">Is the improvement real?</h2>
+<p><strong>One pass rate.</strong> Your agent passes 42 of 50 eval cases (84%). The standard error is √(0.84 × 0.16 / 50) ≈ 0.052, so a 95% interval is roughly 84% ± 10 points, about 74% to 94%. A new prompt scoring 88% on the same 50 cases is well inside that range.</p>
+<p><strong>Compare on the same cases.</strong> Look at the cases that changed. Suppose the new prompt fixes 6 cases and breaks 2. Only those 8 changed cases carry information, and a 6-to-2 split happens by chance about 29% of the time even when the prompts are equally good. Say you would add cases or run more trials before shipping.</p>
+<p><strong>How many cases you need.</strong> Detecting a 5-point change around 80% with two separate samples needs on the order of a thousand cases per version. Comparing the same cases, as above, needs fewer. That is why teams grow eval sets from production failures and run each case several times.</p>
+<p><strong>Repeated runs.</strong> If each attempt succeeds 90% of the time independently, the chance that three attempts all succeed (pass^3) is 0.9³ ≈ 73%. Users who rely on the agent every day experience something closer to that number than to 90%.</p>
+<h2 id="iv-evals--designing-an-eval-for-a-new-feature">Designing an eval for a new feature</h2>
+<p>A common prompt: "We're adding a refund tool to the support agent. How would you evaluate it before launch?" A strong answer covers:</p>
+<ul>
+<li><strong>Slices.</strong> Eligible and ineligible refunds, amounts near the limit, missing order numbers, two issues in one message, other customers' orders and requests in other languages.</li>
+<li><strong>Adversarial cases.</strong> Instructions hidden in a ticket or a help article that try to trigger a refund, and repeated requests for the same order.</li>
+<li><strong>Graders.</strong> Code checks for tool choice, arguments and limits; outcome checks on the final database state; an LLM judge only for tone and completeness, calibrated as above.</li>
+<li><strong>Release blockers.</strong> Any refund without approval, any refund to the wrong customer, any duplicate refund. A high average score can't outweigh these.</li>
+<li><strong>Data hygiene.</strong> Keep a holdout set you never tune on, and add every production failure to the dev set.</li>
+<li><strong>Rollout.</strong> Shadow mode first, then proposals only, then approved refunds for a small share of traffic.</li>
+</ul>
+<h2 id="iv-evals--a-method-for-debugging-rounds">A method for debugging rounds</h2>
+<ol>
+<li><strong>Restate the symptom</strong> with numbers: what changed, since when, and for whom.</li>
+<li><strong>Find a good trace and a bad trace</strong> for similar inputs and compare them step by step.</li>
+<li><strong>Locate the first divergence,</strong> not the last symptom. The final answer is usually wrong because of something earlier.</li>
+<li><strong>Classify the cause:</strong> retrieval, tool, model, prompt, state or infrastructure.</li>
+<li><strong>Confirm with one test</strong> that fails before the fix and passes after it.</li>
+<li><strong>Prevent recurrence:</strong> add the case to the eval set, add a check or alert, and say what you would monitor.</li>
+</ol>
+<h2 id="iv-evals--five-common-failures-worked">Five common failures, worked</h2>
+<h3 id="iv-evals--the-agent-calls-the-same-tool-over-and-over">The agent calls the same tool over and over</h3>
+<p><strong>Trace:</strong> <code>search_orders</code> is called 12 times with identical arguments, and the run hits the step limit.</p>
+<p><strong>Likely causes:</strong> the tool returns an error the model can't act on, such as "failed"; the result is too long and gets cut off; or the result was sent without its call ID, so the model never saw it.</p>
+<p><strong>Fix:</strong> return specific, actionable errors; cap and summarise results; detect repeated identical calls and stop with a reason; add the case to the eval set.</p>
+<h3 id="iv-evals--answers-got-worse-after-the-index-was-rebuilt">Answers got worse after the index was rebuilt</h3>
+<p><strong>Trace:</strong> the right document exists, but retrieval now returns archived versions, and recall@5 dropped from 0.88 to 0.71.</p>
+<p><strong>Likely causes:</strong> the rebuild used a new embedding model while some old vectors remained; a metadata filter for version or status was dropped; or chunking changed and split the key passage.</p>
+<p><strong>Fix:</strong> build each index version separately and switch only when retrieval checks pass; run recall@k in CI on every rebuild; keep the version filter covered by a test.</p>
+<h3 id="iv-evals--failures-rose-after-a-model-upgrade">Failures rose after a model upgrade</h3>
+<p><strong>Trace:</strong> structured outputs now fail validation 6% of the time, up from 0.5%, mostly on date fields.</p>
+<p><strong>Likely causes:</strong> the new model formats some values differently, the prompt relied on the old model's habits, or strict schema mode was off.</p>
+<p><strong>Fix:</strong> pin model versions; turn on strict schemas where supported; add validators with a capped retry; gate model changes on the eval suite and release them as a canary.</p>
+<h3 id="iv-evals--cost-per-task-tripled">Cost per task tripled</h3>
+<p><strong>Trace:</strong> input tokens per task jumped from about 6,000 to 19,000.</p>
+<p><strong>Likely causes:</strong> a tool started returning raw HTML; the conversation history is being sent twice; or a timestamp at the top of the system prompt is breaking the prompt cache on every call.</p>
+<p><strong>Fix:</strong> cap tool results; use one source of history; keep the stable prompt prefix first; alert on tokens per task, not just total spend.</p>
+<h3 id="iv-evals--the-right-document-was-retrieved-but-the-answer-is-wrong">The right document was retrieved, but the answer is wrong</h3>
+<p><strong>Trace:</strong> the cited chunk says returns are accepted within 30 days, but the answer says 14 days.</p>
+<p><strong>Likely causes:</strong> an older version of the same policy was also retrieved; the key chunk sat in a long context among many others; or the prompt doesn't require answers to come only from the cited text.</p>
+<p><strong>Fix:</strong> deduplicate by source and keep only the current version; send fewer, better-ranked chunks; check that each cited passage supports the claim; add a faithfulness check to the eval set.</p>
+<h2 id="iv-evals--checklist">Checklist</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="iv-evals-todo-1"><input id="iv-evals-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Redo the judge calibration and the confidence interval with your own numbers, out loud, without notes.</span></label></li>
+<li data-tier="M"><label for="iv-evals-todo-2"><input id="iv-evals-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Answer the refund-tool eval prompt in 15 minutes, covering slices, graders, blockers and rollout.</span></label></li>
+<li data-tier="M"><label for="iv-evals-todo-3"><input id="iv-evals-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Debug two of the five failures out loud using the six-step method before reading the worked answer.</span></label></li>
+<li data-tier="R"><label for="iv-evals-todo-4"><input id="iv-evals-todo-4" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Calibrate a real judge on 50 or more of your own labelled outputs and report TPR and TNR.</span></label></li>
+<li data-tier="R"><label for="iv-evals-todo-5"><input id="iv-evals-todo-5" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Break your own agent in one of the five ways and find it from the trace alone.</span></label></li>
+<li data-tier="S"><label for="iv-evals-todo-6"><input id="iv-evals-todo-6" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Compare two prompts on your eval set using only the changed cases, and say whether the difference is real.</span></label></li>
+</ul>
+<h2 id="iv-evals--resources">Resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-9693f49562"><input aria-label="Mark “Using LLM-as-a-Judge For Evaluation: A Complete Guide” as done" class="res-box" id="res-9693f49562" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://hamel.dev/blog/posts/llm-judge/" rel="noopener noreferrer" target="_blank">Using LLM-as-a-Judge For Evaluation: A Complete Guide</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Hamel Husain</span><span>30 min</span></p><p class="res-note">The step-by-step method for building a binary judge from expert critiques and validating it with true positive and true negative rates.</p></div></li>
+<li class="res" data-res="res-5e6fffedd4"><input aria-label="Mark “A statistical approach to model evaluations” as done" class="res-box" id="res-5e6fffedd4" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://www.anthropic.com/research/statistical-approach-to-model-evals" rel="noopener noreferrer" target="_blank">A statistical approach to model evaluations</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Anthropic</span><span>10 min</span></p><p class="res-note">Five recommendations for reporting eval results, including standard errors, paired comparisons and power analysis.</p></div></li>
+<li class="res" data-res="res-f8967c552f"><input aria-label="Mark “Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations” as done" class="res-box" id="res-f8967c552f" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://arxiv.org/abs/2411.00640" rel="noopener noreferrer" target="_blank">Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations</a><p class="res-meta"><span class="res-type t-paper">Paper</span><span>Evan Miller</span><span>1 h</span></p><p class="res-note">The paper behind those recommendations, with the formulas for standard errors, clustered errors and paired differences.</p></div></li>
+<li class="res" data-res="res-5ca70c652e"><input aria-label="Mark “Demystifying evals for AI agents” as done" class="res-box" id="res-5ca70c652e" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://anthropic.com/engineering/demystifying-evals-for-ai-agents" rel="noopener noreferrer" target="_blank">Demystifying evals for AI agents</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Anthropic</span><span>25 min</span></p><p class="res-note">Tasks, trials, graders and harnesses for agent evals, with a clear treatment of pass@k and pass^k.</p></div></li>
+<li class="res" data-res="res-5bf201eed3"><input aria-label="Mark “AI Evals: Everything You Need to Know” as done" class="res-box" id="res-5bf201eed3" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://hamel.dev/blog/posts/evals-faq/" rel="noopener noreferrer" target="_blank">AI Evals: Everything You Need to Know</a><p class="res-meta"><span class="res-type t-article">Article</span><span>Hamel Husain and Shreya Shankar</span><span>2–3 h</span></p><p class="res-note">A long FAQ covering error analysis, judge bias, correcting judge-estimated rates and evaluating agents, ideal for follow-up questions.</p></div></li>
+</ul></div><section class="page-done" data-done-for="iv-evals" aria-label="Page completion"></section>

@@ -1,0 +1,157 @@
+<header class="page-head"><p class="eyebrow"><a href="#L0">Level 0</a> · Project<span class="timebox">1 weeks</span></p><h1 tabindex="-1">A tested API service <span class="chip chip-done" data-done-flag="p0-api-service" hidden>Completed</span></h1><p class="standfirst">Build a small FastAPI service that wraps a free public API, with Pydantic models, offline tests, a Docker image and a GitHub Actions workflow.</p><p class="page-meta">Requirements <span data-must-for="p0-api-service">0/0</span> · Stretch goals <span data-extra-for="p0-api-service">0/0</span></p></header><div class="prose"><h2 id="p0-api-service--the-brief">The brief</h2>
+<p>You will build a small web service that wraps a free public API and gives it a cleaner, safer interface. For example, a weather service could call a free forecast API and expose <code>GET /forecast?latitude=52.52&amp;longitude=13.41</code>, returning a short typed summary instead of the raw upstream response. The service validates input, handles upstream failures gracefully and documents itself.</p>
+<p>The users are a front-end developer, or a future agent, who need reliable data without learning the quirks of the upstream API. This is the shape of a real agent tool: a narrow, well-tested function behind an HTTP endpoint. You will reuse this skeleton in later levels when you serve models and agents.</p>
+<h2 id="p0-api-service--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l0-python-for-ai">Python for AI engineering</a>: Pydantic models, async httpx calls, custom exceptions and pytest.</li>
+<li><a href="#l0-apis-and-http">Web APIs, HTTP and JSON</a>: timeouts, retries with backoff, status codes and FastAPI routes with automatic docs.</li>
+<li><a href="#l0-dev-tooling">Git, the command line and Docker</a>: a clean repository, a Dockerfile, a CI workflow and a README.</li>
+</ul>
+<h2 id="p0-api-service--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p0-api-service-todo-1"><input id="p0-api-service-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Expose at least two routes, such as <code>GET /health</code> and one data route, with Pydantic response models and validated query or path parameters.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-2"><input id="p0-api-service-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Call the upstream API with an async httpx client, a timeout, and retries with exponential backoff for 429, 5xx and network errors.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-3"><input id="p0-api-service-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Map upstream failures to clear responses, for example 502 when the upstream is down and 404 when it has no data, with no stack traces sent to clients.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-4"><input id="p0-api-service-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Read all configuration, including any API key, from environment variables, and commit a <code>.env.example</code> with placeholder values.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-5"><input id="p0-api-service-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write at least eight pytest tests that run without network access by mocking the upstream API, covering success, bad input and upstream failure.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-6"><input id="p0-api-service-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Ship a Dockerfile and a <code>.dockerignore</code> so that <code>docker build</code> and <code>docker run</code> start the service.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-7"><input id="p0-api-service-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Add a GitHub Actions workflow that runs the tests on every push and pull request.</span></label></li>
+<li data-tier="M"><label for="p0-api-service-todo-8"><input id="p0-api-service-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write a README with setup, run, test and Docker instructions plus an example request and response.</span></label></li>
+</ul>
+<h2 id="p0-api-service--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p0-api-service-todo-9"><input id="p0-api-service-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Cache upstream responses in memory for a few minutes and add a test proving the second call skips the network.</span></label></li>
+<li data-tier="R"><label for="p0-api-service-todo-10"><input id="p0-api-service-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add a linter and formatter such as Ruff to CI and type-check the code with mypy.</span></label></li>
+<li data-tier="S"><label for="p0-api-service-todo-11"><input id="p0-api-service-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Add a <code>compose.yaml</code> with a second service, such as Redis for the cache.</span></label></li>
+<li data-tier="S"><label for="p0-api-service-todo-12"><input id="p0-api-service-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Log one structured JSON line per request with a request id, status code and upstream latency.</span></label></li>
+<li data-tier="S"><label for="p0-api-service-todo-13"><input id="p0-api-service-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Build the image in CI and push it to a container registry on every merge to <code>main</code>.</span></label></li>
+</ul>
+<h2 id="p0-api-service--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project and dependencies</td>
+<td>uv</td>
+<td>pip with venv, Poetry</td>
+</tr>
+<tr>
+<td>Web framework</td>
+<td>FastAPI</td>
+<td>Flask, Litestar</td>
+</tr>
+<tr>
+<td>HTTP client</td>
+<td>httpx (async)</td>
+<td>aiohttp, requests (sync only)</td>
+</tr>
+<tr>
+<td>Retries</td>
+<td>Tenacity</td>
+<td>A hand-written backoff loop</td>
+</tr>
+<tr>
+<td>Tests and HTTP mocking</td>
+<td>pytest with RESPX</td>
+<td>pytest with httpx's MockTransport, pytest-httpx</td>
+</tr>
+<tr>
+<td>Upstream API</td>
+<td><a href="https://open-meteo.com/" rel="noopener noreferrer" target="_blank">Open-Meteo</a> (free for non-commercial use, no key)</td>
+<td>Any keyless API from the public-apis list</td>
+</tr>
+<tr>
+<td>Container</td>
+<td>Docker</td>
+<td>Podman</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>GitHub Actions</td>
+<td>GitLab CI</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p0-api-service--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Pick the upstream API.</strong> Choose a free API that needs no key or only a free one, and call it with <code>curl</code> to learn its parameters and response shape. Save one real response as a JSON file to use as a test fixture.</li>
+<li><strong>Scaffold the project.</strong> Run <code>uv init</code>, add FastAPI, httpx, Tenacity, pytest and RESPX, then create a GitHub repository with a Python <code>.gitignore</code> and push the skeleton.</li>
+<li><strong>Model the data.</strong> Write Pydantic models for the parts of the upstream response you use and a separate model for your own response. Keep your response small, with field names that make sense to your users.</li>
+<li><strong>Write the client.</strong> Wrap the upstream call in one async function with a timeout, retries with backoff and conversion to your model. Raise your own exception type when the upstream fails so routes can map it to a status code.</li>
+<li><strong>Add the routes.</strong> Create the FastAPI app with <code>/health</code> and your data route, and try both by hand in <code>/docs</code>. Map your exception to 502 or 404 with a short, clear error message.</li>
+<li><strong>Test without the network.</strong> Use RESPX to replay your saved JSON, a 500, a timeout and a 429 followed by success. Test the routes end to end with FastAPI's <code>TestClient</code>.</li>
+<li><strong>Containerize and automate.</strong> Write the Dockerfile and <code>.dockerignore</code> and check that the container serves <code>/docs</code> on a published port. Add the GitHub Actions workflow and confirm a green check on a pull request.</li>
+<li><strong>Document it.</strong> Write the README, add the CI badge and record a short demo.</li>
+</ol>
+<h2 id="p0-api-service--how-to-evaluate-it">How to evaluate it</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tests</td>
+<td>8 or more tests pass with the network disabled</td>
+<td>15 or more tests cover every error path and run in under 5 seconds</td>
+</tr>
+<tr>
+<td>Error handling</td>
+<td>Upstream failures return a 5xx with a message</td>
+<td>Each failure type maps to a specific status code and clients never see a stack trace</td>
+</tr>
+<tr>
+<td>Resilience</td>
+<td>Retries 429 and 5xx with backoff</td>
+<td>Also respects <code>Retry-After</code>, caps total wait time and has a test for each case</td>
+</tr>
+<tr>
+<td>Reproducibility</td>
+<td>A fresh clone runs by following the README</td>
+<td><code>docker run</code> and CI both work first time from a fresh clone</td>
+</tr>
+<tr>
+<td>Configuration and secrets</td>
+<td>No secrets anywhere in the repository</td>
+<td><code>.env.example</code> documents every variable and the app stops with a clear message when one is missing</td>
+</tr>
+<tr>
+<td>API design</td>
+<td>Routes return Pydantic models and appear in <code>/docs</code></td>
+<td>Clear names, example values in the docs and correct status codes on every route</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p0-api-service--show-your-work">Show your work</h2>
+<ul>
+<li>A README with a one-paragraph description, the request flow as a short list, setup steps, an example <code>curl</code> call with its response and the CI badge.</li>
+<li>A 60-second screen recording or GIF showing <code>/docs</code>, a successful call and a handled upstream failure.</li>
+<li>A short write-up of 300 to 500 words on one design decision, such as which errors you retry and why.</li>
+<li>A CV line such as "Built a tested FastAPI service with async retries, Docker and GitHub Actions CI", linked to the repository.</li>
+</ul>
+<h2 id="p0-api-service--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>A book lookup service that returns title, authors and year from a public book catalogue.</li>
+<li>A currency converter that caches daily exchange rates and rejects unknown currency codes.</li>
+<li>A public holidays service that answers whether a given date is a holiday in a given country.</li>
+<li>A recipe search service that filters results by ingredient and returns a compact list.</li>
+<li>Any keyless API from the public-apis list, with the smallest useful interface you can design on top.</li>
+</ul>
+<h2 id="p0-api-service--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-1ebff55168"><input aria-label="Mark “Testing” as done" class="res-box" id="res-1ebff55168" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://fastapi.tiangolo.com/tutorial/testing/" rel="noopener noreferrer" target="_blank">Testing</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>FastAPI</span><span>20 min</span></p><p class="res-note">Shows how to test routes with `TestClient` and pytest, including headers, error responses and POST bodies.</p></div></li>
+<li class="res" data-res="res-112190abbb"><input aria-label="Mark “FastAPI in Containers” as done" class="res-box" id="res-112190abbb" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://fastapi.tiangolo.com/deployment/docker/" rel="noopener noreferrer" target="_blank">FastAPI in Containers</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>FastAPI</span><span>45 min</span></p><p class="res-note">A ready Dockerfile for FastAPI with advice on layer caching, the exec form of `CMD` and a uv variant.</p></div></li>
+<li class="res" data-res="res-8290b80a1f"><input aria-label="Mark “Using uv in GitHub Actions” as done" class="res-box" id="res-8290b80a1f" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://docs.astral.sh/uv/guides/integration/github/" rel="noopener noreferrer" target="_blank">Using uv in GitHub Actions</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Astral</span><span>20 min</span></p><p class="res-note">Workflow examples that install uv, cache dependencies and run your tests with `uv run pytest`.</p></div></li>
+<li class="res" data-res="res-9d41fd2620"><input aria-label="Mark “RESPX” as done" class="res-box" id="res-9d41fd2620" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://lundberg.github.io/respx/" rel="noopener noreferrer" target="_blank">RESPX</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>lundberg</span><span>reference</span></p><p class="res-note">Mocks httpx requests through a pytest fixture so you can replay upstream responses and failures offline.</p></div></li>
+<li class="res" data-res="res-75d7fd5a31"><input aria-label="Mark “uv-docker-example” as done" class="res-box" id="res-75d7fd5a31" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/astral-sh/uv-docker-example" rel="noopener noreferrer" target="_blank">uv-docker-example</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>Astral</span><span>30 min</span></p><p class="res-note">A minimal FastAPI project packaged with uv, Docker and Compose that you can copy as a starting layout.</p></div></li>
+<li class="res" data-res="res-de2a117c79"><input aria-label="Mark “Public APIs” as done" class="res-box" id="res-de2a117c79" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/public-apis/public-apis" rel="noopener noreferrer" target="_blank">Public APIs</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>public-apis</span><span>reference</span></p><p class="res-note">A large community-maintained list of free APIs to choose your upstream from.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p0-api-service" aria-label="Page completion"></section>

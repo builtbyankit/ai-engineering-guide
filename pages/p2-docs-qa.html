@@ -1,0 +1,155 @@
+<header class="page-head"><p class="eyebrow"><a href="#L2">Level 2</a> · Project<span class="timebox">1.5–2 weeks</span></p><h1 tabindex="-1">Docs Q&amp;A with citations <span class="chip chip-done" data-done-flag="p2-docs-qa" hidden>Completed</span></h1><p class="standfirst">Build question answering over public docs or PDFs with hybrid search, reranking, cited answers that refuse when unsupported, and a retrieval and answer evaluation report.</p><p class="page-meta">Requirements <span data-must-for="p2-docs-qa">0/0</span> · Stretch goals <span data-extra-for="p2-docs-qa">0/0</span></p></header><div class="prose"><h2 id="p2-docs-qa--the-brief">The brief</h2>
+<p>You will build a question-answering assistant for a set of documents. Pick a public documentation site, such as an open-source library's user guide, or a folder of PDFs, such as product manuals or research papers. A user asks a question in plain language and gets a short answer with numbered citations that lead to the exact page or section. When the documents do not support an answer, the assistant says so and does not guess.</p>
+<p>The users are people who would otherwise search the docs by hand, such as a new user of a library or someone hunting through manuals. Alongside the app you write a short evaluation report showing how well retrieval and answers work, what fails and what you changed. That report turns a demo into evidence you can show an employer.</p>
+<h2 id="p2-docs-qa--what-you-ll-practise">What you'll practise</h2>
+<ul>
+<li><a href="#l2-embeddings-vector-search">Embeddings and vector search</a>: picking an embedding model with a quick test and storing chunks with metadata.</li>
+<li><a href="#l2-rag-pipeline">Building a RAG pipeline</a>: parsing, chunking, prompt assembly, citations and refusals.</li>
+<li><a href="#l2-advanced-retrieval">Better retrieval: hybrid search and reranking</a>: BM25 plus vectors, reciprocal rank fusion and a reranker.</li>
+<li><a href="#l2-rag-evaluation">Evaluating RAG</a>: a labelled question set, retrieval and answer metrics, and error analysis.</li>
+<li><a href="#l1-structured-outputs">Structured outputs and function calling basics</a>: returning answers and citations as validated JSON.</li>
+</ul>
+<h2 id="p2-docs-qa--requirements">Requirements</h2>
+<ul class="checks todo">
+<li data-tier="M"><label for="p2-docs-qa-todo-1"><input id="p2-docs-qa-todo-1" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Ingest at least 50 pages of public documentation or PDFs, keeping source, title, section and page or URL for every chunk.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-2"><input id="p2-docs-qa-todo-2" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Retrieve with hybrid search (BM25 or full-text search plus vectors) merged with reciprocal rank fusion.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-3"><input id="p2-docs-qa-todo-3" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Rerank the merged candidates with a cross-encoder or hosted reranker before building the prompt.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-4"><input id="p2-docs-qa-todo-4" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Return answers as structured output whose citations map to real chunk ids, and show them as links or page references.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-5"><input id="p2-docs-qa-todo-5" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Refuse clearly when the retrieved context does not support an answer.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-6"><input id="p2-docs-qa-todo-6" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Provide a CLI, web page or API endpoint where someone can ask a question and see the answer with its sources.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-7"><input id="p2-docs-qa-todo-7" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Include an eval set of at least 40 questions, 8 or more of them unanswerable, and a script that reports recall@5, MRR, faithfulness, answer relevance and refusal accuracy.</span></label></li>
+<li data-tier="M"><label for="p2-docs-qa-todo-8"><input id="p2-docs-qa-todo-8" type="checkbox"/><span><span class="tier tier-M">Must ship</span>Write an evaluation report with a baseline, at least one improvement, before and after numbers, and an error analysis.</span></label></li>
+</ul>
+<h2 id="p2-docs-qa--stretch-goals">Stretch goals</h2>
+<ul class="checks todo">
+<li data-tier="R"><label for="p2-docs-qa-todo-9"><input id="p2-docs-qa-todo-9" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Add contextual chunk notes or parent/child retrieval and measure the change.</span></label></li>
+<li data-tier="R"><label for="p2-docs-qa-todo-10"><input id="p2-docs-qa-todo-10" type="checkbox"/><span><span class="tier tier-R">Recommended</span>Check each citation after generation by confirming the cited chunk contains the supporting text, and drop or retry claims that fail.</span></label></li>
+<li data-tier="S"><label for="p2-docs-qa-todo-11"><input id="p2-docs-qa-todo-11" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Add query decomposition for multi-part questions and test it on a multi-hop subset of your eval set.</span></label></li>
+<li data-tier="S"><label for="p2-docs-qa-todo-12"><input id="p2-docs-qa-todo-12" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Support incremental re-indexing so changed files are re-embedded without rebuilding everything.</span></label></li>
+<li data-tier="S"><label for="p2-docs-qa-todo-13"><input id="p2-docs-qa-todo-13" type="checkbox"/><span><span class="tier tier-S">Stretch</span>Run the eval in GitHub Actions on every push and fail the build if recall@5 drops.</span></label></li>
+</ul>
+<h2 id="p2-docs-qa--suggested-stack">Suggested stack</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Suggested</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parsing</td>
+<td>Docling or PyMuPDF4LLM for PDFs; Markdown files as they are</td>
+<td>Unstructured; BeautifulSoup for HTML</td>
+</tr>
+<tr>
+<td>Embeddings</td>
+<td>An open model run with Sentence Transformers, shortlisted from MTEB</td>
+<td>OpenAI or Gemini embedding APIs</td>
+</tr>
+<tr>
+<td>Storage and keyword search</td>
+<td>Postgres with pgvector and built-in full-text search</td>
+<td>Qdrant with dense and sparse vectors; Chroma plus bm25s</td>
+</tr>
+<tr>
+<td>Reranking</td>
+<td>An open cross-encoder run with Sentence Transformers</td>
+<td>Cohere Rerank or another hosted reranker</td>
+</tr>
+<tr>
+<td>Generation</td>
+<td>Any API model from Level 1, using structured output</td>
+<td>A local model through Ollama</td>
+</tr>
+<tr>
+<td>Evaluation</td>
+<td>A plain Python or pytest script plus Ragas</td>
+<td>DeepEval; ranx for ranking metrics</td>
+</tr>
+<tr>
+<td>Interface</td>
+<td>A CLI or a FastAPI endpoint</td>
+<td>Streamlit or Gradio for a quick web page</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p2-docs-qa--build-it-step-by-step">Build it step by step</h2>
+<ol>
+<li><strong>Pick and fetch the corpus</strong>: Choose 50 to 300 pages whose licence lets you use them in a public demo. Save the raw files with their source URLs so citations can link back.</li>
+<li><strong>Parse and chunk</strong>: Convert everything to Markdown, split by headings into chunks of a few hundred tokens, and store each chunk with an id and its metadata. Spot-check ten chunks, including one that contains a table.</li>
+<li><strong>Write the eval set early</strong>: Before tuning anything, write and label 40 or more questions, including unanswerable ones. This set is how you will judge every later change.</li>
+<li><strong>Baseline retrieval and answers</strong>: Embed the chunks, run vector search and generate answers with chunk ids in the prompt. Record recall@5 and MRR so you have numbers to beat.</li>
+<li><strong>Add hybrid search and reranking</strong>: Add BM25 or full-text search, merge with RRF, then rerank the top 30 to 50 candidates. Rerun the eval after each change and keep the results table.</li>
+<li><strong>Citations and refusals</strong>: Ask for structured output with the answer, the cited chunk ids and an <code>answerable</code> flag. Check that every cited id exists, then show citations as links or page numbers.</li>
+<li><strong>Score answers and analyse errors</strong>: Run faithfulness and answer relevance, hand-check a sample of judge scores and tag every failure by cause. Fix the largest group and measure again.</li>
+<li><strong>Package it</strong>: Add the interface, a README and the evaluation report, and make the whole thing run from one setup command.</li>
+</ol>
+<h2 id="p2-docs-qa--how-to-evaluate-it">How to evaluate it</h2>
+<p>The thresholds below are example targets. Adjust them to your corpus and explain any change in your report.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Good enough</th>
+<th>Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retrieval</td>
+<td>Recall@5 of at least 0.75 on answerable questions</td>
+<td>Recall@5 of at least 0.9, with MRR reported and improved over the baseline</td>
+</tr>
+<tr>
+<td>Citations</td>
+<td>Every cited id exists and points to the right document</td>
+<td>Each cited passage is checked automatically to contain the supporting text</td>
+</tr>
+<tr>
+<td>Refusals</td>
+<td>Refuses at least 7 of 8 unanswerable questions</td>
+<td>Refuses all of them while still answering at least 90% of answerable ones</td>
+</tr>
+<tr>
+<td>Faithfulness</td>
+<td>Average score of at least 0.8, with 10 judge scores hand-checked</td>
+<td>0.9 or higher, with judge agreement against your own labels reported</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>Answers in under 10 s on a laptop</td>
+<td>Median under 3 s, with timings reported per stage</td>
+</tr>
+<tr>
+<td>Report</td>
+<td>Baseline, one improvement and before and after numbers</td>
+<td>Several measured changes, failure counts by type and a clear next step</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="p2-docs-qa--show-your-work">Show your work</h2>
+<ul>
+<li>A README with the corpus and its licence, a short architecture description, setup steps, example questions and known limits.</li>
+<li>A 2-minute demo video or GIF showing a cited answer, a click through to the source and a refusal.</li>
+<li>The evaluation report as a Markdown file or blog post, with the before and after table and three example failures.</li>
+<li>A CV line with real numbers, for example "Built hybrid RAG over 300 pages of docs; raised recall@5 from 0.68 to 0.91 with BM25 fusion and reranking."</li>
+</ul>
+<h2 id="p2-docs-qa--ideas-to-make-it-yours">Ideas to make it yours</h2>
+<ul>
+<li>Your city council's meeting minutes, answering "what was decided about X, and when?"</li>
+<li>The documentation of a programming library you use, keeping code samples intact inside chunks.</li>
+<li>A folder of research papers in one field, with citations down to page numbers.</li>
+<li>Public repair manuals for bikes or home appliances, where refusing matters because wrong advice is costly.</li>
+<li>A government guidance site with yearly versions, using date filters so answers match the right year.</li>
+</ul>
+<h2 id="p2-docs-qa--helpful-resources">Helpful resources</h2>
+<ul class="res-list">
+<li class="res" data-res="res-d1bb7e43b0"><input aria-label="Mark “Enhancing RAG with Contextual Retrieval” as done" class="res-box" id="res-d1bb7e43b0" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/anthropics/claude-cookbooks/blob/main/capabilities/contextual-embeddings/guide.ipynb" rel="noopener noreferrer" target="_blank">Enhancing RAG with Contextual Retrieval</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Anthropic</span><span>2 h</span></p><p class="res-note">A full notebook that adds contextual embeddings, BM25 hybrid search and reranking to a baseline and measures each step.</p></div></li>
+<li class="res" data-res="res-590bfd3fb1"><input aria-label="Mark “pgvector-python” as done" class="res-box" id="res-590bfd3fb1" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/pgvector/pgvector-python" rel="noopener noreferrer" target="_blank">pgvector-python</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>pgvector</span><span>reference</span></p><p class="res-note">Has short examples of hybrid search with reciprocal rank fusion and with a cross-encoder, plus a small RAG example.</p></div></li>
+<li class="res" data-res="res-5a4ffa0dc9"><input aria-label="Mark “kotaemon” as done" class="res-box" id="res-5a4ffa0dc9" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/Cinnamon/kotaemon" rel="noopener noreferrer" target="_blank">kotaemon</a><p class="res-meta"><span class="res-type t-repo">Repo</span><span>Cinnamon</span><span>reference</span></p><p class="res-note">An open-source document chat app with hybrid retrieval, reranking and in-browser PDF citations, worth studying for design ideas.</p></div></li>
+<li class="res" data-res="res-c42aee2f0e"><input aria-label="Mark “Citations” as done" class="res-box" id="res-c42aee2f0e" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://platform.claude.com/docs/en/build-with-claude/citations" rel="noopener noreferrer" target="_blank">Citations</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Anthropic</span><span>20 min</span></p><p class="res-note">If you use Claude, the API can cite passages from your own chunks so you do not have to parse citation markers yourself.</p></div></li>
+<li class="res" data-res="res-e861f5af17"><input aria-label="Mark “Testset Generation for RAG” as done" class="res-box" id="res-e861f5af17" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://docs.ragas.io/en/stable/getstarted/rag_testset_generation/" rel="noopener noreferrer" target="_blank">Testset Generation for RAG</a><p class="res-meta"><span class="res-type t-docs">Docs</span><span>Ragas</span><span>30 min</span></p><p class="res-note">Generates draft single-hop and multi-hop questions from your documents to seed the eval set before you review them.</p></div></li>
+<li class="res" data-res="res-5469b20d95"><input aria-label="Mark “Advanced Labs: Build Evidence for Mastery” as done" class="res-box" id="res-5469b20d95" title="Mark as done" type="checkbox"/><div class="res-body"><a class="res-title" href="https://github.com/builtbyankit/agentic-ai-learning-guide/blob/main/agentic-ai-advanced-labs.md" rel="noopener noreferrer" target="_blank">Advanced Labs: Build Evidence for Mastery</a><p class="res-meta"><span class="res-type t-tutorial">Tutorial</span><span>Agentic AI Mastery</span><span>self-paced</span></p><p class="res-note">Eight labs, including separate answer and retrieval evaluation, calibrated abstention and index lifecycle with security metadata, each with a report template.</p></div></li>
+</ul></div><section class="page-done" data-done-for="p2-docs-qa" aria-label="Page completion"></section>

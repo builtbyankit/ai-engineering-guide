@@ -8,11 +8,11 @@
 <meta property="og:title" content="AI Agent Engineering Guide">
 <meta property="og:description" content="From writing small programs to building, evaluating and running production AI agents. Free, with milestones, projects and progress saved in your browser.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#2b5c8a">
+<meta name="theme-color" content="#5754d6">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
 <script>try{var t=localStorage.getItem("ai-agent-guide:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <style>
 :root {
@@ -609,8 +609,10 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
 :root[data-theme="dark"] .btn-danger { color: #f2b8b5; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-danger { color: #f2b8b5; } }
 </style>
+<link rel="stylesheet" href="workspace.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="app">
   <header class="topbar">
     <button class="menu-btn" id="menu-btn" type="button" aria-controls="sidebar" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span>Menu</button>
@@ -620,12 +622,13 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
 
   <aside class="sidebar" id="sidebar" aria-label="Site navigation">
     <div class="side-inner">
-      <a class="brand" href="#home">AI Agent Engineering Guide</a>
-      <div class="search" role="search">
+      <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">a<span>i</span></span><span>AI Engineering<span class="brand-sub">THE OPEN LEARNING GUIDE</span></span></a>
+      <div class="search" role="search"><kbd class="search-key" aria-hidden="true">/</kbd>
         <label for="search-input" class="sr-only">Search the guide</label>
-        <input id="search-input" type="search" placeholder="Search (press /)" autocomplete="off" spellcheck="false">
+        <input id="search-input" type="search" placeholder="Search the guide…" autocomplete="off" spellcheck="false">
         <div id="search-results" hidden></div>
       </div>
+      <nav id="site-nav" aria-label="Contents">%%NAV%%</nav>
       <div class="progress" id="progress-box">
         <fieldset class="track-select compact">
           <legend class="sr-only">What to count</legend>
@@ -653,32 +656,63 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
         </div>
         <a class="progress-link" href="#progress">Details, backup and restore</a>
       </div>
-      <nav id="site-nav" aria-label="Contents">%%NAV%%</nav>
       <p class="side-foot"><button type="button" id="theme-btn">Theme: system</button><a href="%%REPO_URL%%" target="_blank" rel="noopener noreferrer">Source on GitHub</a></p>
     </div>
   </aside>
 
-  <main class="content" id="main">
+  <main class="content" id="main" tabindex="-1">
+    <div class="workspace-bar"><span><span class="workspace-dot" aria-hidden="true"></span> Your learning workspace</span><a href="%%REPO_URL%%" target="_blank" rel="noopener noreferrer">Open source <span aria-hidden="true">↗</span></a></div>
     <div class="page" id="home">
       <header class="hero">
-        <p class="eyebrow">A free, open study guide</p>
-        <h1>AI Agent Engineering Guide</h1>
-        <p class="standfirst">Go from writing small programs to building, evaluating and running production AI agents. Seven levels, %%N_CORE_MODULES%% core modules and %%N_OPT_MODULES%% optional ones, %%N_PROJECTS%% portfolio projects and %%N_RES%% hand-picked blogs, courses, docs, videos and papers.</p>
-        <fieldset class="track-select">
-          <legend class="sr-only">Choose what to count</legend>
-          <label class="track-opt"><input type="radio" name="track-home" value="core" checked><span class="track-name">Core path</span><span class="track-sub">%%N_CORE_MODULES%% modules · %%CORE_WEEKS%%</span></label>
-          <label class="track-opt"><input type="radio" name="track-home" value="full"><span class="track-name">Everything</span><span class="track-sub">+ %%N_OPT_MODULES%% optional modules · %%FULL_WEEKS%%</span></label>
-          <label class="track-opt"><input type="radio" name="track-home" value="fast"><span class="track-name">Fast track</span><span class="track-sub">Working developers: skips %%N_FAST_SKIP%% Level 0 modules · %%FAST_WEEKS%%</span></label>
-        </fieldset>
-        <dl class="stats">
-          <div class="stat"><dt>Time to complete</dt><dd><span class="stat-big" data-dur-weeks>%%CORE_WEEKS%%</span><span class="stat-sub" data-dur-hours>%%CORE_HOURS%%</span></dd></div>
-          <div class="stat"><dt>Resources</dt><dd><span class="stat-big">%%N_RES%% links</span><span class="stat-sub">%%N_FREE%% completely free · links checked %%CHECKED%%</span></dd></div>
-        </dl>
-        <p class="stats-note">Estimates cover the Start here resources, the practice, the must-ship tasks and every project. Your progress is saved in this browser and never leaves it.</p>
-        <p class="hero-actions"><a class="btn" href="#start">Start: how to use this guide</a><a class="btn-quiet" href="#L0">Begin Level 0</a><a class="btn-quiet" href="#resources">Browse resources</a></p>
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> FREE &amp; OPEN SOURCE · BUILT FOR BUILDERS</p>
+          <h1>Understand AI.<br><span>Build what’s next.</span></h1>
+          <p class="standfirst">Your path from the fundamentals to production-ready agents. Learn the concepts, build real projects, and make every step count.</p>
+          <div class="hero-actions"><a class="btn" href="#start">Find your starting point <span aria-hidden="true">↗</span></a><a class="hero-text-link" href="#resources">Explore resources <span aria-hidden="true">→</span></a></div>
+          <p class="hero-caption">Self-paced. Hands-on. Yours to explore.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+          <div class="art-core">ai<span>engineering</span></div>
+          <span class="art-node node-data">{ }<small>FOUNDATIONS</small></span>
+          <span class="art-node node-agents">✳<small>AGENTS</small></span>
+          <span class="art-node node-ship">↗<small>PRODUCTION</small></span>
+          <span class="art-label">LEARN → BUILD → SHIP</span>
+        </div>
       </header>
-      %%ROUTE%%
+      <dl class="overview-stats">
+        <div><dt>Learning levels</dt><dd>07<span>from foundations to scale</span></dd></div>
+        <div><dt>Deep-dive modules</dt><dd>%%N_CORE_MODULES%%<span>+ %%N_OPT_MODULES%% optional explorations</span></dd></div>
+        <div><dt>Portfolio projects</dt><dd>%%N_PROJECTS%%<span>build as you learn</span></dd></div>
+        <div><dt>Curated resources</dt><dd>%%N_RES%%<span>%%N_FREE%% completely free</span></dd></div>
+      </dl>
+      <div class="learning-dashboard">
+        <section class="continue-card" aria-labelledby="continue-heading">
+          <p class="eyebrow" id="continue-kicker">YOUR NEXT STEP</p>
+          <h2 id="continue-heading">Start something great.</h2>
+          <p id="continue-description">Begin with the foundations and build your way up.</p>
+          <a class="btn" id="continue-link" href="#l0-python-for-ai">Start learning <span aria-hidden="true">→</span></a>
+          <div class="continue-progress"><span><b data-pages-done>0</b> of <b data-pages-total>0</b> pages complete</span><a href="#progress">View progress ↗</a></div>
+          <div class="meter pages"><span data-pages-bar></span></div>
+        </section>
+        <section class="path-picker" aria-labelledby="path-heading">
+          <h2 id="path-heading">Make the path your own</h2><p>Choose the depth that fits your experience.</p>
+          <fieldset class="track-select">
+            <legend class="sr-only">Choose your learning path</legend>
+            <label class="track-opt"><input type="radio" name="track-home" value="core" checked><span class="track-name">Core path</span><span class="track-sub">The essentials</span></label>
+            <label class="track-opt"><input type="radio" name="track-home" value="full"><span class="track-name">Everything</span><span class="track-sub">Go deeper</span></label>
+            <label class="track-opt"><input type="radio" name="track-home" value="fast"><span class="track-name">Fast track</span><span class="track-sub">For developers</span></label>
+          </fieldset>
+          <p class="path-estimate"><strong data-dur-weeks>%%CORE_WEEKS%%</strong><span>at 10–12 hours per week</span></p>
+          <p class="path-hours" data-dur-hours>%%CORE_HOURS%%</p>
+        </section>
+      </div>
       %%CARDS%%
+      <details class="timeline-panel"><summary><span>Plan your learning timeline</span><span class="timeline-hint">See time estimates by level</span></summary><div class="timeline-content">%%ROUTE%%</div></details>
+      <section class="explore-grid" aria-label="More ways to learn">
+        <a href="#resources" class="explore-card"><span class="explore-icon" aria-hidden="true">◈</span><div><h2>A library worth exploring</h2><p>Find the right docs, courses, videos, and papers for your next step.</p></div><span aria-hidden="true">↗</span></a>
+        <a href="#interview" class="explore-card"><span class="explore-icon" aria-hidden="true">◎</span><div><h2>Turn learning into opportunity</h2><p>Practice system design, coding, and the AI interview rounds.</p></div><span aria-hidden="true">↗</span></a>
+      </section>
     </div>
     <article class="page" id="view" hidden></article>
     <nav class="pager" id="pager" aria-label="Previous and next pages" hidden></nav>
@@ -725,6 +759,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
   var searchInput = document.getElementById("search-input"), searchResults = document.getElementById("search-results");
   var siteNav = document.getElementById("site-nav");
   var cache = {}, navToken = 0, headingObserver = null;
+  document.querySelector(".skip-link").addEventListener("click", function (e) {
+    e.preventDefault();
+    document.getElementById("main").focus();
+    document.getElementById("main").scrollIntoView({ block: "start" });
+  });
+
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function setAll(sel, text) { document.querySelectorAll(sel).forEach(function (el) { el.textContent = text; }); }
@@ -903,12 +943,38 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     document.querySelectorAll("[data-gates-bar]").forEach(function (el) { el.style.width = pct(t.gates.c, t.gates.t); });
     document.querySelectorAll("[data-must-bar]").forEach(function (el) { el.style.width = pct(t.M.c, t.M.t); });
     document.querySelectorAll("[data-res-bar]").forEach(function (el) { el.style.width = pct(t.res.c, t.res.t); });
+    updateDashboard();
     if (currentId() === "progress") renderProgressTable();
   }
   function setTick(id, on) {
     if (on) state[id] = true; else delete state[id];
     save();
     updateProgress();
+  }
+
+  /* Keep the next step aligned with the selected path and existing completion data. */
+  function updateDashboard() {
+    var pages = countedPages(), last = read("ai-agent-guide:last-page");
+    var next = pages.indexOf(last) !== -1 && !isDone(last) ? last : pages.find(function (id) { return !isDone(id); });
+    var link = document.getElementById("continue-link");
+    LEVELS.forEach(function (l) {
+      var p = countDone(levelPages(l.id));
+      document.querySelectorAll('[data-card-bar="' + l.id + '"]').forEach(function (el) { el.style.width = pct(p.c, p.t); });
+    });
+    if (!next) {
+      setAll("#continue-kicker", "PATH COMPLETE");
+      setAll("#continue-heading", "Look how far you’ve come.");
+      setAll("#continue-description", "Your selected path is complete. Explore interview prep or choose a deeper track.");
+      link.href = "#interview"; link.textContent = "Explore interview prep →";
+      return;
+    }
+    var returning = next === last || countDone(pages).c > 0;
+    setAll("#continue-kicker", returning ? "KEEP YOUR MOMENTUM" : "YOUR FIRST STEP");
+    setAll("#continue-heading", R[next].t);
+    setAll("#continue-description", R[next].sum || "Build your understanding, then put it into practice.");
+    link.href = "#" + next;
+    link.textContent = (returning ? "Continue learning" : "Start learning") + " →";
+
   }
 
   /* ---------- track ---------- */
@@ -937,10 +1003,12 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
 
   /* ---------- drawer ---------- */
   var mq = window.matchMedia("(min-width: 1100px)");
+  mq.addEventListener("change", function (e) { if (e.matches) closeDrawer(false); });
   function openDrawer() {
     if (mq.matches) return;
     sidebar.setAttribute("data-open", "true");
     scrim.hidden = false;
+    document.body.classList.add("drawer-open");
     menuBtn.setAttribute("aria-expanded", "true");
     var cur = sidebar.querySelector('[aria-current="page"]') || sidebar.querySelector("a");
     if (cur) cur.focus({ preventScroll: false });
@@ -949,6 +1017,7 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     if (sidebar.getAttribute("data-open") !== "true") return;
     sidebar.removeAttribute("data-open");
     scrim.hidden = true;
+    document.body.classList.remove("drawer-open");
     menuBtn.setAttribute("aria-expanded", "false");
     if (returnFocus) menuBtn.focus();
   }
@@ -1161,6 +1230,9 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     pager.hidden = true;
     railInner.hidden = true;
     setCurrentNav("");
+    var dashboardLink = siteNav.querySelector('[data-route="home"]');
+    if (dashboardLink) dashboardLink.setAttribute("aria-current", "page");
+    updateDashboard();
     document.title = SITE;
     window.scrollTo(0, 0);
   }
@@ -1168,6 +1240,8 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
     var parsed = parseHash(), id = parsed.id;
     var token = ++navToken;
     closeDrawer(false);
+    document.body.dataset.page = id;
+    if (DONEABLE[id] && IV.indexOf(id) === -1) store("ai-agent-guide:last-page", id);
     if (id === "home") { showHome(); return; }
     if (id === "progress") { showView("Your progress"); renderProgress(); afterRender(id); return; }
     if (id === "resources") { showView("Resource library"); renderLibrary(parsed.params); afterRender(id); return; }
@@ -1425,3 +1499,4 @@ a.res-title::after { content: "\2197"; display: inline-block; margin-left: 4px; 
 </script>
 </body>
 </html>
+
